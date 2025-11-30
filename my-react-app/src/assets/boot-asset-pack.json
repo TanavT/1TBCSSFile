@@ -1,0 +1,44 @@
+{
+    "section1": {
+        "files": [
+            {
+                "url": "assets/Connect4_Empty_Grid.png",
+                "type": "image",
+                "key": "Connect4_Empty_Grid"
+            },
+            {
+                "url": "src/assets/Connect4_Empty_Grid.png",
+                "type": "image",
+                "key": "Connect4_Empty_Grid_1"
+            },
+            {
+                "url": "assets/Red_Circle_full.png",
+                "type": "image",
+                "key": "Red_Circle_full"
+            },
+            {
+                "url": "src/assets/Red_Circle_full.png",
+                "type": "image",
+                "key": "Red_Circle_full_1"
+            },
+            {
+                "url": "assets/Yellow_Circle.png",
+                "type": "image",
+                "key": "Yellow_Circle"
+            },
+            {
+                "url": "src/assets/Yellow_Circle.png",
+                "type": "image",
+                "key": "Yellow_Circle_1"
+            }
+        ]
+    },
+    "meta": {
+        "app": "Phaser Editor 2D - Asset Pack Editor",
+        "contentType": "phasereditor2d.pack.core.AssetContentType",
+        "url": "https://phasereditor2d.com",
+        "version": 2,
+        "showAllFilesInBlocks": true,
+        "visible": true
+    }
+}

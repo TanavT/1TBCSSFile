@@ -12,20 +12,16 @@ import cors from 'cors';
 //client.connect().then(() => {});
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static('path/to/your/assets'));
 
 // Allow us to send requests from react to here
-app.use(cors({
-  origin: "http://localhost:8080", // frontend URL
-  credentials: true                // allow cookies/session
-}));
+app.use(cors());
 
 
 app.use(
   session({
-    name: 'AwesomeWebApp',
-    secret: "This is a secret.. shhh don't tell anyone",
+    name: 'assets',
+    secret: "please work for the love of god",
     saveUninitialized: false,
     resave: false,
     cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
@@ -35,7 +31,7 @@ app.use(
 configRoutesFunction(app);
 
 
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
+  console.log('Your routes will be running on http://localhost:3001');
 });
