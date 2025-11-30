@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import {Route, Routes} from 'react-router-dom'
 import { Link } from 'react-router-dom';
+import React from 'react'
 
 import Navbar from './components/Navbar.jsx'; //purple bar at top of every page
 
@@ -20,7 +19,7 @@ import AccountInfo from './AccountInfo.jsx';
 function App() {
 
   return (
-    <>
+     <div id="app">
       <Navbar/> 
       <Routes>
         <Route path='/chess' element={<ChessHomePage/>} />
@@ -33,7 +32,7 @@ function App() {
         <Route path='/login' element={<AccountPage/>} />
         <Route path='/account' element={<AccountInfo/>}/>
       </Routes>
-    </>
+   </div>
   )
 }
 
