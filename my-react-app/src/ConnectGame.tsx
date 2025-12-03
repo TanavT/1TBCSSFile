@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
+import  {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { PhaserGame } from './PhaserGame';
 import type { IRefPhaserGame } from './PhaserGame';
@@ -15,16 +15,15 @@ function ConnectGame(){
         .catch(() => setUser(null));
     }, [])
 
-    const currentScene = (scene) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
+    const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?
-        
     }
 
     return (
         <div>
-             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
             <h2>Connect4</h2>
-            {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            {user ?<> <h2>Username: {user.username}</h2>  </>: <h2>Please log in to play</h2>}
         </div>
         
     )

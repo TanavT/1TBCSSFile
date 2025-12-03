@@ -14,11 +14,12 @@ function ConnectHomePage(){
     }, [])
 
     const handleRandomQueue = async () => {
-        if(user){
-            navigate("/connectMatch");
-        } else {
-            navigate("/login")
-        };
+        navigate("/connectMatch"); //just making this here for now so its easier
+        // if(user){
+        //     navigate("/connectMatch");
+        // } else {
+        //     navigate("/login")
+        // };
     }
 
     const handlePrivateMatch = async () => {
