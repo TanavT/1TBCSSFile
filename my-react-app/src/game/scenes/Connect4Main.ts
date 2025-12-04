@@ -8,9 +8,13 @@ import Phaser from "phaser"
 import connect4_Empty_Grid from "../../assets/Connect4_Empty_Grid.png";
 import red_Circle_full from "../../assets/Red_Circle_full.png";
 import yellow_Circle from "../../assets/Yellow_Circle.png";
+import io from 'socket.io-client';
+import { Socket } from "socket.io-client";
 /* END-USER-IMPORTS */
 
 export default class Connect4Main extends Phaser.Scene {
+
+	
 
 	constructor() {
 		super("Connect4Main");
@@ -20,7 +24,84 @@ export default class Connect4Main extends Phaser.Scene {
 		/* END-USER-CTR-CODE */
 	}
 
+	socket:Socket;
+
+	color:string;
+	opponentColor:string;
+
+	myTurn:boolean = false; //red goes first
+
 	preload(){
+		this.socket = io('http://localhost:4000');
+		this.socket.on('user_join', (id) => {
+			console.log('A user joined their id is ' + id);
+  		});
+		this.socket.on('color', ({id, color}) => {
+			if (this.socket.id == id){
+				if(color == 'red'){
+					this.color="red"
+					this.opponentColor="yellow"
+				}
+				else{
+					this.color="yellow"
+					this.opponentColor="red"
+				}
+			}
+			else{
+				if(color == 'red'){
+					this.color="yellow"
+					this.opponentColor="red"
+				}
+				else{
+					this.color="red"
+					this.opponentColor="yellow"
+				}
+			}
+			console.log("COLOR:" + this.color)
+			this.myTurn = (this.color == "red")
+  		})
+		this.socket.on('error', ({id, message}) => {
+			console.log("I am "+id+" and the message is: " + message)
+		})
+		this.socket.on("otherPlaced", (collumn) => {
+			  this.myTurn = true;
+			  console.log(collumn.x);
+			  let collumnNumber = Math.floor((collumn.x - 200)/100);
+			  if(collumn.x === 196) collumnNumber = 0
+			  if(this.countCollum[collumnNumber] < 6){
+			  if(this.opponentColor == "red"){
+			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
+
+			  tempThingy.scaleX = 0.3;
+			  tempThingy.scaleY = 0.3;
+			  	this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'R'
+			  }
+			  else{
+			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
+
+			  tempThingy.scaleX = 0.18;
+			  tempThingy.scaleY = 0.18;
+			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
+			  }
+			  this.circleList.push(tempThingy)
+			  console.log(this.globalGameState)
+			//this.turn = 1-this.turn;
+              const t = this.tweens.add({
+                    targets: [tempThingy],
+                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
+                    duration: 200,
+                    easing: 'bounce',
+                    yoyo: false,
+                    paused: true
+                })
+              t.play()
+			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
+			  this.checkGameOver(this.globalGameState);
+			  }
+              
+		})
+
+
 		this.load.image(
 		'Connect4_Empty_Grid',
 		'assets/Connect4_Empty_Grid.png'
@@ -35,6 +116,11 @@ export default class Connect4Main extends Phaser.Scene {
 		);
 
 	}
+
+	sceneShutdown() {
+		this.socket.off("user_join");
+		this.socket.disconnect();
+    }
 
 	editorCreate(): void {
 
@@ -175,6 +261,7 @@ export default class Connect4Main extends Phaser.Scene {
 		this.circleList.forEach((circle) => {
 			circle.destroy();
 		})
+		this.sceneShutdown();
 	}
 
 	async idkFunc(){
@@ -183,17 +270,22 @@ export default class Connect4Main extends Phaser.Scene {
 
 	create() {
 
+		 this.events.on('shutdown', this.sceneShutdown, this);
+
 		this.editorCreate();
 
 		const collumns = [this.rectangle, this.rectangle_1, this.rectangle_2, this.rectangle_3, this.rectangle_4, this.rectangle_5, this.rectangle_6]
 
         collumns.forEach((collumn) => {
             collumn.on('pointerdown', () => {
+			  if(this.myTurn){
+			  this.myTurn = false;
+			  this.socket.emit("placePiece", (collumn))
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
 			  if(collumn.x === 196) collumnNumber = 0
 			  if(this.countCollum[collumnNumber] < 6){
-			  if(this.turn === 0){
+			  if(this.color == "red"){
 			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
 
 			  tempThingy.scaleX = 0.3;
@@ -209,7 +301,7 @@ export default class Connect4Main extends Phaser.Scene {
 			  }
 			  this.circleList.push(tempThingy)
 			  console.log(this.globalGameState)
-			  this.turn = 1-this.turn;
+			//this.turn = 1-this.turn;
               const t = this.tweens.add({
                     targets: [tempThingy],
                     y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
@@ -222,7 +314,8 @@ export default class Connect4Main extends Phaser.Scene {
 			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
 			  this.checkGameOver(this.globalGameState);
 			  }
-            })
+              }
+			})
         })
 
 
