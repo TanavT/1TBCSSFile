@@ -32,7 +32,7 @@ export default class Connect4Main extends Phaser.Scene {
 	myTurn:boolean = false; //red goes first
 
 	preload(){
-		this.socket = io('http://localhost:4000');
+		this.socket = io('http://localhost:3000');
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
   		});

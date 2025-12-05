@@ -11,6 +11,35 @@ import {createServer} from 'http';
 //import * as flat from 'flat';
 
 
+
+app2.use(express.json());
+app2.use(express.urlencoded({ extended: true }));
+
+// Allow us to send requests from react to here
+app2.use(cors({
+  origin: "https://testing-game-1tbcss.web.app/", // frontend URL
+  credentials: true                // allow cookies/session
+}));
+
+
+app2.use(
+  session({
+    name: 'AwesomeWebapp2',
+    secret: "This is a secret.. shhh don't tell anyone",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
+  })
+);
+
+configRoutesFunction(app2);
+
+
+const httpServer = app2.listen(3000, () => {
+  console.log("We've now got a server!");
+  console.log('Your routes will be running on http://localhost:3000');
+});
+
 const client = createClient({
   socket: {
     host: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com",
@@ -20,7 +49,7 @@ const client = createClient({
 });
 
 client.connect().catch(console.error);
-const httpServer = createServer(app);
+// const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
 let switcher = 1
@@ -74,36 +103,9 @@ io.on('connection', (socket) => {
   });
 });
 
-app2.use(express.json());
-app2.use(express.urlencoded({ extended: true }));
-
-// Allow us to send requests from react to here
-app2.use(cors({
-  origin: "https://testing-game-1tbcss.web.app/", // frontend URL
-  credentials: true                // allow cookies/session
-}));
-
-
-app2.use(
-  session({
-    name: 'AwesomeWebapp2',
-    secret: "This is a secret.. shhh don't tell anyone",
-    saveUninitialized: false,
-    resave: false,
-    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
-  })
-);
-
-configRoutesFunction(app2);
-
-
-app2.listen(3000, () => {
-  console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
-});
-httpServer.listen(4000, () => { //we've got 2 servers here this is chaos idk whats goin on
-  console.log(`listening on *:${4000}`);
-});
+// httpServer.listen(3000, () => { //we've got 2 servers here this is chaos idk whats goin on
+//   console.log(`listening on *:${4000}`);
+// });
 
 
 
