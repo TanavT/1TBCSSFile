@@ -11,15 +11,15 @@ import {createServer} from 'http';
 //import * as flat from 'flat';
 
 
-const client = createClient();
-client.connect({
-    socket: {
-    host: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com:17307",
-    port: 12345
+const client = createClient({
+  socket: {
+    host: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com",
+    port: 17307
   },
   password: "lbsJey9NCaW4awjcVroom52ybQMJbpL7"
-}
-  ).then(() => {});
+});
+
+client.connect().catch(console.error);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
