@@ -13,8 +13,12 @@ import {createServer} from 'http';
 
 const client = createClient();
 client.connect({
-    url: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com:17307"
-  }
+    socket: {
+    host: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com:17307",
+    port: 12345
+  },
+  password: "lbsJey9NCaW4awjcVroom52ybQMJbpL7"
+}
   ).then(() => {});
 const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
