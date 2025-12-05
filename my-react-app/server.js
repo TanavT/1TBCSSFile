@@ -75,7 +75,7 @@ app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
 app2.use(cors({
-  origin: "http://localhost:8080", // frontend URL
+  origin: "https://testing-game-1tbcss.web.app/", // frontend URL
   credentials: true                // allow cookies/session
 }));
 
