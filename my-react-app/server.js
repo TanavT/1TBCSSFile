@@ -17,7 +17,7 @@ app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
 app2.use(cors({
-  origin: "https://testing-game-1tbcss.web.app/", // frontend URL
+  origin: "https://testing-game-1tbcss.web.app", // frontend URL
   credentials: true                // allow cookies/session
 }));
 
@@ -50,7 +50,11 @@ const client = createClient({
 
 client.connect().catch(console.error);
 // const httpServer = createServer(app);
-const io = new Server(httpServer, {cors: {origin: '*'}});
+const io = new Server(httpServer, {cors: {
+    origin: "https://testing-game-1tbcss.web.app",
+    methods: ["GET", "POST"],
+    credentials: true
+  }});
 
 let switcher = 1
 let numClients = 0
