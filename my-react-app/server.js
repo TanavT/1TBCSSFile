@@ -60,7 +60,7 @@ let switcher = 1
 let numClients = 0
 let clientList = []
 io.on('connection', (socket) => {
-  switcher = 1-switcher
+  // switcher = 1-switcher
   let thisClient
   if(switcher == 0){console.log (socket.id + " wrong one"); }
   else{
