@@ -7,7 +7,7 @@ import React from 'react'
 import Navbar from './components/Navbar.jsx'; //purple bar at top of every page
 
 import ChessGame from './ChessGame.jsx';
-import CheckersGame from './CheckersGame.jsx';
+import CheckersGame from './CheckersGame.tsx';
 import ConnectGame from './ConnectGame.jsx';
 import ChessHomePage from './ChessHome.jsx'; //page that lets us queue for chess
 import CheckersHomePage from './CheckersHome.jsx';
