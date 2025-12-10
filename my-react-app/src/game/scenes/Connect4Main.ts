@@ -31,11 +31,16 @@ export default class Connect4Main extends Phaser.Scene {
 
 	myTurn:boolean = false; //red goes first
 
+
 	preload(){
+		console.log("It's preloadin time")
 		this.socket = io('http://localhost:4000');
+
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
+			this.socket.emit("realSocketConnect", 'test')
   		});
+		
 		this.socket.on('color', ({id, color}) => {
 			if (this.socket.id == id){
 				if(color == 'red'){
@@ -116,11 +121,6 @@ export default class Connect4Main extends Phaser.Scene {
 		);
 
 	}
-
-	sceneShutdown() {
-		this.socket.off("user_join");
-		this.socket.disconnect();
-    }
 
 	editorCreate(): void {
 
@@ -270,8 +270,6 @@ export default class Connect4Main extends Phaser.Scene {
 
 	create() {
 
-		 this.events.on('shutdown', this.sceneShutdown, this);
-
 		this.editorCreate();
 
 		const collumns = [this.rectangle, this.rectangle_1, this.rectangle_2, this.rectangle_3, this.rectangle_4, this.rectangle_5, this.rectangle_6]
@@ -317,9 +315,6 @@ export default class Connect4Main extends Phaser.Scene {
               }
 			})
         })
-
-
-
 	}
 
 	/* END-USER-CODE */

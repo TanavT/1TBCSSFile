@@ -16,40 +16,39 @@ client.connect().then(() => {});
 const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
-let switcher = 1
-let numClients = 0
+
+let numClientsConnect = 0
 let clientList = []
 io.on('connection', (socket) => {
-  switcher = 1-switcher
   let thisClient
-  if(switcher == 0){console.log (socket.id + " wrong one"); }
-  else{
-    numClients++
-    thisClient = numClients
+  socket.on('realSocketConnect', (testStr) => {
+    console.log('someone real joined')
+    thisClient = numClientsConnect
     clientList.push(socket)
-    if(thisClient == 2){
+    if(thisClient%2 == 1){
       socket.emit('error', {id: socket.id, message:"you are two"});
       let red = Math.floor(Math.random() * 2)
       if(red == 0){
         socket.emit('color', {id: socket.id, color:"red"});
-        clientList[0].emit('color', {id: socket.id, color:"red"});
+        clientList[thisClient - 1].emit('color', {id: socket.id, color:"red"});
       }
       else{
         socket.emit('color', {id: socket.id, color:"yellow"});
-        clientList[0].emit('color', {id: socket.id, color:"yellow"});
+        clientList[thisClient - 1].emit('color', {id: socket.id, color:"yellow"});
       }
     }
-  }
+    numClientsConnect++
+  })
   socket.on('placePiece', (collumn) => {
-    if (thisClient == 1){
-      clientList[1].emit('otherPlaced', (collumn))
+    if (thisClient%2 == 0){
+      clientList[thisClient + 1].emit('otherPlaced', (collumn))
     }
     else{
-      clientList[0].emit('otherPlaced', (collumn))
+      clientList[thisClient - 1].emit('otherPlaced', (collumn))
     }
   })
   console.log('new client connected', socket.id);
-  socket.broadcast.emit('user_join', socket.id);
+  socket.emit('user_join', socket.id);
 
   socket.on('user_join', (name) => {
     console.log('A user joined their name is ' + name);
@@ -63,7 +62,7 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Disconnect Fired');
-    numClients--;
+    //numClientsConnect--;
   });
 });
 
