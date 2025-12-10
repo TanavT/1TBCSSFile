@@ -47,7 +47,32 @@ const exportedMethods = {
         const insertInfo = await accountsCollection.insertOne(newUser);
 
         return { id: insertInfo.insertedId, username };
-    }
+    },
+
+    // async addFriend(userUsername, friendUsername) {
+    //     userUsername = userUsername.trim();
+    //     friendUsername = friendUsername.trim();
+    //     if(typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
+    //         throw `Error: Please enter a valid username!`;
+    //     }
+
+    //     const accountsCollection = await accounts();
+    //     // let accountsList = await accountsCollection
+    //     //                     .find({})
+    //     //                     .toArray();
+    //     const user = await accountsCollection.findOne({username: userUsername});
+    //     const friend = await accountsCollection.findOne({username: friendUsername});
+
+    //     if(user === null) {
+    //         throw `Error: No user with that ID exists within the database!`;
+    //     }
+
+    //     if(friend === null) {
+    //         throw `Error: No friend with that ID exists within the database!`;
+    //     }
+
+    //     return user;
+    // }
 }
 
 export default exportedMethods;
