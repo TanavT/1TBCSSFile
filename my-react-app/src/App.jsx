@@ -4,7 +4,8 @@ import {Route, Routes} from 'react-router-dom'
 import { Link } from 'react-router-dom';
 import React from 'react'
 
-import Navbar from './components/Navbar.jsx'; //purple bar at top of every page
+import Navbar from './components/Navbar.jsx'; //purple bar at top of every 
+import ChatBox from './components/ChatBox.jsx';
 
 import ChessGame from './ChessGame.jsx';
 import CheckersGame from './CheckersGame.jsx';
@@ -14,7 +15,7 @@ import CheckersHomePage from './CheckersHome.jsx';
 import ConnectHomePage from './ConnectHome.jsx';
 import AccountPage from './AccountPage.jsx'; //page that lets us sign in
 import AccountInfo from './AccountInfo.jsx';
-
+// import SearchUsers from './SearchUsers.jsx'; //lets the user search for otehr users by username
 
 function App() {
 
@@ -29,9 +30,12 @@ function App() {
         <Route path='/connect' element={<ConnectHomePage/>} />
         <Route path='/connectMatch' element ={<ConnectGame/>}/>
 
+        {/* <Route path='/search' element={<SearchUsers/>}/> */}
+
         <Route path='/login' element={<AccountPage/>} />
         <Route path='/account' element={<AccountInfo/>}/>
       </Routes>
+      <ChatBox/>
    </div>
   )
 }
