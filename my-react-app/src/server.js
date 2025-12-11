@@ -7,12 +7,12 @@ import configRoutesFunction from './routes/index.js';
 import cors from 'cors';
 import { Server } from "socket.io"
 import { createServer } from "http"
+import { accounts } from './routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
 
 
 //const client = createClient();
 //client.connect().then(() => {});
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +33,24 @@ app.use(
     cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
   })
 );
+
+//crteating an api to grab users from
+app.get('/api/users/search', async (req, res) => {
+    try {
+        const username = req.query.username;
+        if (!username) {
+            return res.status(400).json({ error: 'Username required' });
+        }
+        
+        const accountsCollection = await accounts();
+        const result = await accountsCollection.findOne({ username: username });
+        
+        res.json(result || null);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
 
 configRoutesFunction(app);
 

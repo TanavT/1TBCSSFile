@@ -14,6 +14,7 @@ function AccountInfo() {
     }, [])
 
     console.log(user);
+    console.log(user ? user.friendList : "");
   return (
     <div>
         {user ? (
@@ -24,6 +25,10 @@ function AccountInfo() {
                 <p>Checkers: {user.winrates.checkersWins}-{user.winrates.checkersLosses}</p>
                 <p>Connect4: {user.winrates.connectWins}-{user.winrates.connectLosses}</p>
                 <p>Mania: {user.winrates.maniaWins}-{user.winrates.maniaLosses}</p>
+                <p>Friends: </p>
+                {user.friendList.map((username) => (
+                    <li key={username}>{username}</li>
+                ))}
             </div>
         ) : 
             (<p> not signed in</p>)}
