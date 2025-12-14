@@ -210,6 +210,11 @@ export default class ChessGame extends Phaser.Scene {
 
 
 		})
+
+		this.load.image(
+		'blackKingChess',
+		'assets/blackKingChess.png'
+		);
 	}
 
 	editorCreate(): void {
@@ -737,7 +742,7 @@ export default class ChessGame extends Phaser.Scene {
 		whiteQueen.scaleY = 1.6;
 		this.piecesOnSquares[3] = whiteQueen
 
-		const blackKing = this.add.image(this.squares[60].x, this.squares[60].y, "blackKing");
+		const blackKing = this.add.image(this.squares[60].x, this.squares[60].y, "blackKingChess");
 		blackKing.scaleX = 1.6;
 		blackKing.scaleY = 1.6;
 		this.piecesOnSquares[60] = blackKing
