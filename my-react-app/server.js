@@ -19,7 +19,51 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
 
+let checkersSwitcher = 1;
+let checkersClientList = [];
+let checkersNumClients = 0;
+const checkers = io.of("/checkers"); //seperate namespace for checkers to keep logic seperate from Colby's connect4
+checkers.on("connection", (socket) => {
+  let thisClient;
+
+  numClients++
+  thisClient = numClients;
+  console.log(thisClient);
+  clientList.push(socket);
+  if(thisClient == 2){ //2nd player connected, so assign colors
+    socket.emit('checkersTest', {id: socket.id, message:"CHECKERS: you are two"});
+    let red = Math.floor(Math.random() * 2);
+    if(red == 0){
+      socket.emit('checkersColor', {id: socket.id, color:"red"}); //to the 2nd connected player
+      clientList[0].emit('checkersColor', {id: clientList[1].id, color: "black"}) //to the first connected player
+    } else{
+      socket.emit('checkersColor', {id: socket.id, color:"black"});
+      clientList[0].emit('checkersColor', {id: clientList[1].id, color: "red"})
+    }
+  } else {
+    socket.emit('checkersTest', {id: socket.id, message:"CHECKERS: you are one"});
+  }
+
+  socket.on("blackMove", ({row, col}) => { //black moves
+    //console.log("black moved. Row: " + row + ", Col: " + col);
+      clientList[0].emit("redRecieve", {row: row, col: col});
+      clientList[1].emit("redRecieve", {row: row, col: col});
+  });
+  socket.on("redMove", ({row, col}) => { //black moves
+    //console.log("red moved. Row: " + row + ", Col: " + col);
+      clientList[0].emit("blackRecieve", {row: row, col: col});
+      clientList[1].emit("blackRecieve", {row: row, col: col});
+  });
+})
+
+
+
+let switcher = 1
+let numClients = 0
+
+
 let numClientsConnect = 0
+
 let clientList = []
 
 let numClientsChess = 0
