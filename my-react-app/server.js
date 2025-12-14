@@ -77,7 +77,9 @@ io.on('connection', (socket) => {
 
   socket.on('placePiece', (collumn) => {
     if(i == 0){
-      if (connectTimers[Math.floor(thisClient / 2)].whoRed = thisClient){
+      i++
+      if (connectTimers[Math.floor(thisClient / 2)].whoRed == thisClient){
+        console.log("MADE AN INTERVAL")
        setInterval((() => {
         if(connectTimers[Math.floor(thisClient / 2)].turn == "red"){
           connectTimers[Math.floor(thisClient / 2)].redTimer -= 1
@@ -92,7 +94,6 @@ io.on('connection', (socket) => {
       }), 1000)
       console.log("why isn't it working")
       }
-      i++
     }
 
     if(connectTimers[Math.floor(thisClient / 2)].turn == "red"){
@@ -117,7 +118,9 @@ io.on('connection', (socket) => {
 
   socket.on('placePieceChess', (data) => {
     if(i == 0){
-      if (chessTimers[Math.floor(thisClient / 2)].whoWhite = thisClient){
+      i++
+      if (chessTimers[Math.floor(thisClient / 2)].whoWhite == thisClient){
+         console.log("MADE AN INTERVAL")
        setInterval((() => {
         if(chessTimers[Math.floor(thisClient / 2)].turn == "white"){
           chessTimers[Math.floor(thisClient / 2)].whiteTimer -= 1
@@ -132,7 +135,6 @@ io.on('connection', (socket) => {
       }), 1000)
       console.log("why isn't it working")
       }
-      i++
     }
 
     if(chessTimers[Math.floor(thisClient / 2)].turn == "white"){

@@ -7,9 +7,9 @@
                 "key": "blackBishop"
             },
             {
-                "url": "assets/blackKing.png",
+                "url": "assets/blackKingChess.png",
                 "type": "image",
-                "key": "blackKing"
+                "key": "blackKingChess"
             },
             {
                 "url": "assets/blackKnight.png",
