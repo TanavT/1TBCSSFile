@@ -2,14 +2,49 @@
     "section1": {
         "files": [
             {
+                "url": "assets/blackBishop.png",
+                "type": "image",
+                "key": "blackBishop"
+            },
+            {
+                "url": "assets/blackKing.png",
+                "type": "image",
+                "key": "blackKing"
+            },
+            {
+                "url": "assets/blackKnight.png",
+                "type": "image",
+                "key": "blackKnight"
+            },
+            {
+                "url": "assets/blackPawn.png",
+                "type": "image",
+                "key": "blackPawn"
+            },
+            {
+                "url": "assets/blackQueen.png",
+                "type": "image",
+                "key": "blackQueen"
+            },
+            {
+                "url": "assets/blackRook.png",
+                "type": "image",
+                "key": "blackRook"
+            },
+            {
+                "url": "assets/chessboard.png",
+                "type": "image",
+                "key": "chessboard"
+            },
+            {
                 "url": "assets/Connect4_Empty_Grid.png",
                 "type": "image",
                 "key": "Connect4_Empty_Grid"
             },
             {
-                "url": "src/assets/Connect4_Empty_Grid.png",
+                "url": "assets/Location_dot_grey.svg.png",
                 "type": "image",
-                "key": "Connect4_Empty_Grid_1"
+                "key": "Location_dot_grey.svg"
             },
             {
                 "url": "assets/Red_Circle_full.png",
@@ -17,19 +52,39 @@
                 "key": "Red_Circle_full"
             },
             {
-                "url": "src/assets/Red_Circle_full.png",
+                "url": "assets/whiteBishop.png",
                 "type": "image",
-                "key": "Red_Circle_full_1"
+                "key": "whiteBishop"
+            },
+            {
+                "url": "assets/whiteKing.png",
+                "type": "image",
+                "key": "whiteKing"
+            },
+            {
+                "url": "assets/whiteKnight.png",
+                "type": "image",
+                "key": "whiteKnight"
+            },
+            {
+                "url": "assets/whitePawn.png",
+                "type": "image",
+                "key": "whitePawn"
+            },
+            {
+                "url": "assets/whiteQueen.png",
+                "type": "image",
+                "key": "whiteQueen"
+            },
+            {
+                "url": "assets/whiteRook.png",
+                "type": "image",
+                "key": "whiteRook"
             },
             {
                 "url": "assets/Yellow_Circle.png",
                 "type": "image",
                 "key": "Yellow_Circle"
-            },
-            {
-                "url": "src/assets/Yellow_Circle.png",
-                "type": "image",
-                "key": "Yellow_Circle_1"
             }
         ]
     },

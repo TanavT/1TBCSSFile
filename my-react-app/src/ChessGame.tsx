@@ -1,8 +1,11 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
+import { IRefPhaserGame, PhaserGame } from './chess/PhaserGame';
 
 function ChessGame(){
     const [user, setUser] = useState(null);
+    
+     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
@@ -10,9 +13,14 @@ function ChessGame(){
         .catch(() => setUser(null));
     }, [])
 
+     const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
+        //todo?
+    }
+
     return (
         <div>
             <h2>CHESS</h2>
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
         </div>
         
