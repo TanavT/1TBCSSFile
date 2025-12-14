@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { PhaserGame } from './PhaserGame';
+import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
 
 function CheckersGame(){
     const [user, setUser] = useState(null);
@@ -13,9 +13,9 @@ function CheckersGame(){
         .catch(() => setUser(null));
     }, [])
 
-    //const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
+    const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
-    //}
+    }
 
     return (
         <div>
