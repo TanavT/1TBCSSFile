@@ -15,20 +15,6 @@ function ChatBox() {
     const room = location.pathname.replace("/", "");
 
     useEffect(() => {
-        socketRef.current = io("http://localhost:4000/chat");
-
-        socketRef.current.emit("joinRoom", room);
-
-        socketRef.current.on("chatMessage", (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-
-        return () => {
-            socketRef.current.disconnect();
-        };
-    }, []);
-
-    useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
             .then(res => {
                 setUser(res.data);
@@ -39,12 +25,33 @@ function ChatBox() {
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        socketRef.current = io("http://localhost:4000/chat");
+
+        socketRef.current.on("userJoined", (msg) => {
+            let message = {username: msg.username, text: msg.message};
+            setMessages((prev) => [...prev, message]);
+        }, [])
+        
+        socketRef.current.on("chatMessage", (msg) => {
+            setMessages((prev) => [...prev, msg]);
+        });
+        
+        socketRef.current.emit("joinRoom", room, user.username);
+
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, [user]);
     
     function sendMessage(e) {
         e.preventDefault();
 
         if (input.trim() === "" || !user) return;
-
+        setMessages((prev) => [...prev, {username: user.username, text: input}]); // save current client's messages
         socketRef.current.emit("chatMessage", {
             room,
             username: user.username,
