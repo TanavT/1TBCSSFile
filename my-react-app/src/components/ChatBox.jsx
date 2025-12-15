@@ -1,23 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 import "./ChatBox.css";
 
-const socket = io("http://localhost:3000");
 
 function ChatBox() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const socketRef = useRef(null);
+    const location = useLocation();
+    const room = location.pathname.replace("/", "");
 
     useEffect(() => {
-        socket.on("chatMessage", (msg) => {
+        socketRef.current = io("http://localhost:4000/chat");
+
+        socketRef.current.emit("joinRoom", room);
+
+        socketRef.current.on("chatMessage", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
 
         return () => {
-            socket.off("chatMessage");
+            socketRef.current.disconnect();
         };
     }, []);
 
@@ -38,13 +45,12 @@ function ChatBox() {
 
         if (input.trim() === "" || !user) return;
 
-        // attaching username to the method
-        const messageData = {
+        socketRef.current.emit("chatMessage", {
+            room,
             username: user.username,
             text: input
-        };
-        
-        socket.emit("chatMessage", messageData);
+        });
+
         setInput("");
     }
 

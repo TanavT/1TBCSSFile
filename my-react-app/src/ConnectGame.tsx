@@ -2,6 +2,7 @@ import  {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { PhaserGame } from './PhaserGame';
 import type { IRefPhaserGame } from './PhaserGame';
+import ChatBox from './components/ChatBox.jsx';
 
 
 function ConnectGame(){
@@ -24,6 +25,7 @@ function ConnectGame(){
             <h2>Connect4</h2>
             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
             {user ?<> <h2>Username: {user.username}</h2>  </>: <h2>Please log in to play</h2>}
+            <ChatBox />
         </div>
         
     )

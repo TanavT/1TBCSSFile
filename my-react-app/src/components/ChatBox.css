@@ -9,7 +9,13 @@
     height: 200px;
     background: white;
     padding: 5px;
-    color: black
+    color: black;
+    overflow-y: auto; 
+    border: 1px solid #ccc;
+}
+
+.messageBox div {
+    margin-bottom: 5px;
 }
 
 .messageForm {

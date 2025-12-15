@@ -16,7 +16,6 @@ import ConnectHomePage from './ConnectHome.jsx';
 import AccountPage from './AccountPage.jsx'; //page that lets us sign in
 import AccountInfo from './AccountInfo.jsx';
 import SearchUsers from './SearchUsers.jsx'; //lets the user search for otehr users by username
-
 function App() {
 
   return (

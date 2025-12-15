@@ -10,13 +10,33 @@ import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
 //import * as flat from 'flat';
 
-
-
-
 const client = createClient();
 client.connect().then(() => {});
-const httpServer = createServer(app);
+const httpServer = createServer(app2);
 const io = new Server(httpServer, {cors: {origin: '*'}});
+
+
+//chat message socket
+const chat = io.of("/chat"); //separate namespace for chat to keep separate from the game sockets
+chat.on("connection", (socket) => {
+  console.log("Chat socket connected:", socket.id);
+
+  socket.on("joinRoom", (roomName) => {
+    socket.join(roomName);
+    console.log(`${socket.id} joined room ${roomName}`);
+  });
+
+  socket.on("chatMessage", ({ room, username, text }) => {
+    chat.to(room).emit("chatMessage", {
+      username,
+      text
+    });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Chat socket disconnected:", socket.id);
+  });
+});
 
 
 let checkersSwitcher = 1;
@@ -134,7 +154,11 @@ io.on('connection', (socket) => {
         let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
         //console.log("OTHER OTHER OTHER " + other)
         socket.emit('timer', {timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer});
-        clientList[other].emit('timer',{timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer});
+        clientList[other].emit('timer',{timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer}); //logic for figuring out the other client in the room
+        //check only if the other exists
+        //comment logs on servers and where response is handled
+        //something with checkers not working because clashing variables
+        //dont run checkers at ALL after server starting
       }), 1000)
       console.log("why isn't it working")
       }
@@ -216,6 +240,7 @@ io.on('connection', (socket) => {
   });
 });
 
+
 app2.use(express.json());
 app2.use(express.urlencoded({ extended: true }));
 
@@ -235,6 +260,24 @@ app2.use(
     cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
   })
 );
+
+//crteating an api to grab users from
+app2.get('/api/users/search', async (req, res) => {
+    try {
+        const username = req.query.username;
+        if (!username) {
+            return res.status(400).json({ error: 'Username required' });
+        }
+        
+        const accountsCollection = await accounts();
+        const result = await accountsCollection.findOne({ username: username });
+        
+        res.json(result || null);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
 
 configRoutesFunction(app2);
 
