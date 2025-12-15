@@ -18,44 +18,7 @@ client.connect().then(() => {});
 const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
-
-let checkersSwitcher = 1;
-let checkersClientList = [];
-let checkersNumClients = 0;
-const checkers = io.of("/checkers"); //seperate namespace for checkers to keep logic seperate from Colby's connect4
-checkers.on("connection", (socket) => {
-  let thisClient;
-
-  numClients++
-  thisClient = numClients;
-  console.log(thisClient);
-  clientList.push(socket);
-  if(thisClient == 2){ //2nd player connected, so assign colors
-    socket.emit('checkersTest', {id: socket.id, message:"CHECKERS: you are two"});
-    let red = Math.floor(Math.random() * 2);
-    if(red == 0){
-      socket.emit('checkersColor', {id: socket.id, color:"red"}); //to the 2nd connected player
-      clientList[0].emit('checkersColor', {id: clientList[1].id, color: "black"}) //to the first connected player
-    } else{
-      socket.emit('checkersColor', {id: socket.id, color:"black"});
-      clientList[0].emit('checkersColor', {id: clientList[1].id, color: "red"})
-    }
-  } else {
-    socket.emit('checkersTest', {id: socket.id, message:"CHECKERS: you are one"});
-  }
-
-  socket.on("blackMove", ({row, col}) => { //black moves
-    //console.log("black moved. Row: " + row + ", Col: " + col);
-      clientList[0].emit("redRecieve", {row: row, col: col});
-      clientList[1].emit("redRecieve", {row: row, col: col});
-  });
-  socket.on("redMove", ({row, col}) => { //black moves
-    //console.log("red moved. Row: " + row + ", Col: " + col);
-      clientList[0].emit("blackRecieve", {row: row, col: col});
-      clientList[1].emit("blackRecieve", {row: row, col: col});
-  });
-})
-
+let checkersCustomClients = {}
 
 
 let switcher = 1
@@ -63,18 +26,62 @@ let numClients = 0
 
 
 let numClientsConnect = 0
-
 let clientList = []
 
 let numClientsChess = 0
 let clientListChess = []
 
+let numClientsCheckers = 0;
+let clientListCheckers = [];
+
 let chessTimers = []
 let connectTimers = []
+let checkersTimers = []
 
 io.on('connection', (socket) => {
   let thisColor = ""
   let thisClient
+
+  let fun = true;
+
+  socket.on('checkersCustomConnect', ({me, opp}) => {
+    checkersCustomClients[me] = socket;
+
+    if(checkersCustomClients[opp]) {
+      const roomName = `${me}-${opp}`; 
+      socket.join(roomName);
+      checkersCustomClients[opp].join(roomName);
+
+      let red = Math.floor(Math.random() * 2)
+      //checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      if (red == 0){
+        checkersCustomClients[me].emit('checkersColor', {id:checkersCustomClients[me].id, color:"red" });
+        checkersCustomClients[opp].emit('checkersColor', {id:checkersCustomClients[opp].id, color:"black"})
+      } else {
+        checkersCustomClients[opp].emit('checkersColor', {id:checkersCustomClients[me].id, color:"black" });
+        checkersCustomClients[me].emit('checkersColor', {id: checkersCustomClients[opp].id, color:"red"})
+      }
+    }
+  })
+
+  socket.on('realSocketCheckers', (teststr) => {
+    console.log('someone real connected to checkers')
+    thisClient = numClientsCheckers
+    clientListCheckers.push(socket)
+    if(thisClient%2 == 1){
+      let red = Math.floor(Math.random() * 2)
+      checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      if (red == 0){
+        socket.emit('checkersColor', {id:socket.id, color:"red" });
+        clientListCheckers[thisClient-1].emit('checkersColor', {id:socket.id, color:"black"})
+      } else {
+        socket.emit('checkersColor', {id:socket.id, color:"black" });
+        clientListCheckers[thisClient-1].emit('checkersColor', {id: socket.id, color:"red"})
+      }
+    }
+    numClientsCheckers++;
+  })
+
   socket.on('realSocketConnect', (testStr) => {
     console.log('someone real joined')
     thisClient = numClientsConnect
@@ -118,6 +125,91 @@ io.on('connection', (socket) => {
     numClientsChess++
   })
 
+  let i = 0;
+
+  socket.on('blackMove', ({row, col}) => {
+    console.log("HELL      AAAH");
+    console.log(i);
+    if(i == 0){
+      console.log("whjat");
+      i++
+      //if (checkersTimers[Math.floor(thisClient / 2)].whoRed == thisClient){
+        console.log("MADE AN INTERVAL")
+       setInterval((() => {
+        //console.log("timer");
+        if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+          checkersTimers[Math.floor(thisClient / 2)].redTimer -= 1
+        }
+        else{
+          checkersTimers[Math.floor(thisClient / 2)].blackTimer -= 1
+        }
+        let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+        //console.log("OTHER OTHER OTHER " + other)
+        socket.emit('timer', {timeRed: checkersTimers[Math.floor(thisClient / 2)].redTimer, timeBlack: checkersTimers[Math.floor(thisClient / 2)].blackTimer});
+        clientListCheckers[other].emit('timer',{timeRed: checkersTimers[Math.floor(thisClient / 2)].redTimer, timeBlack: checkersTimers[Math.floor(thisClient / 2)].blackTimer});
+      }), 1000)
+      console.log("why isn't it working")
+      //}
+    }
+
+
+    if(!fun){
+      console.log("flipping");
+      if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+        console.log("flipped to black");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "red"
+      }
+      fun = !fun;
+    } else {
+      console.log("not flipping");
+      fun = !fun;
+    }
+    
+    console.log(checkersTimers[Math.floor(thisClient / 2)].turn)
+
+    if (thisClient%2 == 0){
+      clientListCheckers[thisClient + 1].emit("redRecieve", {row: row, col: col});
+    }
+    else{
+      clientListCheckers[thisClient - 1].emit("redRecieve", {row: row, col: col});
+    }
+  })
+
+  socket.on('redMove', ({row, col}) => {
+    if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+      checkersTimers[Math.floor(thisClient / 2)].turn = "black"
+    }
+    else{
+      checkersTimers[Math.floor(thisClient / 2)].turn = "red"
+    }
+    console.log(checkersTimers[Math.floor(thisClient / 2)].turn)
+
+    if(!fun){
+      if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+        console.log("flipped to black");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "red"
+      }
+      fun = !fun
+    } else {
+      fun = !fun;
+    }
+
+    if (thisClient%2 == 0){
+      clientListCheckers[thisClient + 1].emit("blackRecieve", {row: row, col: col});
+    }
+    else{
+      clientListCheckers[thisClient - 1].emit("blackRecieve", {row: row, col: col});
+    }
+  })
+
 
   socket.on('placePiece', (collumn) => {
     if(i == 0){
@@ -158,7 +250,7 @@ io.on('connection', (socket) => {
     }
   })
 
-  let i = 0;
+
 
   socket.on('placePieceChess', (data) => {
     if(i == 0){

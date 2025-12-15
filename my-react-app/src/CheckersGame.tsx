@@ -16,15 +16,23 @@ function CheckersGame(){
     const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
     }
+    console.log(user);
 
-    return (
-        <div>
-            <h2>CHECKERS</h2>
-             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
-            {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
-        </div>
-        
-    )
+    if(user){
+
+    
+    return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx
+            <div>
+                <h2>CHECKERS</h2>
+                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" /> 
+                {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            </div>
+            
+        )
+
+    } else {
+        return <p>loading...</p>
+    }
 }
 
 export default CheckersGame;
