@@ -9,7 +9,8 @@ import cors from 'cors';
 import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
 //import * as flat from 'flat';
-
+import { v4 as uuid } from 'uuid';
+import gameData from './src/routes/gameData.js'
 
 
 
@@ -65,6 +66,9 @@ let numClients = 0
 let numClientsConnect = 0
 
 let clientList = []
+let clientIDs = []
+let connectMatches = []
+let connectMatchUpdated = []
 
 let numClientsChess = 0
 let clientListChess = []
@@ -75,26 +79,47 @@ let connectTimers = []
 io.on('connection', (socket) => {
   let thisColor = ""
   let thisClient
-  socket.on('realSocketConnect', (testStr) => {
+  socket.on('realSocketConnect', (userID) => {
     console.log('someone real joined')
     thisClient = numClientsConnect
     clientList.push(socket)
+    clientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
       connectTimers.push({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
+      const matchID = uuid()
+      connectMatches.push(matchID)
+      connectMatchUpdated.push(false)
       if(red == 0){
-        socket.emit('color', {id: socket.id, color:"red"});
-        clientList[thisClient - 1].emit('color', {id: socket.id, color:"red"});
+        // console.log(`Client IDS: ${clientIDs[thisClient - 1]}, userID: ${userID}`)
+        socket.emit('color', {id: socket.id, color:"red", opponentUserID: clientIDs[thisClient - 1], matchID: matchID});
+        clientList[thisClient - 1].emit('color', {id: socket.id, color:"red", opponentUserID: userID, matchID: matchID});
+        // console.log('first triggered')
       }
       else{
-        socket.emit('color', {id: socket.id, color:"yellow"});
-        clientList[thisClient - 1].emit('color', {id: socket.id, color:"yellow"});
+        // console.log(`Client IDS: ${clientIDs[thisClient - 1]}, userID: ${userID}`)
+        socket.emit('color', {id: socket.id, color:"yellow", opponentUserID: clientIDs[thisClient - 1], matchID: matchID});
+        clientList[thisClient - 1].emit('color', {id: socket.id, color:"yellow", opponentUserID: userID, matchID: matchID});
+        // console.log('second triggered')
       }
     }
     numClientsConnect++
   })
   
+  socket.on("gameOverConnect", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = connectMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+    }
+    if (connectMatchUpdated[index] === false) {
+      connectMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.connectGameOver(userID, opponentUserID, gameState)
+      console.log(updatedElos)
+    }
+  })
 
   socket.on('realSocketChess', (testStr) => {
     console.log('someone real joined chess')

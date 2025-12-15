@@ -34,7 +34,7 @@ const exportedMethods = {
         //const passwordHash = await bcrypt.hash(password, 12);
         const newUser = { 
             username, 
-            hashedPassword, 
+            password: hashedPassword, 
             winrates: {
                 chessWins: 0,
                 chessLosses: 0,
