@@ -40,13 +40,67 @@ const exportedMethods = {
                 maniaWins: 0,
                 maniaLosses: 0
             },
-            signupDate: todayString
+            signupDate: todayString,
+            friendList: []
 
         };
         console.log(newUser);
         const insertInfo = await accountsCollection.insertOne(newUser);
 
         return { id: insertInfo.insertedId, username };
+    },
+
+    //returns the user after searching
+    async searchUser(username) {
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({ username });
+        
+        if (!user) {
+            throw "User not found";
+        }
+        
+        return {
+            id: user._id,
+            username: user.username,
+            signupDate: user.signupDate,
+            winrates: user.winrates,
+            friendList: user.friendList
+        };
+    },
+
+    async addFriend(userUsername, friendUsername) {
+        userUsername = userUsername.trim();
+        friendUsername = friendUsername.trim();
+        if(typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
+            throw `Error: Please enter a valid username!`;
+        }
+
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({username: userUsername});
+        const friend = await accountsCollection.findOne({username: friendUsername});
+
+        if(user === null) {
+            throw `Error: No user with that ID exists within the database!`;
+        }
+
+        if(friend === null) {
+            throw `Error: No friend with that ID exists within the database!`;
+        }
+
+        if(user.friendList.includes(friendUsername)) {
+            throw `Error: User is already friends with ${friendUsername}`;
+        }
+
+        if(userUsername === friendUsername) {
+            throw `Error: Cannot friend yourself`
+        }
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: userUsername },
+                { $push: { friendList: friendUsername } }
+        );
+
+        return updateResult;
     }
 }
 

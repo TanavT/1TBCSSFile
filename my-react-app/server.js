@@ -1,6 +1,5 @@
 import express from 'express';
 //import redis from 'redis';
-import app from 'express';
 import { createClient } from 'redis';
 const app2 = express();
 import session from 'express-session';
@@ -8,14 +7,12 @@ import configRoutesFunction from './src/routes/index.js';
 import cors from 'cors';
 import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
+import { accounts } from './src/routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
-
-
-
 
 const client = createClient();
 client.connect().then(() => {});
-const httpServer = createServer(app);
+const httpServer = createServer(app2);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
 let checkersCustomClients = {}
@@ -226,7 +223,11 @@ io.on('connection', (socket) => {
         let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
         //console.log("OTHER OTHER OTHER " + other)
         socket.emit('timer', {timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer});
-        clientList[other].emit('timer',{timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer});
+        clientList[other].emit('timer',{timeRed: connectTimers[Math.floor(thisClient / 2)].redTimer, timeYellow: connectTimers[Math.floor(thisClient / 2)].yellowTimer}); //logic for figuring out the other client in the room
+        //check only if the other exists
+        //comment logs on servers and where response is handled
+        //something with checkers not working because clashing variables
+        //dont run checkers at ALL after server starting
       }), 1000)
       console.log("why isn't it working")
       }
@@ -308,6 +309,7 @@ io.on('connection', (socket) => {
   });
 });
 
+
 app2.use(express.json());
 app2.use(express.urlencoded({ extended: true }));
 
@@ -327,6 +329,26 @@ app2.use(
     cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
   })
 );
+
+//crteating an api to grab users from
+app2.get('/api/users/search', async (req, res) => {
+    try {
+        const username = req.query.username;
+        if (!username) {
+            return res.status(400).json({ error: 'Username required' });
+        }
+        console.log("before accounts collection");
+        const accountsCollection = await accounts();
+        console.log("after grabbing accounts");
+        const result = await accountsCollection.findOne({ username: username });
+        console.log("after grabbing results");
+        
+        res.json(result ? [result] : []);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
 
 configRoutesFunction(app2);
 
