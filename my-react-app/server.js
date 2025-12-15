@@ -1,6 +1,5 @@
 import express from 'express';
 //import redis from 'redis';
-import app from 'express';
 import { createClient } from 'redis';
 const app2 = express();
 import session from 'express-session';
@@ -8,6 +7,7 @@ import configRoutesFunction from './src/routes/index.js';
 import cors from 'cors';
 import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
+import { accounts } from './src/routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
 
 const client = createClient();
@@ -268,11 +268,13 @@ app2.get('/api/users/search', async (req, res) => {
         if (!username) {
             return res.status(400).json({ error: 'Username required' });
         }
-        
+        console.log("before accounts collection");
         const accountsCollection = await accounts();
+        console.log("after grabbing accounts");
         const result = await accountsCollection.findOne({ username: username });
+        console.log("after grabbing results");
         
-        res.json(result || null);
+        res.json(result ? [result] : []);
     } catch (error) {
         console.error("Error searching users:", error);
         res.status(500).json({ error: 'Failed to search users' });

@@ -30,18 +30,15 @@ function SearchUsers() {
         setError(null);
         
         try {
-            const response = await fetch(`http://localhost:3000/api/users/search?username=${input}`);
-            const result = await response.json();
-            
-            // Assuming the API returns an array of users or a single user
-            // Adjust based on your actual API response structure
-            if (Array.isArray(result)) {
-                setUserResults(result);
-            } else if (result.username) {
-                setUserResults([result]);
-            } else {
-                setUserResults([]);
-            }
+            const response = await axios.get(
+                "http://localhost:3000/api/users/search",
+                {
+                    params: { username: input },
+                    withCredentials: true
+                }
+            );
+
+            setUserResults(response.data);
         } catch (err) {
             console.error("Error searching users:", err);
             setError("Failed to search users");
