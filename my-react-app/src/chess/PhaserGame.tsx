@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import StartGame from './game/main';
 import { EventBus } from './game/EventBus';
+import ChessGame from './game/scenes/ChessGame';
 
 export interface IRefPhaserGame
 {
@@ -11,12 +12,13 @@ export interface IRefPhaserGame
 interface IProps
 {
     currentActiveScene?: (scene_instance: Phaser.Scene) => void
+    userID?: string
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref)
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, userID }, ref)
 {
     const game = useRef<Phaser.Game | null>(null!);
-
+    const sceneStarted = useRef(false);
     useLayoutEffect(() =>
     {
         if (game.current === null)
@@ -46,6 +48,17 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             }
         }
     }, [ref]);
+    useEffect(() => {
+        if (!game.current || !userID || sceneStarted.current) return;
+
+        sceneStarted.current = true;
+
+        game.current.scene.start('Boot', {
+            chessData: {
+                userID
+            }
+        });
+    }, [userID]);
 
     useEffect(() =>
     {

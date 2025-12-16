@@ -23,6 +23,10 @@ const io = new Server(httpServer, {cors: {origin: '*'}});
 let checkersSwitcher = 1;
 let checkersClientList = [];
 let checkersNumClients = 0;
+let checkersClientIDs = []
+let checkersMatches = []
+let checkersMatchUpdated = []
+
 const checkers = io.of("/checkers"); //seperate namespace for checkers to keep logic seperate from Colby's connect4
 checkers.on("connection", (socket) => {
   let thisClient;
@@ -72,6 +76,9 @@ let connectMatchUpdated = []
 
 let numClientsChess = 0
 let clientListChess = []
+let chessClientIDs = []
+let chessMatches = []
+let chessMatchUpdated = []
 
 let chessTimers = []
 let connectTimers = []
@@ -121,28 +128,49 @@ io.on('connection', (socket) => {
     }
   })
 
-  socket.on('realSocketChess', (testStr) => {
+  socket.on('realSocketChess', (userID) => {
     console.log('someone real joined chess')
     thisClient = numClientsChess
     clientListChess.push(socket)
+    chessClientIDs.push(userID)
     if(thisClient%2 == 1){
       let white = Math.floor(Math.random() * 2)
       chessTimers.push({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
+      const matchID = uuid()
+      chessMatches.push(matchID)
+      console.log(`MatchID ${matchID}`)
+      chessMatchUpdated.push(false)
       if(white == 0){
         thisColor = "white"
-        socket.emit('color', {id: socket.id, color:"white"});
-        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"white"});
+        socket.emit('color', {id: socket.id, color:"white", userID: userID, opponentUserID: chessClientIDs[thisClient - 1], matchID: matchID});
+        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"white", userID: chessClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID});
       }
       else{
         thisColor = "black"
-        socket.emit('color', {id: socket.id, color:"black"});
-        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"black"});
+        socket.emit('color', {id: socket.id, color:"black", opponentUserID: chessClientIDs[thisClient - 1], matchID: matchID});
+        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"black", opponentUserID: userID, matchID: matchID});
       }
     }
     numClientsChess++
   })
 
+  socket.on("gameOverChess", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = chessMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      return
+    }
+    if (chessMatchUpdated[index] === false) {
+      chessMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "chess")
+      console.log(updatedElos)
+    }
+  })
+
+  
 
   socket.on('placePiece', (collumn) => {
     if(i == 0){
