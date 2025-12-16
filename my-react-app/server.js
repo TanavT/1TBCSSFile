@@ -10,14 +10,17 @@ import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
 //import * as flat from 'flat';
 
-
-
+if (process.env){
+  console.log(process.title)
+} else {
+  console.log(".env not detected! The server will not run properly") 
+}
 app2.use(express.json());
 app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
 app2.use(cors({
-  origin: "https://testing-game-1tbcss.web.app", // frontend URL
+  origin: process.env.FRONTEND_CLIENT, // frontend URL
   credentials: true                // allow cookies/session
 }));
 
@@ -37,20 +40,20 @@ configRoutesFunction(app2);
 // const httpServer = createServer(app);
 const httpServer = app2.listen(3000, () => {
   console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
+  console.log(`Your routes will be running on ${process.env.BACKEND_SERVER}`);
 });
 
 const client = createClient({
   socket: {
-    host: "redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com",
-    port: 17307
+    host: process.env.REDIS_URL,
+    port: process.env.REDIS_PORT
   },
-  password: "lbsJey9NCaW4awjcVroom52ybQMJbpL7"
+  password: process.env.REDIS_PASSWORD
 });
 
 client.connect().catch(console.error);
 const io = new Server(httpServer, {cors: {
-    origin: "https://testing-game-1tbcss.web.app",
+    origin: process.env.FRONTEND_CLIENT,
     methods: ["GET", "POST"],
     credentials: true
   }});
