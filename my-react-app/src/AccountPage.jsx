@@ -35,7 +35,7 @@ function AccountPage() {
             navigate('/chess');
             setMessage(`Signed up as ${res.data.username}`);
         } catch (e) {
-            setMessage('Signup failed');
+            setMessage(`Signup failed`);
         }
     }
 

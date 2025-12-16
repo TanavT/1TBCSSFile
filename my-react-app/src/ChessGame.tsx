@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { IRefPhaserGame, PhaserGame } from './chess/PhaserGame';
+import ChatBox from './components/ChatBox.jsx';
 
 function ChessGame(){
     const [user, setUser] = useState(null);
@@ -20,8 +21,9 @@ function ChessGame(){
     return (
         <div>
             <h2>CHESS</h2>
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" />
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            <ChatBox />
         </div>
         
     )

@@ -1,0 +1,40 @@
+.chatBox { 
+    border: 1px solid #333;
+    background: purple;
+    padding: 10px;
+    width: 300px; 
+}
+
+.messageBox {
+    height: 200px;
+    background: white;
+    padding: 5px;
+    color: black;
+    overflow-y: auto; 
+    border: 1px solid #ccc;
+}
+
+.messageBox div {
+    margin-bottom: 5px;
+}
+
+.messageForm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px
+}
+
+.inputBox {
+    width: 150px;
+}
+
+.sendButton {
+    background: white;
+    color: purple;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

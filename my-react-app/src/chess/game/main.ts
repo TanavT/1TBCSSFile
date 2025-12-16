@@ -26,9 +26,28 @@ const config: Phaser.Types.Core.GameConfig = {
     ]
 };
 
-const StartGame = (parent: string) => {
+const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => {
 
-    return new Game({ ...config, parent });
+    return new Game({ 
+        ...config, 
+        parent,
+        callbacks: {
+            preBoot: (game) => {
+                if(options?.user) {
+                    console.log("user given");
+                    game.registry.set("user", options.user);
+                }
+                if(options?.gametype) {
+                    console.log("gametype given");
+                    game.registry.set("gametype", options.gametype)
+                }
+                if(options?.opp) {
+                    console.log("opp given");
+                    game.registry.set("opp", options.opp)
+                }
+            }
+        }
+    });
 
 }
 
