@@ -30,6 +30,11 @@ router
             let cleanUsername = xss(req.body.username);
             let cleanPassword = xss(req.body.password);
             const user = await accountData.signup(cleanUsername, cleanPassword);
+
+            if(!user) {
+                throw `Error: Could not find user!`;
+            }
+
             req.session.user = user;
             return res.json(user);
         } catch (e){
@@ -64,12 +69,12 @@ router
     .route('/search')
     .get(async (req, res) => {
         try {
-            const username = req.query.username;
-            if (!username || username.trim() === '') {
+            const cleanUsername = xss(req.query.username);
+            if (!cleanUsername || cleanUsername.trim() === '') {
                 return res.status(400).json({ error: 'Username required' });
             }
             
-            const user = await accountData.searchUser(username.trim());
+            const user = await accountData.searchUser(cleanUsername.trim());
             return res.json(user);
         } catch (e) {
             console.log(e);
@@ -79,7 +84,8 @@ router
 
 router.post('/addFriend', async (req, res) => {
     try {
-        const { userUsername, friendUsername } = req.body;
+        let userUsername = xss(req.body.userUsername);
+        let friendUsername = xss(req.body.friendUsername);
         
         if (!userUsername || !friendUsername) {
             return res.status(400).json({ error: 'Both usernames are required' });
@@ -103,7 +109,8 @@ router.post('/addFriend', async (req, res) => {
 
 router.post('/deleteFriend', async (req, res) => {
     try {
-        const { userUsername, friendUsername } = req.body;
+        let userUsername = xss(req.body.userUsername);
+        let friendUsername = xss(req.body.friendUsername);
         
         if (!userUsername || !friendUsername) {
             return res.status(400).json({ error: 'Both usernames are required' });
