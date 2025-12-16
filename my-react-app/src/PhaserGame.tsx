@@ -20,7 +20,7 @@ interface IProps
     opp?:any
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp }, ref)
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp, userID }, ref)
 
 {
     const sceneStarted = useRef(false);

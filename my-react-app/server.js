@@ -12,7 +12,7 @@ import { accounts } from './src/routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
 import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
-import client from './redis.js'
+//import client from './redis.js'
 
 
 
@@ -511,7 +511,7 @@ io.on('connection', (socket) => {
     numClientsCheckers++;
   })
 
-  socket.on('realSocketConnect', (testStr) => {
+  socket.on('realSocketConnect', (userID) => {
     console.log('someone real joined')
     thisClient = numClientsConnect
     clientList.push(socket)
@@ -864,6 +864,7 @@ io.on('connection', (socket) => {
 
 
   socket.on('placePiece', (collumn) => {
+    console.log("got a piece to place")
     if(i == 0){
       i++
       if (connectTimers[Math.floor(thisClient / 2)].whoRed == thisClient){
@@ -899,10 +900,10 @@ io.on('connection', (socket) => {
 
 
     if (thisClient%2 == 0){
-      clientList[thisClient + 1].emit('customOtherPlaced', (collumn))
+      clientList[thisClient + 1].emit('otherPlaced', (collumn))
     }
     else{
-      clientList[thisClient - 1].emit('cusotmOtherPlaced', (collumn))
+      clientList[thisClient - 1].emit('otherPlaced', (collumn))
     }
   })
 

@@ -150,6 +150,10 @@ export default class Connect4Main extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
 	}
 
+	me
+	gametype
+	opp
+
 
 	init(data: { userID: string }) {
     this.userID = data.userID;
@@ -272,6 +276,7 @@ export default class Connect4Main extends Phaser.Scene {
 			}
 		)
 		this.socket.on("otherPlaced", (collumn) => {
+			console.log("I GOT THE OPPONENTS MESSAGE")
 			  this.myTurn = true;
 			  this.turnText.text = `Turn: ${this.color}`
 			  console.log(collumn.x);
