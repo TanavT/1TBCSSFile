@@ -29,53 +29,33 @@ export default class ChessGame extends Phaser.Scene {
 
 	gameOver:boolean = false;
 
-	gametype: string;
-	opp: any;
-	me: any;
-
-	init() {
-		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
-		console.log("got user: " + user.username);
-		this.me = user.username
-
-		const gametype = this.game.registry.get("gametype");
-		console.log("got gametype: " + gametype);
-		this.gametype = gametype;
-
-		const opp = this.game.registry.get("opp");
-		console.log("got opp: " + opp);
-		this.opp = opp;
-	}
-
 	preload(){
+		this.cameras.main.setZoom(0.57); 
+		this.cameras.main.centerOn(520,380)
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
-			console.log('A user joined their id is ' + id);
-			if(this.gametype == "queue"){
-				this.socket.emit("realSocketChess", 'test')
-			} else {
-				console.log("custom match");
-				this.socket.emit("chessCustomConnect", {me: this.me, opp: this.opp})
-			}
-			
+			//console.log('A user joined their id is ' + id);
+			this.socket.emit("realSocketChessMania", 'test')
   		});
 
-		this.socket.on('timer', ({timeWhite, timeBlack}) => {
+		this.socket.on('timer', ({timeFirst, timeSecond}) => {
 			if(this.gameOver) return
 			if(this.color == "white"){
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeWhite)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeBlack)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeFirst)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeSecond)}`
 			}
 			else{
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeBlack)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeWhite)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeSecond)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeFirst)}`
 			}
-			if(timeWhite == 0){
+			if(timeFirst == 0 && this.gameOver == false){
+				this.socket.emit("gameDone", {game: "chess", winner: "black"});
 				this.gameOver = true
 				this.winBlack.visible = true
 			}
-			if(timeBlack == 0){
+			if(timeSecond == 0 && this.gameOver == false){
+				this.socket.emit("gameDone", {game: "chess", winner: "white"});
 				this.gameOver = true
 				this.winWhite.visible = true
 			}
@@ -102,22 +82,49 @@ export default class ChessGame extends Phaser.Scene {
 					this.opponentColor="black"
 				}
 			}
-			console.log("COLOR:" + this.color)
+			//console.log("COLOR:" + this.color)
 			this.myTurn = (this.color == "white")
 			this.yourColorText.text = `Your Color: ${this.color}`
   		})
 
 		this.socket.on('error', ({id, message}) => {
-			console.log("I am "+id+" and the message is: " + message)
+			//console.log("I am "+id+" and the message is: " + message)
+		})
+
+		this.socket.on("yourTurn", (data) => {
+			this.myTurn = true
+			//console.log("MY TURN CHESS")
+		} )
+
+		this.socket.on("allOver", (whoWon) => {
+			this.blackRectangle.visible = true
+			this.yourTimeText.visible = false
+			this.enemyTimeText.visible = false
+			if(whoWon == "first" && this.color == "white"){
+				this.youWin.visible = true
+			}
+			else if(whoWon == "first" && this.color == "black"){
+				this.opponentWins.visible = true
+			}
+			else if(whoWon == "second" && this.color == "black"){
+				this.youWin.visible = true
+			}
+			else if(whoWon == "second" && this.color == "white"){
+				this.opponentWins.visible = true
+			}
+			else{
+				this.yallTie.visible = true
+			}
+
 		})
 
 		this.socket.on("otherPlaced", ({promote, promoteLetter, promoteTexture, startSquareStr, destinationSquareStr, castleStr}) => {
 			let startSquareInt = this.squareToNumberConverter(startSquareStr)
 			let destSquareInt = this.squareToNumberConverter(destinationSquareStr)
-			console.log("int int int" + startSquareInt)
-			console.log(destSquareInt)
-			console.log(startSquareStr)
-			console.log(destinationSquareStr)
+			//console.log("int int int" + startSquareInt)
+			//console.log(destSquareInt)
+			//console.log(startSquareStr)
+			//console.log(destinationSquareStr)
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
 			y: {from: this.piecesOnSquares[startSquareInt].y, to: this.squares[destSquareInt].y},
@@ -129,7 +136,7 @@ export default class ChessGame extends Phaser.Scene {
 			})
 
 			if(promote){
-				console.log("promote promote promote")
+				//console.log("promote promote promote")
 				this.chess.move({from: startSquareStr, to: destinationSquareStr, promotion: promoteLetter})
 				this.piecesOnSquares[startSquareInt].setTexture(promoteTexture)
 			}
@@ -212,17 +219,24 @@ export default class ChessGame extends Phaser.Scene {
 			this.piecesOnSquares[destSquareInt] = this.piecesOnSquares[startSquareInt];
 			this.piecesOnSquares[startSquareInt] = null
 			ttt.play()
-			this.myTurn = true
+			//this.myTurn = true
 			this.turnText.text = `Turn: ${this.color}`
 
 
 			if(this.chess.isGameOver()){
+				this.gameOver = true
 				//rectangle_1.visible = true
 				if(this.chess.isCheckmate()){
 					if(this.chess.turn() == 'b'){
 						this.winWhite.visible = true
+						this.socket.emit("gameDone", {game: "chess", winner: "white"});
 					}
-					else this.winBlack.visible = true
+					else {this.winBlack.visible = true
+					this.socket.emit("gameDone", {game: "chess", winner: "black"});
+					}
+				}
+				else{
+					this.socket.emit("gameDone", {game: "chess", winner: "tie"});
 				}
 				if(this.chess.isStalemate()){
 					this.stalemate.visible = true
@@ -237,10 +251,8 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.load.image(
 		'blackKingChess',
-		'/assets/blackKingChess.png'
+		'assets/blackKingChess.png'
 		);
-
-
 	}
 
 	editorCreate(): void {
@@ -578,45 +590,73 @@ export default class ChessGame extends Phaser.Scene {
 		location_dot_grey_svg_63.scaleY = 0.03;
 
 		// rectangle_1
-		const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
-		rectangle_1.scaleX = 8;
-		rectangle_1.scaleY = 6;
-		rectangle_1.visible = false;
-		rectangle_1.isFilled = true;
-		rectangle_1.fillColor = 0;
 
 		// yourColorText
-		const yourColorText = this.add.text(22, 621, "", {});
+		const yourColorText = this.add.text(300, 770, "", {});
 		yourColorText.text = "Your Color: none";
 		yourColorText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourColorText.setWordWrapWidth(10);
 		this.yourColorText = yourColorText
 
 		// turnText
-		const turnText = this.add.text(906, 666, "", {});
+		const turnText = this.add.text(700, 770, "", {});
 		turnText.text = "Turn: white";
 		turnText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		turnText.setWordWrapWidth(10);
 		this.turnText = turnText
 
 		// yourTimeText
-		const yourTimeText = this.add.text(16, 11, "", {});
+		const yourTimeText = this.add.text(300, -120, "", {});
 		yourTimeText.text = "Your time: 10:00\n";
 		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourTimeText.setWordWrapWidth(10);
 		this.yourTimeText = yourTimeText
 
 		// enemyTimeText
-		const enemyTimeText = this.add.text(901, 10, "", {});
+		const enemyTimeText = this.add.text(700, -120, "", {});
 		enemyTimeText.text = "Enemy timer: 10:00\n";
 		enemyTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		enemyTimeText.setWordWrapWidth(10);
 		this.enemyTimeText = enemyTimeText
 
+		const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
+		rectangle_1.scaleX = 8;
+		rectangle_1.scaleY = 6;
+		rectangle_1.visible = false;
+		rectangle_1.isFilled = true;
+		rectangle_1.fillColor = 0;
+		rectangle_1.alpha = 0.5;
+		rectangle_1.alphaTopLeft = 0.5;
+		rectangle_1.alphaTopRight = 0.5;
+		rectangle_1.alphaBottomLeft = 0.5;
+		rectangle_1.alphaBottomRight = 0.5;
+		this.blackRectangle = rectangle_1
+
+		const youWinText = this.add.text(200, -120, "", {});
+		youWinText.text = "YOU WIN";
+		youWinText.visible = false
+		youWinText.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
+
+		this.youWin = youWinText
+
+		const opponentWins = this.add.text(200, -120, "", {});
+		opponentWins.text = "OPPONENT WINS";
+		opponentWins.visible = false
+		opponentWins.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
+
+		this.opponentWins = opponentWins
+
+		const yallTie = this.add.text(200, -120, "", {});
+		yallTie.text = "TIE GAME";
+		yallTie.visible = false
+		yallTie.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
+
+		this.opponentWins = yallTie
+
 		for(let x = 0; x < 64; x++){
 			this.squares.push(eval(`location_dot_grey_svg_${x.toString()}`))
-			// console.log(this.squares.length)
-			// console.log(this.squares[x].name)
+			// //console.log(this.squares.length)
+			// //console.log(this.squares[x].name)
 		}
 
 		this.events.emit("scene-awake");
@@ -627,6 +667,11 @@ export default class ChessGame extends Phaser.Scene {
 	yourTimeText
 	enemyTimeText
 
+	blackRectangle
+
+	youWin
+	opponentWins
+	yallTie
 	/* START-USER-CODE */
 
 	// Write your code here
@@ -635,8 +680,8 @@ export default class ChessGame extends Phaser.Scene {
 		let letterFinal = 'X'
 		let numberFinal = Math.floor(numberParam/8) + 1
 		//console.log(numberParam)
-		// console.log(numberParam % 8)
-		// console.log(typeof(numberParam))
+		 //console.log(numberParam % 8)
+		 //console.log(typeof(numberParam))
 		switch (numberParam % 8){
 			case 0:
 				letterFinal ='a'
@@ -663,7 +708,7 @@ export default class ChessGame extends Phaser.Scene {
 				letterFinal ='h'
 				break;
 			default:
-				console.log("numConverterBroke")
+				//console.log("numConverterBroke")
 				break;
 		}
 		return letterFinal + numberFinal.toString()
@@ -687,8 +732,8 @@ export default class ChessGame extends Phaser.Scene {
 
 	// for(let x = 0; x < 64; x++){
 	// 		this.squares.push(eval(`location_dot_grey_svg_${x.toString()}`))
-	// 		console.log(this.squares.length)
-	// 		console.log(this.squares[x].name)
+	// 		//console.log(this.squares.length)
+	// 		//console.log(this.squares[x].name)
 	// 	}
 
 	chess = new Chess()
@@ -927,7 +972,7 @@ export default class ChessGame extends Phaser.Scene {
 				let temp = this.upgradeBlackArr[x]
 				temp.on('pointerdown', () => {
 					this.chosenUpgrade = temp.texture
-					console.log('tex tex tex' + temp.texture.key)
+					//console.log('tex tex tex' + temp.texture.key)
 					switch (temp.texture.key){
 						case "blackQuuen":
 							this.chosenUpgradeLetter = 'q'
@@ -963,13 +1008,7 @@ export default class ChessGame extends Phaser.Scene {
                     yoyo: false,
                     paused: true
                 	})
-					if(this.gametype == "queue"){
-						console.log("queue move made");
-						this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: ""}))
-					} else {
-						console.log("custom move made");
-						this.socket.emit('customPlacePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: "", me:this.me, opp:this.opp}))
-					}
+					this.socket.emit('placePieceChessMania', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: ""}))
 					this.chess = chess
 					clickedSquareString = ""
 					t.play()
@@ -988,7 +1027,7 @@ export default class ChessGame extends Phaser.Scene {
 				let temp2 = this.upgradeWhiteArr[x]
 				temp2.on('pointerdown', () => {
 					this.chosenUpgrade = temp2.texture
-					console.log('tex tex tex' + temp2.texture.key)
+					//console.log('tex tex tex' + temp2.texture.key)
 					switch (temp2.texture.key){
 						case "whiteQueen":
 							this.chosenUpgradeLetter = 'q'
@@ -1025,15 +1064,10 @@ export default class ChessGame extends Phaser.Scene {
                     paused: true
                 	})
 					let temp:string = this.numberToSquareConverter(moveToSquareInt)
-					console.log("HOOOOOOOW " + temp)
-					if(this.gametype == "queue"){
-						this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: ""}))
-					} else {
-						console.log("custom move made");
-						this.socket.emit('customPlacePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: "", me: this.me, opp: this.opp}))
-					}
+					//console.log("HOOOOOOOW " + temp)
+					this.socket.emit('placePieceChessMania', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: ""}))
 					//this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: this.chosenUpgrade.key, startSquareStr: 'a1', destinationSquareStr: 'x8', castleStr: ""}))
-					//console.log("this is where the loopin happens")
+					////console.log("this is where the loopin happens")
 					t.play()
 					moveToSquareInt = -1;
 					moves = []
@@ -1082,10 +1116,10 @@ export default class ChessGame extends Phaser.Scene {
 			square.alphaBottomLeft = 0;
 			square.alphaBottomRight = 0;
 			square.on('pointerdown', () => {
-				console.log(this.myTurn)
+				//console.log(this.myTurn)
 				chess = this.chess
 				if(this.upgradeBlackArr[0].visible == false && this.upgradeWhiteArr[0].visible == false && this.myTurn == true && this.gameOver == false){
-				console.log(thisNumber)
+				//console.log(thisNumber)
 				if(!activeSquares.includes(square)){
 					clickedSquareInt = thisNumber;
 					this.squares.forEach((square2) => {
@@ -1096,10 +1130,10 @@ export default class ChessGame extends Phaser.Scene {
 					})
 					clickedSquare = square
 					clickedSquareString = this.numberToSquareConverter(thisNumber)
-					console.log(clickedSquareString)
+					//console.log(clickedSquareString)
 					isClicked = true
 					moves = chess.moves({ square: clickedSquareString })
-					console.log(moves)
+					//console.log(moves)
 					moves = moves.map((string) => {
 						if(string.includes("=")){string = string.slice(0, string.indexOf("="))}
 						if(string[string.length -1] == "+" || string[string.length -1] == "#" ){string = string.slice(0,string.length -1)}
@@ -1108,12 +1142,12 @@ export default class ChessGame extends Phaser.Scene {
 						}
 						return string.slice(-2)
 					})
-					console.log(moves)
+					//console.log(moves)
 					for(let j = 0; j < 64; j++){
 						let temp = chess.get(clickedSquareString)
 						let typePiece;
 						if(temp !== undefined) typePiece = temp.type.toUpperCase()
-						console.log(typePiece)
+						//console.log(typePiece)
 						let startStr = ""
 						if(typePiece != 'P'){startStr = typePiece}
 						if(moves.includes(startStr + this.numberToSquareConverter(j)) || moves.includes(startStr + 'x' + this.numberToSquareConverter(j)) || moves.includes(this.numberToSquareConverter(j))){
@@ -1280,12 +1314,19 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					if(chess.isGameOver()){
+						this.gameOver = true
 						//rectangle_1.visible = true
-						if(chess.isCheckmate()){
-							if(chess.turn() == 'b'){
-								winWhite.visible = true
+						if(this.chess.isCheckmate()){
+							if(this.chess.turn() == 'b'){
+								this.winWhite.visible = true
+								this.socket.emit("gameDone", {game: "chess", winner: "white"});
 							}
-							else winBlack.visible = true
+							else {this.winBlack.visible = true
+								this.socket.emit("gameDone", {game: "chess", winner: "black"});
+							}
+						}
+						else{
+							this.socket.emit("gameDone", {game: "chess", winner: "tie"});
 						}
 						if(chess.isStalemate()){
 							stalemate.visible = true
@@ -1297,18 +1338,14 @@ export default class ChessGame extends Phaser.Scene {
 					this.myTurn = false
 					this.turnText.text = `Turn: ${this.opponentColor}`
 					if(promoteChecker == false)
-						if(this.gametype == "queue"){
-							this.socket.emit('placePieceChess', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
-						} else {
-							this.socket.emit('customPlacePieceChess', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr, me: this.me, opp: this.opp}))
-						}
+						this.socket.emit('placePieceChessMania', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
 					this.chess = chess
 					castleStr = ""
 					if(promoteChecker == false)
 						clickedSquareString = ""
 				}
 				// else if(isClicked == true){
-				//	console.log("isClickd true")
+				//	//console.log("isClickd true")
 				// 	isClicked = false
 				// }
 

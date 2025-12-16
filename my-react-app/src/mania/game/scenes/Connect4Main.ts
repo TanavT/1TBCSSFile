@@ -147,52 +147,36 @@ export default class Connect4Main extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
 	}
 
-	gametype: string;
-	opp: any;
-	me: any;
-
-	init() {
-		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
-		console.log("got user: " + user.username);
-		this.me = user.username
-
-		const gametype = this.game.registry.get("gametype");
-		console.log("got gametype: " + gametype);
-		this.gametype = gametype;
-
-		const opp = this.game.registry.get("opp");
-		console.log("got opp: " + opp);
-		this.opp = opp;
-	}
-
 	preload(){
+		this.cameras.main.setZoom(0.59); 
+		this.cameras.main.centerOn(515,380)
+
 		console.log("It's preloadin time")
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
-			if(this.gametype == "queue"){
-				this.socket.emit("realSocketConnect", 'test')
-			} else {
-				this.socket.emit("customJoinConnect", {me:this.me, opp:this.opp})
-			}
-			
+			this.socket.emit("realSocketConnectMania", 'test')
   		});
 
-		this.socket.on('timer', ({timeRed, timeYellow}) => {
+		this.socket.on("allOver", (whoWon) => {
+			this.blackRectangle.visible = true
+		})
+
+		this.socket.on('timer', ({timeFirst, timeSecond}) => {
 			if(this.gameOver) return
 			if(this.color == "red"){
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeRed)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeYellow)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeFirst)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeSecond)}`
 			}
 			else{
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeYellow)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeRed)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeSecond)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeFirst)}`
 			}
-			if(timeRed == 0){
+			if(timeFirst == 0){
 				this.doGameOver("Y")
 			}
-			if(timeYellow == 0){
+			if(timeSecond == 0){
 				this.doGameOver("R")
 			}
   		});
@@ -225,48 +209,13 @@ export default class Connect4Main extends Phaser.Scene {
 		this.socket.on('error', ({id, message}) => {
 			console.log("I am "+id+" and the message is: " + message)
 		})
-
-		this.socket.on("customOtherPlaced", (collumn) => {
-			
-			  this.myTurn = true;
-			  this.turnText.text = `Turn: ${this.color}`
-			  console.log(collumn.x);
-			  let collumnNumber = Math.floor((collumn.x - 200)/100);
-			  if(collumn.x === 196) collumnNumber = 0
-			  if(this.countCollum[collumnNumber] < 6){
-			  if(this.opponentColor == "red"){
-			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
-
-			  tempThingy.scaleX = 0.3;
-			  tempThingy.scaleY = 0.3;
-			  	this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'R'
-			  }
-			  else{
-			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
-
-			  tempThingy.scaleX = 0.18;
-			  tempThingy.scaleY = 0.18;
-			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
-			  }
-			  this.circleList.push(tempThingy)
-			  console.log(this.globalGameState)
-			//this.turn = 1-this.turn;
-              const t = this.tweens.add({
-                    targets: [tempThingy],
-                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
-                    duration: 200,
-                    easing: 'bounce',
-                    yoyo: false,
-                    paused: true
-                })
-              t.play()
-			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
-			  this.checkGameOver(this.globalGameState);
-			  }
-			}
-		)
+		this.socket.on('yourTurn', (data)=> {
+			this.myTurn = true
+			console.log("MY TURN connect")
+		})
 		this.socket.on("otherPlaced", (collumn) => {
-			  this.myTurn = true;
+			console.log("I GOT A MESSAGE")
+			  //this.myTurn = true;
 			  this.turnText.text = `Turn: ${this.color}`
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
@@ -307,15 +256,15 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.load.image(
 		'Connect4_Empty_Grid',
-		'/assets/Connect4_Empty_Grid.png'
+		'assets/Connect4_Empty_Grid.png'
 		);
 		this.load.image(
 		'Red_Circle_full',
-		'/assets/Red_Circle_full.png'
+		'assets/Red_Circle_full.png'
 		);
 		this.load.image(
 		'Yellow_Circle',
-		'/assets/Yellow_Circle.png'
+		'assets/Yellow_Circle.png'
 		);
 
 	}
@@ -388,15 +337,19 @@ export default class Connect4Main extends Phaser.Scene {
 	countCircles = 0
 
 	doGameOver(winner:string):void{
+		if(this.gameOver == true) return
 		console.log(winner + ' WINS FR!!!')
 		this.gameOver = true
 		if(winner == "R"){
+			this.socket.emit("gameDone", {game: "connect", winner: "red"});
 			this.winRed.visible = true
 		}
 		else if(winner == "Y"){
+			this.socket.emit("gameDone", {game: "connect", winner: "yellow"});
 			this.winYellow.visible = true
 		}
 		else{
+			this.socket.emit("gameDone", {game: "connect", winner: "tie"});
 			this.tieGame.visible = true
 		}
 		// this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
@@ -424,15 +377,9 @@ export default class Connect4Main extends Phaser.Scene {
         collumns.forEach((collumn) => {
             collumn.on('pointerdown', () => {
 			  if(this.myTurn && this.gameOver == false){
-			  
-				this.myTurn = false;
-				this.turnText.text = `Turn: ${this.opponentColor}`
-			  if(this.gametype == "queue"){
-				this.socket.emit("placePiece", (collumn))
-			  } else {
-				this.socket.emit("customConnectPlacePiece", ({collumn: collumn, me:this.me, opp:this.opp}))
-			  }
-			  
+			  this.myTurn = false;
+			  this.turnText.text = `Turn: ${this.opponentColor}`
+			  this.socket.emit("placePieceMania", (collumn))
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
 			  if(collumn.x === 196) collumnNumber = 0
@@ -493,6 +440,20 @@ export default class Connect4Main extends Phaser.Scene {
 	tieGame.setStyle({ "fontSize": "100px" });
 	tieGame.setStroke('#000000', 6);
 	this.tieGame = tieGame
+
+	const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
+		rectangle_1.scaleX = 8;
+		rectangle_1.scaleY = 6;
+		rectangle_1.visible = false;
+		rectangle_1.isFilled = true;
+		rectangle_1.fillColor = 0;
+		rectangle_1.alpha = 0.5;
+		rectangle_1.alphaTopLeft = 0.5;
+		rectangle_1.alphaTopRight = 0.5;
+		rectangle_1.alphaBottomLeft = 0.5;
+		rectangle_1.alphaBottomRight = 0.5;
+		this.blackRectangle = rectangle_1
+
 	}
 
 	}

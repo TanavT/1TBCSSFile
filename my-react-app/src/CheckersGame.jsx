@@ -21,7 +21,7 @@ function CheckersGame(){
     return (
         <div>
             <h2>CHECKERS</h2>
-             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} type="queue" />
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
             <ChatBox />
         </div>
