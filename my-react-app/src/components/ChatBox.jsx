@@ -61,6 +61,82 @@ function ChatBox() {
         setInput("");
     }
 
+    async function handleAddFriend(friendUsername) {
+        if (window.confirm(`Are you sure you want to add ${friendUsername} as a friend?`)) {
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/account/addFriend',
+                    {
+                        userUsername: currentUser.username,
+                        friendUsername: friendUsername
+                    },
+                    { withCredentials: true }
+                );
+
+                alert(`${friendUsername} added as friend!`);
+                
+                // Refresh current user data to get updated friend list
+                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Error adding friend:", err);
+                alert(err.response?.data?.error || "Failed to add friend");
+            }
+        }
+    }
+
+    async function handleDeleteFriend(friendUsername) {
+        if (window.confirm(`Are you sure you want to delete ${friendUsername} as a friend?`)) {
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/account/deleteFriend',
+                    {
+                        userUsername: currentUser.username,
+                        friendUsername: friendUsername
+                    },
+                    { withCredentials: true }
+                );
+
+                alert(`${friendUsername} removed as a friend!`);
+                
+                // refresh current user data to get updated friend list
+                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Error deleting friend:", err);
+                alert(err.response?.data?.error || "Failed to delete friend");
+            }
+        }
+    }
+
+    function canAddFriend(user) {
+        if (!currentUser) return false;
+        
+        if (user.username === currentUser.username) {
+            return false;
+        }
+        
+        if (currentUser.friendList && currentUser.friendList.includes(user.username)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    function canDeleteFriend(user) {
+        if (!currentUser) return false;
+        
+        if (user.username === currentUser.username) {
+            return false;
+        }
+        
+        if (currentUser.friendList && !currentUser.friendList.includes(user.username)) {
+            return false;
+        }
+        
+        return true;
+    }
+
     // don't render until we know if user is logged in
     if (loading) {
         return <div>Loading...</div>;

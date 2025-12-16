@@ -87,7 +87,7 @@ const exportedMethods = {
             throw `Error: No friend with that ID exists within the database!`;
         }
 
-        if(user.friendList.includes(friendUsername)) {
+        if(user.friendList && user.friendList.includes(friendUsername)) {
             throw `Error: User is already friends with ${friendUsername}`;
         }
 
@@ -101,7 +101,48 @@ const exportedMethods = {
         );
 
         return updateResult;
+    },
+
+    async deleteFriend(userUsername, friendUsername) {
+        userUsername = userUsername.trim();
+        friendUsername = friendUsername.trim();
+
+        if (typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
+            throw `Error: Please enter a valid username!`;
+        }
+
+        const accountsCollection = await accounts();
+
+        const user = await accountsCollection.findOne({ username: userUsername });
+        const friend = await accountsCollection.findOne({ username: friendUsername });
+
+        if (!user) {
+            throw `Error: No user with that username exists within the database!`;
+        }
+
+        if (!friend) {
+            throw `Error: No friend with that username exists within the database!`;
+        }
+
+        if (userUsername === friendUsername) {
+            throw `Error: Cannot unfriend yourself`;
+        }
+
+        // safeguard against missing friendList
+        const friendList = user.friendList || [];
+
+        if (!friendList.includes(friendUsername)) {
+            throw `Error: User is not friends with ${friendUsername}`;
+        }
+
+        const updateResult = await accountsCollection.updateOne(
+            { username: userUsername },
+            { $pull: { friendList: friendUsername } }
+        );
+
+        return updateResult;
     }
+
 }
 
 export default exportedMethods;
