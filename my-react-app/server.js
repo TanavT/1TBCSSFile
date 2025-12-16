@@ -42,7 +42,7 @@ configRoutesFunction(app2);
 const PORT = process.env.PORT || 3000;
 const httpServer = app2.listen(PORT, () => {
   console.log("We've now got a server!");
-  console.log(`Your routes will be running on ${process.env.BACKEND_SERVER}`);
+  console.log(`Your routes will be running on ${process.env.VITE_BACKEND_SERVER}`);
 });
 
 const client = createClient({

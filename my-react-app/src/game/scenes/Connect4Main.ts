@@ -148,7 +148,7 @@ export default class Connect4Main extends Phaser.Scene {
 	}
 
 	preload(){
-		this.socket = io(`${process.env.BACKEND_SERVER}`);
+		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			this.socket.emit("realSocketConnect", 'test')

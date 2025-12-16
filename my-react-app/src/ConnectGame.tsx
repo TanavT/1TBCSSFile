@@ -10,7 +10,7 @@ function ConnectGame(){
      const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
-        axios.get(`${process.env.BACKEND_SERVER}/account/me`, { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
         .then(res => setUser(res.data))
         .catch(() => setUser(null));
     }, [])

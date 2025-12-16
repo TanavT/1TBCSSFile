@@ -8,7 +8,7 @@ function ChessHomePage(){
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${process.env.BACKEND_SERVER}/account/me`, { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
         .then(res => setUser(res.data))
         .catch(() => setUser(null));
     }, [])
