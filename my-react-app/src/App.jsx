@@ -7,11 +7,13 @@ import React from 'react'
 import Navbar from './components/Navbar.jsx'; //purple bar at top of every page
 
 import ChessGame from './ChessGame.jsx';
-import CheckersGame from './CheckersGame.jsx';
+import CheckersGame from './CheckersGame.tsx';
 import ConnectGame from './ConnectGame.jsx';
+import ManiaGame from './ManiaGame.jsx';
 import ChessHomePage from './ChessHome.jsx'; //page that lets us queue for chess
 import CheckersHomePage from './CheckersHome.jsx';
 import ConnectHomePage from './ConnectHome.jsx';
+import ManiaHomePage from './ManiaHome.jsx';
 import AccountPage from './AccountPage.jsx'; //page that lets us sign in
 import AccountInfo from './AccountInfo.jsx';
 
@@ -28,6 +30,8 @@ function App() {
         <Route path='/checkersMatch' element ={<CheckersGame/>}/>
         <Route path='/connect' element={<ConnectHomePage/>} />
         <Route path='/connectMatch' element ={<ConnectGame/>}/>
+         <Route path='/mania' element={<ManiaHomePage/>} />
+        <Route path='/maniaMatch' element ={<ManiaGame/>}/>
 
         <Route path='/login' element={<AccountPage/>} />
         <Route path='/account' element={<AccountInfo/>}/>

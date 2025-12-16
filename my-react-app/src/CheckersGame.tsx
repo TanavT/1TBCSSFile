@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { PhaserGame } from './PhaserGame';
+import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
 
 function CheckersGame(){
     const [user, setUser] = useState(null);
@@ -8,14 +8,14 @@ function CheckersGame(){
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+        axios.get("http://localhost:3000/account/me", { withCredentials: true })
         .then(res => setUser(res.data))
         .catch(() => setUser(null));
     }, [])
 
-    //const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
+    const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
-    //}
+    }
 
     return (
         <div>
