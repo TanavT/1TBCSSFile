@@ -119,6 +119,7 @@ export default class ChessGame extends Phaser.Scene {
 			console.log("dest: " + destSquareInt)
 			console.log("start: " + startSquareInt)
 			console.log(destinationSquareStr)
+			//console.log('-----');
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
 			y: {from: this.piecesOnSquares[startSquareInt].y, to: this.squares[destSquareInt].y},

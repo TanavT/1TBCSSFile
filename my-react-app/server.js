@@ -213,7 +213,7 @@ io.on('connection', (socket) => {
       chessCustomClients[opp].join(roomName);
 
       let white = Math.floor(Math.random() * 2)
-      chessCustomTimers[roomName] = ({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? me : opp})
+      chessCustomTimers[roomName] = ({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? opp : me})
       if(white == 0){
         chessCustomClients[me].emit('color', {id:chessCustomClients[me].id, color:"white" });
         chessCustomClients[opp].emit('color', {id:chessCustomClients[opp].id, color:"black"})
@@ -455,23 +455,26 @@ io.on('connection', (socket) => {
     }
 
     
-    //console.log("custom black move");
+    console.log("custom black move");
     console.log(i);
     if(i == 0){
       i++
-      console.log(i);
-      console.log("weird ass interval");
-       chessCustomTimers[roomName].interval = setInterval((() => {
-        if(chessCustomTimers[roomName].turn == "red"){
-          chessCustomTimers[roomName].redTimer -= 1
-        }
-        else{
-          chessCustomTimers[roomName].blackTimer -= 1
-        }
-        io.to(roomName).emit('timer', {timeWhite: chessCustomTimers[roomName].whiteTimer, timeBlack: chessCustomTimers[roomName].blackTimer});
-      }), 1000)
-      //console.log("why isn't it working")
-      //}
+      console.log(chessCustomTimers[roomName])
+      if(chessCustomTimers[roomName].whoWhite == myName){ 
+        //console.log(i);
+        console.log("weird ass interval");
+        chessCustomTimers[roomName].interval = setInterval((() => {
+          if(chessCustomTimers[roomName].turn == "red"){
+            chessCustomTimers[roomName].redTimer -= 1
+          }
+          else{
+            chessCustomTimers[roomName].blackTimer -= 1
+          }
+          io.to(roomName).emit('timer', {timeWhite: chessCustomTimers[roomName].whiteTimer, timeBlack: chessCustomTimers[roomName].blackTimer});
+        }), 1000)
+        //console.log("why isn't it working")
+        //}
+      }
     }
 
 
@@ -493,8 +496,8 @@ io.on('connection', (socket) => {
     
     //checkersCustomTimers[roomName].turn)
 
-
-    io.to(roomName).emit("otherPlaced", (data));
+    chessCustomClients[oppName].emit("otherPlaced", (data));
+    //io.to(roomName).emit("otherPlaced", (data));
   
   })
 
