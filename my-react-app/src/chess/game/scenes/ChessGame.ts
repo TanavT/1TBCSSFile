@@ -48,6 +48,7 @@ export default class ChessGame extends Phaser.Scene {
 	}
 
 	preload(){
+		this.editorCreate();
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
@@ -702,7 +703,6 @@ export default class ChessGame extends Phaser.Scene {
 
 	create() {
 
-		this.editorCreate();
 
 		const whiteRook = this.add.image(this.squares[0].x, this.squares[0].y + 5, "whiteRook");
 		whiteRook.scaleX = 1.6;
