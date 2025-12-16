@@ -36,6 +36,7 @@ export default class CheckersMain extends Phaser.Scene {
 	winRed
 	winBlack
 	tieGame
+	blackRectangle
 
 	yourTimeText
 	enemyTimeText
@@ -83,37 +84,41 @@ export default class CheckersMain extends Phaser.Scene {
 	opponentColor:string;
 
 	gametype: string;
-	opp: any;
-	me: any;
 
 	init() {
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
-		console.log("got user: " + user.username);
-		this.me = user.username
+		if(user)
+			console.log("got user: " + user.username);
 
 		const gametype = this.game.registry.get("gametype");
 		console.log("got gametype: " + gametype);
 		this.gametype = gametype;
-
-		const opp = this.game.registry.get("opp");
-		this.opp = opp;
 	}
+	gameOverBool: boolean = false
+
+	myTurn: boolean = false
+	hasBeenSent: boolean = false
 
     preload() {
+
+		this.cameras.main.setZoom(0.80); 
+		this.cameras.main.centerOn(210,300)
 		
 		this.socket = io('http://localhost:4000');
 		this.socket.on('checkersTest', ({id, message}) => {
 			console.log("I am " + id + " and the message is " + message);
 		});
 
+		this.socket.on("allOver", (whoWon) => {
+			this.blackRectangle.visible = true
+		})
+
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketCheckers", 'test');
+				this.socket.emit("realSocketCheckersMania", 'test');
 			} else {
 				console.log("custom match");
-				console.log("opponent name: " + this.opp);
-				this.socket.emit("checkersCustomConnect", {me: this.me, opp: this.opp})
 			}
 			
 		})
@@ -121,7 +126,10 @@ export default class CheckersMain extends Phaser.Scene {
 		this.socket.on('checkersColor', ({id, color}) => {
 			console.log("I am " + id + " and my color is " + color);
 			this.myColor = color;
+			if(this.myColor == "black") {this.myTurn = true; this.opponentColor = "red"}
+			else {this.opponentColor = "black"}
 		});
+		let flipperFlopper = 0
 		this.socket.on('redRecieve', ({row, col}) => {
 			console.log('redRecieve');
 			
@@ -129,6 +137,11 @@ export default class CheckersMain extends Phaser.Scene {
 			if(this.myColor == 'red'){
 				//console.log('and I am red');
 				this.handleTileClick(row, col);
+				// flipperFlopper += 1
+				// if(flipperFlopper == 2){
+				// 	this.toMove = this.opponentColor
+				// 	flipperFlopper = 0
+				// }
 			}
 		});
 		this.socket.on('blackRecieve', ({row, col}) => {
@@ -137,33 +150,50 @@ export default class CheckersMain extends Phaser.Scene {
 			if(this.myColor == 'black'){
 				//console.log('and I am black');
 				this.handleTileClick(row, col);
+				// flipperFlopper += 1
+				// if(flipperFlopper == 2){
+				// 	this.toMove = this.opponentColor
+				// 	flipperFlopper = 0
+				// }
 			}
 		})
 
-		this.socket.on('timer', ({timeRed, timeBlack}) => {
-			//console.log("timer")
-			if(!this.gameRunning) return
-			if(this.myColor == "red"){
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeBlack)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeRed)}`
+		this.socket.on('yourTurn', (data) => {
+			//this.toMove = this.myColor
+			if(this.pieceSelected){
+				this.hasBeenSent = true
 			}
 			else{
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeRed)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeBlack)}`
+				this.toMove = this.myColor
 			}
-			if(timeRed == 0){
+			console.log("MY TURN CHECKERS")
+		})
+
+		this.socket.on('timer', ({timeSecond, timeFirst}) => {
+			//console.log("timer")
+			console.log(this.toMove)
+			if(!this.gameRunning) return
+			if(this.myColor == "red"){
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeFirst)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeSecond)}`
+			}
+			else{
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeSecond)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeFirst)}`
+			}
+			if(timeSecond == 0){
 				this.gameOver("Red")
 			}
-			if(timeBlack == 0){
+			if(timeFirst == 0){
 				this.gameOver("Black")
 			}
 		})
 
-        this.load.image('board', '/assets/checkersBoardSmall.png');
-        this.load.image('redPiece', '/assets/redPiece.png');
-        this.load.image('blackPiece', '/assets/blackPiece.png');
-		this.load.image('blackKing', '/assets/blackKing.png');
-		this.load.image('redKing', '/assets/redKing.png');
+        this.load.image('board', 'assets/checkersBoardSmall.png');
+        this.load.image('redPiece', 'assets/redPiece.png');
+        this.load.image('blackPiece', 'assets/blackPiece.png');
+		this.load.image('blackKing', 'assets/blackKing.png');
+		this.load.image('redKing', 'assets/redKing.png');
         //this.load.image('logo', 'assets/phaser.png');
 
         //  The ship sprite is CC0 from https://ansimuz.itch.io - check out his other work!
@@ -218,6 +248,19 @@ export default class CheckersMain extends Phaser.Scene {
 		winBlack.setStyle({ "fontSize": "100px" });
 		winBlack.setStroke('#000000', 6);
 		this.winBlack = winBlack
+
+		const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
+		rectangle_1.scaleX = 8;
+		rectangle_1.scaleY = 6;
+		rectangle_1.visible = false;
+		rectangle_1.isFilled = true;
+		rectangle_1.fillColor = 0;
+		rectangle_1.alpha = 0.5;
+		rectangle_1.alphaTopLeft = 0.5;
+		rectangle_1.alphaTopRight = 0.5;
+		rectangle_1.alphaBottomLeft = 0.5;
+		rectangle_1.alphaBottomRight = 0.5;
+		this.blackRectangle = rectangle_1
 
         this.fieldArray = [];
         //this.fieldGroup = this.add.group();
@@ -331,10 +374,15 @@ export default class CheckersMain extends Phaser.Scene {
     }
 
 	gameOver(team){
-		if (team = "black"){
-			this.winRed.visible = true
-		} else {
-			this.winBlack.visible = true
+		if(this.gameOverBool == false){
+			if (team == "black"){
+				this.winRed.visible = true
+				this.socket.emit("gameDone", {game: "checkers", winner: "red"});
+			} else {
+				this.winBlack.visible = true
+				this.socket.emit("gameDone", {game: "checkers", winner: "black"});
+			}
+			this.gameOverBool = true
 		}
 	}
 
@@ -898,13 +946,11 @@ export default class CheckersMain extends Phaser.Scene {
                         });
 
 						if(this.myColor == "red"){
-							if(this.gametype == "custom"){
-								this.socket.emit("checkersCustomRedMove", {row:this.selectedPiece.row, col: this.selectedPiece.col, me: this.me, opp: this.opp});
-								this.socket.emit("checkersCustomRedMove", {row: row, col: col, me: this.me, opp:this.opp});
-							} else {
-								this.socket.emit("redMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
-								this.socket.emit("redMove", {row: row, col: col});
-							}
+							this.socket.emit("redMoveMania", {row:this.selectedPiece.row, col: this.selectedPiece.col});
+							const timer = setTimeout(() => {
+							this.socket.emit("redMoveMania", {row: row, col: col});
+							}, 1000);
+
 						}
 						
                         
@@ -929,8 +975,6 @@ export default class CheckersMain extends Phaser.Scene {
 						let diff = Math.abs(row - this.selectedPiece.row);
 						//console.log(diff);
 
-						let jumped = false;
-
 						if(diff == 2){//piece removed. need to clear
 							if(row < this.selectedPiece.row){
 								if(col < this.selectedPiece.col){
@@ -939,14 +983,12 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row+1][col+1].piece = null;
 									this.fieldArray[row+1][col+1].team = null;
 									this.fieldArray[row+1][col+1].king = null;
-									jumped = true
 								} else {
 									//console.log("piece above and right");
 									this.fieldArray[row+1][col-1].piece.destroy();
 									this.fieldArray[row+1][col-1].piece = null;
 									this.fieldArray[row+1][col-1].team = null;
 									this.fieldArray[row+1][col-1].king = null;
-									jumped = true
 								}
 							} else {
 								if(col < this.selectedPiece.col){
@@ -955,30 +997,22 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row-1][col+1].piece = null;
 									this.fieldArray[row-1][col+1].team = null;
 									this.fieldArray[row-1][col+1].king = null;
-									jumped = true
 								} else {
 									//console.log("piece below and right");
 									this.fieldArray[row-1][col-1].piece.destroy();
 									this.fieldArray[row-1][col-1].piece = null;
 									this.fieldArray[row-1][col-1].team = null;
 									this.fieldArray[row-1][col-1].king = null;
-									jumped = true
 								}
 							}
 						}
 
                         this.cleanUpBoard();
-						if(jumped){
-							let jumping = this.checkJumping();
-							if(jumping.length != 0){
-								console.log("can jump");
-							} else {
-								this.toMove = 'black'
-							}
-						} else {
-							this.toMove = 'black';
+                        this.toMove = this.opponentColor
+						if(this.hasBeenSent){
+							this.hasBeenSent = false
+							this.toMove = this.myColor
 						}
-                        
                         this.pieceSelected = false;
                     //}      
                 }
@@ -1004,13 +1038,10 @@ export default class CheckersMain extends Phaser.Scene {
                         });
 
 						if(this.myColor == "black"){
-							if(this.gametype == "custom"){
-								this.socket.emit("checkersCustomBlackMove", {row:this.selectedPiece.row, col: this.selectedPiece.col, me: this.me, opp: this.opp});
-								this.socket.emit("checkersCustomBlackMove", {row: row, col: col, me: this.me, opp:this.opp});
-							} else {
-								this.socket.emit("blackMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
-								this.socket.emit("blackMove", {row: row, col: col});
-							}
+							this.socket.emit("blackMoveMania", {row:this.selectedPiece.row, col: this.selectedPiece.col});
+							const timer = setTimeout(() => {
+							this.socket.emit("blackMoveMania", {row: row, col: col});
+							}, 1000);
 						}
 						
                         
@@ -1032,7 +1063,6 @@ export default class CheckersMain extends Phaser.Scene {
 
 						let diff = Math.abs(row - this.selectedPiece.row);
 						//console.log(diff);
-						let jumped = false;
 
 						if(diff == 2){//piece removed. need to clear
 							if(row < this.selectedPiece.row){
@@ -1042,14 +1072,12 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row+1][col+1].piece = null;
 									this.fieldArray[row+1][col+1].team = null;
 									this.fieldArray[row+1][col+1].king = null;
-									jumped = true
 								} else {
 									//console.log("piece above and right");
 									this.fieldArray[row+1][col-1].piece.destroy();
 									this.fieldArray[row+1][col-1].piece = null;
 									this.fieldArray[row+1][col-1].team = null;
 									this.fieldArray[row+1][col-1].king = null;
-									jumped = true
 								}
 							} else {
 								if(col < this.selectedPiece.col){
@@ -1058,31 +1086,22 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row-1][col+1].piece = null;
 									this.fieldArray[row-1][col+1].team = null;
 									this.fieldArray[row-1][col+1].king = null;
-									jumped = true
 								} else {
 									//console.log("piece below and right");
 									this.fieldArray[row-1][col-1].piece.destroy();
 									this.fieldArray[row-1][col-1].piece = null;
 									this.fieldArray[row-1][col-1].team = null;
 									this.fieldArray[row-1][col-1].king = null;
-									jumped = true
 								}
 							}
 						}
 
                         this.cleanUpBoard();
-
-						if(jumped){
-							let jumping = this.checkJumping();
-							if(jumping.length != 0){
-								console.log("can jump");
-							} else {
-								this.toMove = 'red';
-							}
-						} else {
-							this.toMove = 'red';
+                        this.toMove = this.opponentColor
+						if(this.hasBeenSent){
+							this.hasBeenSent = false
+							this.toMove = this.myColor
 						}
-                        //this.toMove = 'red';
                         this.pieceSelected = false;
                         //console.log(theTile.team);
 

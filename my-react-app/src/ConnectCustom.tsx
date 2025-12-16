@@ -1,12 +1,15 @@
 import  {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { PhaserGame } from './PhaserGame';
-import type { IRefPhaserGame } from './PhaserGame';
+import {useParams} from "react-router-dom";
+import { PhaserGame } from './PhaserGame.js';
+import type { IRefPhaserGame } from './PhaserGame.js';
 import ChatBox from './components/ChatBox.jsx';
 
 
 function ConnectGame(){
     const [user, setUser] = useState(null);
+
+    const params = useParams();
 
      const phaserRef = useRef<IRefPhaserGame | null>(null);
 
@@ -20,11 +23,11 @@ function ConnectGame(){
         //todo?
     }
 
-    if(user){
+    if(user) {
         return (
             <div>
                 <h2>Connect4</h2>
-                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" />
+                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="custom" opp={params.enemyId} />
                 {user ?<> <h2>Username: {user.username}</h2>  </>: <h2>Please log in to play</h2>}
                 <ChatBox />
             </div>
