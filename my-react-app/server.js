@@ -10,13 +10,55 @@ import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 import {createServer} from 'http';
 //import * as flat from 'flat';
 
+if (process.env){
+  console.log(process.title)
+} else {
+  console.log(".env not detected! The server will not run properly") 
+}
+app2.use(express.json());
+app2.use(express.urlencoded({ extended: true }));
+
+// Allow us to send requests from react to here
+console.log("CORS origin:", process.env.FRONTEND_CLIENT);
+app2.use(cors({
+  origin: process.env.FRONTEND_CLIENT, // frontend URL
+  credentials: true                // allow cookies/session
+}));
 
 
+app2.use(
+  session({
+    name: 'AwesomeWebapp2',
+    secret: "This is a secret.. shhh don't tell anyone",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
+  })
+);
 
-const client = createClient();
-client.connect().then(() => {});
-const httpServer = createServer(app);
-const io = new Server(httpServer, {cors: {origin: '*'}});
+configRoutesFunction(app2);
+
+// const httpServer = createServer(app);
+const PORT = process.env.PORT || 3000;
+const httpServer = app2.listen(PORT, () => {
+  console.log("We've now got a server!");
+  console.log(`Your routes will be running on ${process.env.VITE_BACKEND_SERVER}`);
+});
+
+const client = createClient({
+  socket: {
+    host: process.env.REDIS_URL,
+    port: Number(process.env.REDIS_PORT)
+  },
+  password: process.env.REDIS_PASSWORD
+});
+
+client.connect().catch(console.error);
+const io = new Server(httpServer, {cors: {
+    origin: process.env.FRONTEND_CLIENT,
+    methods: ["GET", "POST"],
+    credentials: true
+  }});
 
 let checkersCustomClients = {}
 
@@ -44,7 +86,7 @@ let checkersTimers = []
 let maniaTimers = []
 
 io.on('connection', (socket) => {
-  let thisColor = ""
+  // switcher = 1-switcher
   let thisClient
 
   socket.on("gameDone", ({game, winner}) => {
@@ -695,27 +737,13 @@ io.on('connection', (socket) => {
   });
 });
 
-app2.use(express.json());
-app2.use(express.urlencoded({ extended: true }));
-
-// Allow us to send requests from react to here
-app2.use(cors({
-  origin: "http://localhost:8080", // frontend URL
-  credentials: true                // allow cookies/session
-}));
+// httpServer.listen(3000, () => { //we've got 2 servers here this is chaos idk whats goin on
+//   console.log(`listening on *:${4000}`);
+// });
 
 
-app2.use(
-  session({
-    name: 'AwesomeWebapp2',
-    secret: "This is a secret.. shhh don't tell anyone",
-    saveUninitialized: false,
-    resave: false,
-    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
-  })
-);
 
-configRoutesFunction(app2);
+
 
 
 app2.listen(3000, () => {

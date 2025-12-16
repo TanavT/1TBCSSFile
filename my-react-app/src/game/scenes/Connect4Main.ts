@@ -148,9 +148,7 @@ export default class Connect4Main extends Phaser.Scene {
 	}
 
 	preload(){
-		console.log("It's preloadin time")
-		this.socket = io('http://localhost:4000');
-
+		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			this.socket.emit("realSocketConnect", 'test')
