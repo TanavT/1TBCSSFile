@@ -1,8 +1,17 @@
 import axios from 'axios';
 import {accounts} from './mongo/MongoCollections.js';
+import { validationMethods } from './helpers.js';
 
 const exportedMethods = {
     async login(username, password){
+        if(typeof username !== "string" || username.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty username`;
+        }
+
+        if(typeof password !== "string" || password.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty password`;
+        }
+
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
         if (!user) throw "User not found";
@@ -14,6 +23,9 @@ const exportedMethods = {
     },
 
     async signup(username, password){
+        username = validationMethods.checkUsername(username);
+        password = validationMethods.checkPassword(password);
+
         const accountsCollection = await accounts();
         const existing = await accountsCollection.findOne({ username });
         if (existing) throw "User already exists";
@@ -52,11 +64,15 @@ const exportedMethods = {
 
     //returns the user after searching
     async searchUser(username) {
+        if(typeof username !== "string" || username.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty username`;
+        }
+
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
         
         if (!user) {
-            throw "User not found";
+            throw `Error: User not found`;
         }
         
         return {
