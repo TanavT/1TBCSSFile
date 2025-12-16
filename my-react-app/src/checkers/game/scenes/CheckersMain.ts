@@ -929,6 +929,8 @@ export default class CheckersMain extends Phaser.Scene {
 						let diff = Math.abs(row - this.selectedPiece.row);
 						//console.log(diff);
 
+						let jumped = false;
+
 						if(diff == 2){//piece removed. need to clear
 							if(row < this.selectedPiece.row){
 								if(col < this.selectedPiece.col){
@@ -937,12 +939,14 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row+1][col+1].piece = null;
 									this.fieldArray[row+1][col+1].team = null;
 									this.fieldArray[row+1][col+1].king = null;
+									jumped = true
 								} else {
 									//console.log("piece above and right");
 									this.fieldArray[row+1][col-1].piece.destroy();
 									this.fieldArray[row+1][col-1].piece = null;
 									this.fieldArray[row+1][col-1].team = null;
 									this.fieldArray[row+1][col-1].king = null;
+									jumped = true
 								}
 							} else {
 								if(col < this.selectedPiece.col){
@@ -951,18 +955,30 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row-1][col+1].piece = null;
 									this.fieldArray[row-1][col+1].team = null;
 									this.fieldArray[row-1][col+1].king = null;
+									jumped = true
 								} else {
 									//console.log("piece below and right");
 									this.fieldArray[row-1][col-1].piece.destroy();
 									this.fieldArray[row-1][col-1].piece = null;
 									this.fieldArray[row-1][col-1].team = null;
 									this.fieldArray[row-1][col-1].king = null;
+									jumped = true
 								}
 							}
 						}
 
                         this.cleanUpBoard();
-                        this.toMove = 'black';
+						if(jumped){
+							let jumping = this.checkJumping();
+							if(jumping.length != 0){
+								console.log("can jump");
+							} else {
+								this.toMove = 'black'
+							}
+						} else {
+							this.toMove = 'black';
+						}
+                        
                         this.pieceSelected = false;
                     //}      
                 }
@@ -1016,6 +1032,7 @@ export default class CheckersMain extends Phaser.Scene {
 
 						let diff = Math.abs(row - this.selectedPiece.row);
 						//console.log(diff);
+						let jumped = false;
 
 						if(diff == 2){//piece removed. need to clear
 							if(row < this.selectedPiece.row){
@@ -1025,12 +1042,14 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row+1][col+1].piece = null;
 									this.fieldArray[row+1][col+1].team = null;
 									this.fieldArray[row+1][col+1].king = null;
+									jumped = true
 								} else {
 									//console.log("piece above and right");
 									this.fieldArray[row+1][col-1].piece.destroy();
 									this.fieldArray[row+1][col-1].piece = null;
 									this.fieldArray[row+1][col-1].team = null;
 									this.fieldArray[row+1][col-1].king = null;
+									jumped = true
 								}
 							} else {
 								if(col < this.selectedPiece.col){
@@ -1039,18 +1058,31 @@ export default class CheckersMain extends Phaser.Scene {
 									this.fieldArray[row-1][col+1].piece = null;
 									this.fieldArray[row-1][col+1].team = null;
 									this.fieldArray[row-1][col+1].king = null;
+									jumped = true
 								} else {
 									//console.log("piece below and right");
 									this.fieldArray[row-1][col-1].piece.destroy();
 									this.fieldArray[row-1][col-1].piece = null;
 									this.fieldArray[row-1][col-1].team = null;
 									this.fieldArray[row-1][col-1].king = null;
+									jumped = true
 								}
 							}
 						}
 
                         this.cleanUpBoard();
-                        this.toMove = 'red';
+
+						if(jumped){
+							let jumping = this.checkJumping();
+							if(jumping.length != 0){
+								console.log("can jump");
+							} else {
+								this.toMove = 'red';
+							}
+						} else {
+							this.toMove = 'red';
+						}
+                        //this.toMove = 'red';
                         this.pieceSelected = false;
                         //console.log(theTile.team);
 
