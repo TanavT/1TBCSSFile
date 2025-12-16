@@ -34,11 +34,7 @@ app2.use(
 
 configRoutesFunction(app2);
 
-
-const httpServer = app2.listen(3000, () => {
-  console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
-});
+// const httpServer = createServer(app);
 
 const client = createClient({
   socket: {
@@ -49,7 +45,6 @@ const client = createClient({
 });
 
 client.connect().catch(console.error);
-// const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {
     origin: "https://testing-game-1tbcss.web.app",
     methods: ["GET", "POST"],
@@ -110,6 +105,11 @@ io.on('connection', (socket) => {
 // httpServer.listen(3000, () => { //we've got 2 servers here this is chaos idk whats goin on
 //   console.log(`listening on *:${4000}`);
 // });
+httpServer.listen(3000, () => {
+  console.log("We've now got a server!");
+  console.log('Your routes will be running on http://localhost:3000');
+});
+
 
 
 
