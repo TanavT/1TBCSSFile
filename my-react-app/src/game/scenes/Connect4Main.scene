@@ -128,6 +128,50 @@
             "scaleY": -5.938735196804428,
             "width": 128,
             "height": 128
+        },
+        {
+            "type": "Text",
+            "id": "b0617c4c-441b-4bb9-ab47-d901df06be95",
+            "label": "yourTimeText",
+            "x": 15,
+            "y": 53,
+            "text": "Your time: 10:00\n",
+            "fontFamily": "Times",
+            "fontSize": "40px",
+            "wordWrapWidth": 1
+        },
+        {
+            "type": "Text",
+            "id": "c630c066-334c-45b9-828d-b63ddaa9a745",
+            "label": "enemyTimeText",
+            "x": 902,
+            "y": 53,
+            "text": "Enemy time: 10:00\n",
+            "fontFamily": "Times",
+            "fontSize": "40px",
+            "wordWrapWidth": 1
+        },
+        {
+            "type": "Text",
+            "id": "52ba474b-6f92-428f-9598-a3efeba778c0",
+            "label": "yourColorText",
+            "x": 16,
+            "y": 580,
+            "text": "Your Color: None\n",
+            "fontFamily": "Times",
+            "fontSize": "40px",
+            "wordWrapWidth": 1
+        },
+        {
+            "type": "Text",
+            "id": "5ee88ae2-63e9-42ea-8cc7-bf13b451a3ba",
+            "label": "turnText",
+            "x": 909,
+            "y": 619,
+            "text": "Turn: red\n",
+            "fontFamily": "Times",
+            "fontSize": "40px",
+            "wordWrapWidth": 1
         }
     ],
     "plainObjects": [],

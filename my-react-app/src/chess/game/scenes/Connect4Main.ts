@@ -3,13 +3,11 @@
 
 /* START OF COMPILED CODE */
 
+
+import Phaser from "phaser";
+
 /* START-USER-IMPORTS */
-import Phaser from "phaser"
-import connect4_Empty_Grid from "../../assets/Connect4_Empty_Grid.png";
-import red_Circle_full from "../../assets/Red_Circle_full.png";
-import yellow_Circle from "../../assets/Yellow_Circle.png";
-import io from 'socket.io-client';
-import { Socket } from "socket.io-client";
+
 /* END-USER-IMPORTS */
 
 export default class Connect4Main extends Phaser.Scene {
@@ -71,34 +69,6 @@ export default class Connect4Main extends Phaser.Scene {
 		rectangle_6.scaleX = 0.7592880558062651;
 		rectangle_6.scaleY = -5.938735196804428;
 
-		// yourTimeText
-		const yourTimeText = this.add.text(15, 53, "", {});
-		yourTimeText.text = "Your time: 10:00\n";
-		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
-		yourTimeText.setWordWrapWidth(1);
-		this.yourTimeText = yourTimeText
-
-		// enemyTimeText
-		const enemyTimeText = this.add.text(902, 53, "", {});
-		enemyTimeText.text = "Enemy time: 10:00\n";
-		enemyTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
-		enemyTimeText.setWordWrapWidth(1);
-		this.enemyTimeText = enemyTimeText
-
-		// yourColorText
-		const yourColorText = this.add.text(16, 580, "", {});
-		yourColorText.text = "Your Color: None\n";
-		yourColorText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
-		yourColorText.setWordWrapWidth(1);
-		this.yourColorText = yourColorText
-
-		// turnText
-		const turnText = this.add.text(909, 619, "", {});
-		turnText.text = "Turn: red\n";
-		turnText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
-		turnText.setWordWrapWidth(1);
-		this.turnText = turnText
-
 		this.rectangle_1 = rectangle_1;
 		this.rectangle = rectangle;
 		this.rectangle_2 = rectangle_2;
@@ -122,139 +92,7 @@ export default class Connect4Main extends Phaser.Scene {
 
 	// Write your code here
 
-	socket:Socket;
-
-	color:string;
-	opponentColor:string;
-
-	myTurn:boolean = false; //red goes first
-
-	yourTimeText
-	enemyTimeText
-	yourColorText
-	turnText
-
-	gameOver:boolean = false;
-
-	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
-    // Minutes
-    var minutes = Math.floor(seconds/60);
-    // Seconds
-    var partInSeconds = seconds%60;
-    // Adds left zeros to seconds
-    partInSeconds = partInSeconds.toString().padStart(2,'0');
-    // Returns formated time
-    return `${minutes}:${partInSeconds}`;
-	}
-
-	preload(){
-		this.socket = io('http://localhost:3000');
-		this.socket.on('user_join', (id) => {
-			console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketConnect", 'test')
-  		});
-
-		this.socket.on('timer', ({timeRed, timeYellow}) => {
-			if(this.gameOver) return
-			if(this.color == "red"){
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeRed)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeYellow)}`
-			}
-			else{
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeYellow)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeRed)}`
-			}
-			if(timeRed == 0){
-				this.doGameOver("Y")
-			}
-			if(timeYellow == 0){
-				this.doGameOver("R")
-			}
-  		});
-
-		this.socket.on('color', ({id, color}) => {
-			if (this.socket.id == id){
-				if(color == 'red'){
-					this.color="red"
-					this.opponentColor="yellow"
-				}
-				else{
-					this.color="yellow"
-					this.opponentColor="red"
-				}
-			}
-			else{
-				if(color == 'red'){
-					this.color="yellow"
-					this.opponentColor="red"
-				}
-				else{
-					this.color="red"
-					this.opponentColor="yellow"
-				}
-			}
-			console.log("COLOR:" + this.color)
-			this.myTurn = (this.color == "red")
-			this.yourColorText.text = `Your color: ${this.color}`
-  		})
-		this.socket.on('error', ({id, message}) => {
-			console.log("I am "+id+" and the message is: " + message)
-		})
-		this.socket.on("otherPlaced", (collumn) => {
-			  this.myTurn = true;
-			  this.turnText.text = `Turn: ${this.color}`
-			  console.log(collumn.x);
-			  let collumnNumber = Math.floor((collumn.x - 200)/100);
-			  if(collumn.x === 196) collumnNumber = 0
-			  if(this.countCollum[collumnNumber] < 6){
-			  if(this.opponentColor == "red"){
-			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
-
-			  tempThingy.scaleX = 0.3;
-			  tempThingy.scaleY = 0.3;
-			  	this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'R'
-			  }
-			  else{
-			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
-
-			  tempThingy.scaleX = 0.18;
-			  tempThingy.scaleY = 0.18;
-			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
-			  }
-			  this.circleList.push(tempThingy)
-			  console.log(this.globalGameState)
-			//this.turn = 1-this.turn;
-              const t = this.tweens.add({
-                    targets: [tempThingy],
-                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
-                    duration: 200,
-                    easing: 'bounce',
-                    yoyo: false,
-                    paused: true
-                })
-              t.play()
-			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
-			  this.checkGameOver(this.globalGameState);
-			  }
-
-		})
-
-
-		this.load.image(
-		'Connect4_Empty_Grid',
-		'assets/Connect4_Empty_Grid.png'
-		);
-		this.load.image(
-		'Red_Circle_full',
-		'assets/Red_Circle_full.png'
-		);
-		this.load.image(
-		'Yellow_Circle',
-		'assets/Yellow_Circle.png'
-		);
-
-	}
-
+	
 	checkGameOver(gameState:string [][]):void {
 		for(let [i,x] of gameState.entries()){ //side to side
 			if(i < 4){
@@ -262,7 +100,6 @@ export default class Connect4Main extends Phaser.Scene {
 					if(gameState[i][j] !== 'x' && gameState[i][j] === gameState[i+1][j] && gameState[i+1][j] === gameState[i+2][j] && gameState[i+2][j] === gameState[i+3][j]){
 						console.log(gameState[i][j] + ' WINS!!!')
 						this.doGameOver(gameState[i][j])
-						return
 					}
 				}
 			}
@@ -273,7 +110,6 @@ export default class Connect4Main extends Phaser.Scene {
 						if(gameState[i][j] !== 'x' && gameState[i][j] === gameState[i][j+1] && gameState[i][j+1] === gameState[i][j+2] && gameState[i][j+2] === gameState[i][j+3]){
 							console.log(gameState[i][j] + ' WINS!!!')
 							this.doGameOver(gameState[i][j])
-							return
 						}
 					}
 
@@ -287,7 +123,6 @@ export default class Connect4Main extends Phaser.Scene {
 					if(gameState[i][j] !== 'x' && gameState[i][j] === gameState[i+1][j+1] && gameState[i+1][j+1] === gameState[i+2][j+2] && gameState[i+2][j+2] === gameState[i+3][j+3]){
 						console.log(gameState[i][j] + ' WINS!!!')
 						this.doGameOver(gameState[i][j])
-						return
 					}
 					}
 				}
@@ -301,14 +136,10 @@ export default class Connect4Main extends Phaser.Scene {
 					if(gameState[i][j] !== 'x' && gameState[i][j] === gameState[i+1][j-1] && gameState[i+1][j-1] === gameState[i+2][j-2] && gameState[i+2][j-2] === gameState[i+3][j-3]){
 						console.log(gameState[i][j] + ' WINS!!!')
 						this.doGameOver(gameState[i][j])
-						return
 					}
 					}
 				}
 			}
-		}
-		if(this.countCircles == 42){
-			this.doGameOver("tie")
 		}
 		return
 	}
@@ -316,57 +147,38 @@ export default class Connect4Main extends Phaser.Scene {
 	globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
 
 	circleList = []
-
+	
 	turn = 0;
 	countCollum = [0,0,0,0,0,0,0]
 
-	countCircles = 0
-
 	doGameOver(winner:string):void{
 		console.log(winner + ' WINS FR!!!')
-		this.gameOver = true
-		if(winner == "R"){
-			this.winRed.visible = true
-		}
-		else if(winner == "Y"){
-			this.winYellow.visible = true
-		}
-		else{
-			this.tieGame.visible = true
-		}
-		// this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
-		// this.turn = 0;
-		// this.countCollum = [0,0,0,0,0,0,0];
-		// this.circleList.forEach((circle) => {
-		// 	circle.destroy();
-		// })
-		// this.sceneShutdown();
+		this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
+		this.turn = 0;
+		this.countCollum = [0,0,0,0,0,0,0];
+		this.circleList.forEach((circle) => {
+			circle.destroy();
+		})
 	}
 
 	async idkFunc(){
 
 	}
-	winRed
-	winYellow
-	tieGame
 
 	create() {
 
 		this.editorCreate();
 
+
 		const collumns = [this.rectangle, this.rectangle_1, this.rectangle_2, this.rectangle_3, this.rectangle_4, this.rectangle_5, this.rectangle_6]
 
         collumns.forEach((collumn) => {
             collumn.on('pointerdown', () => {
-			  if(this.myTurn && this.gameOver == false){
-			  this.myTurn = false;
-			  this.turnText.text = `Turn: ${this.opponentColor}`
-			  this.socket.emit("placePiece", (collumn))
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
 			  if(collumn.x === 196) collumnNumber = 0
 			  if(this.countCollum[collumnNumber] < 6){
-			  if(this.color == "red"){
+			  if(this.turn === 0){
 			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
 
 			  tempThingy.scaleX = 0.3;
@@ -382,7 +194,7 @@ export default class Connect4Main extends Phaser.Scene {
 			  }
 			  this.circleList.push(tempThingy)
 			  console.log(this.globalGameState)
-			//this.turn = 1-this.turn;
+			  this.turn = 1-this.turn;
               const t = this.tweens.add({
                     targets: [tempThingy],
                     y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
@@ -395,38 +207,15 @@ export default class Connect4Main extends Phaser.Scene {
 			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
 			  this.checkGameOver(this.globalGameState);
 			  }
-              }
-			})
+            })
         })
-	
 
-	const winRed = this.add.text(130, 320, "", {});
-	winRed.visible = false;
-	winRed.text = "Winner: Red";
-	winRed.setStyle({ "fontSize": "100px" });
-	winRed.setStroke('#000000', 6);
-	this.winRed = winRed
 
-	// winBlack
-	const winYellow = this.add.text(130, 320, "", {});
-	winYellow.visible = false;
-	winYellow.text = "Winner: Yellow";
-	winYellow.setStyle({ "fontSize": "100px" });
-	winYellow.setStroke('#000000', 6);
-	this.winYellow = winYellow
-
-	// tie
-	const tieGame = this.add.text(130, 320, "", {});
-	tieGame.visible = false;
-	tieGame.text = "Result: Tie";
-	tieGame.setStyle({ "fontSize": "100px" });
-	tieGame.setStroke('#000000', 6);
-	this.tieGame = tieGame
-	}
 
 	}
+
 	/* END-USER-CODE */
-
+}
 
 /* END OF COMPILED CODE */
 
