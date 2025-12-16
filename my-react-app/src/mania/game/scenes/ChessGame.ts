@@ -40,7 +40,6 @@ export default class ChessGame extends Phaser.Scene {
   		});
 
 		this.socket.on('timer', ({timeFirst, timeSecond}) => {
-			if(this.gameOver) return
 			if(this.color == "white"){
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeFirst)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeSecond)}`
@@ -84,7 +83,12 @@ export default class ChessGame extends Phaser.Scene {
 			}
 			//console.log("COLOR:" + this.color)
 			this.myTurn = (this.color == "white")
-			this.yourColorText.text = `Your Color: ${this.color}`
+			let temp = "First"
+			if(this.color == "white") temp = "Second"
+			this.yourColorText.text = `Your Go: ${temp}`
+			let temp2 = "Turn: Yours"
+			if(this.color == "white") temp = "Turn: Opponent's"
+			this.turnText.text = temp
   		})
 
 		this.socket.on('error', ({id, message}) => {
@@ -97,6 +101,7 @@ export default class ChessGame extends Phaser.Scene {
 		} )
 
 		this.socket.on("allOver", (whoWon) => {
+			this.gameOver = true
 			this.blackRectangle.visible = true
 			this.yourTimeText.visible = false
 			this.enemyTimeText.visible = false
@@ -220,7 +225,7 @@ export default class ChessGame extends Phaser.Scene {
 			this.piecesOnSquares[startSquareInt] = null
 			ttt.play()
 			//this.myTurn = true
-			this.turnText.text = `Turn: ${this.color}`
+			this.turnText.text = `Turn: Yours`
 
 
 			if(this.chess.isGameOver()){
@@ -262,6 +267,7 @@ export default class ChessGame extends Phaser.Scene {
 		chessboard.scaleX = 2.6;
 		chessboard.scaleY = 2.6;
 		chessboard.angle = 90;
+		chessboard.setCrop(10,0, 270, 300)
 
 		// location_dot_grey_svg_0
 		const location_dot_grey_svg_0 = this.add.image(215, 681, "Location_dot_grey.svg");
@@ -600,7 +606,7 @@ export default class ChessGame extends Phaser.Scene {
 
 		// turnText
 		const turnText = this.add.text(700, 770, "", {});
-		turnText.text = "Turn: white";
+		turnText.text = "Turn: none";
 		turnText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		turnText.setWordWrapWidth(10);
 		this.turnText = turnText
@@ -1016,7 +1022,7 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					this.myTurn = false
-					this.turnText.text = `Turn: ${this.opponentColor}`
+					this.turnText.text = `Turn: Opponent's`
 					this.squares.forEach((square2) => {
 						square2.alphaTopLeft = 0;
 						square2.alphaTopRight = 0;
@@ -1073,7 +1079,7 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					this.myTurn = false
-					this.turnText.text = `Turn: ${this.opponentColor}`
+					this.turnText.text = `Turn: Opponent's`
 					this.chess = chess
 					clickedSquareString = ""
 					this.squares.forEach((square2) => {
@@ -1336,7 +1342,7 @@ export default class ChessGame extends Phaser.Scene {
 						if(chess.isThreefoldRepetition()) repetition.visible = true
 					}
 					this.myTurn = false
-					this.turnText.text = `Turn: ${this.opponentColor}`
+					this.turnText.text = `Turn: Opponent's`
 					if(promoteChecker == false)
 						this.socket.emit('placePieceChessMania', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
 					this.chess = chess
