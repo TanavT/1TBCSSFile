@@ -10,14 +10,13 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#818589',
-    scene: [
-        Connect4Main
-    ]
+    scene: []
 };
+
 
 const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => {
     
-    return new Game({
+    const game =  new Game({
          ...config,
         parent,
         callbacks: {
@@ -37,6 +36,10 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp
             }
         }
      });
+  
+     game.scene.add('Connect4Main', Connect4Main, false);
+  return game;
+
 
 }
 

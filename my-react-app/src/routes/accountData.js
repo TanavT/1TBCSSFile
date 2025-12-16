@@ -1,8 +1,20 @@
 import axios from 'axios';
 import {accounts} from './mongo/MongoCollections.js';
+import bcrypt from 'bcrypt';
+import { ObjectId } from 'mongodb';
+const saltRounds = 10;
 import { validationMethods } from './helpers.js';
 
 const exportedMethods = {
+    async getUser(id){
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({_id: new ObjectId(id) });
+        if (!user) throw "user not found";
+        
+        // console.log(user);
+        return user;
+    },
+
     async login(username, password){
         if(typeof username !== "string" || username.trim().length <= 0) {
             throw `Error: Please enter a valid non-empty username`;
@@ -14,14 +26,17 @@ const exportedMethods = {
 
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
-        if (!user) throw "User not found";
-
-        //password check;
-        //console.log(user);
-        return user;
+        if (!user) throw "Either the username or password is invalid";
         
-        return { id: user._id, username: user.username };
+        //password check;
+        let passwordCompare = false;
+        passwordCompare = await bcrypt.compare(password, user.password)
+        if (!passwordCompare) throw "Either the username or password is invalid"
+        console.log(user);
+        return user;
+        // return { id: user._id, username: user.username };
     },
+
 
     async signup(username, password){
         username = validationMethods.checkUsername(username);
@@ -38,20 +53,30 @@ const exportedMethods = {
         const todayString = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
         //console.log(todayString); 
 
-
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
         //const passwordHash = await bcrypt.hash(password, 12);
         const newUser = { 
             username, 
-            password, 
+            password: hashedPassword, 
             winrates: {
                 chessWins: 0,
+                chessTies: 0,
                 chessLosses: 0,
                 checkersWins: 0,
+                checkersTies: 0,
                 checkersLosses: 0,
                 connectWins: 0,
+                connectTies: 0,
                 connectLosses: 0,
                 maniaWins: 0,
+                maniaTies: 0,
                 maniaLosses: 0
+            },
+            elo: {
+                chess: 800,
+                checkers: 800,
+                connect: 800,
+                mania: 800
             },
             signupDate: todayString,
             friendList: [],

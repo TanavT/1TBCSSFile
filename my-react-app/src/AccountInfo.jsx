@@ -7,15 +7,26 @@ import ChallengeModal from './ChallengeModal.jsx';
 function AccountInfo() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
+    const fetchUser = async () => {
+        const res = await axios.get(
+            "http://localhost:3000/account/me",{withCredentials: true}
+        );
+        setUser(res.data);
+    };
     //const [showModal, setShowModal] = useState(false);
     const [challengedFriend, setChallengedFriend] = useState(null);
     console.log(user);
 
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
-    }, [])
+        fetchUser();
+
+        // socket.on("eloUpdated", fetchUser);
+
+        // return () => {
+        //     socket.off("eloUpdated", fetchUser);
+        // };
+    }, []);
+
 
     async function handleChallengeFriend(friendUsername){
         if( window.confirm(`Are you sure you want to challenge ${friendUsername}?`)){
@@ -79,6 +90,8 @@ function AccountInfo() {
     console.log(user ? user.friendList : "");
   return (
     <div>
+        {user ? (<button onClick={fetchUser}>Refresh</button>) : <></>}
+
         {user ? (
             <div>
                 <p>your name is {user.username ? user.username : 'unknown'}</p>
@@ -87,30 +100,30 @@ function AccountInfo() {
 
                 <p>
                     Chess: 
-                    {(user.winrates && user.winrates.chessWins !== undefined ? user.winrates.chessWins : 0)}
+                    {(user.winrates && user.winrates.chessWins !== undefined && user.winrates.chessLosses !== undefined ?  "W/L = " + {user.winrates.chessWins}/{user.winrates.chessLosses} : "W/L = " + 0)}
                     -
-                    {(user.winrates && user.winrates.chessLosses !== undefined ? user.winrates.chessLosses : 0)}
+                    {(user.elo && user.elo.chess !== undefined ? "Elo = " + {Math.floor(user.elo.chess)} :"Elo = " + 0)}
                 </p>
 
                 <p>
                     Checkers: 
-                    {(user.winrates && user.winrates.checkersWins !== undefined ? user.winrates.checkersWins : 0)}
+                    {(user.winrates && user.winrates.checkersWins !== undefined && user.winrates.checkersLosses !== undefined ?  "W/L =" + {user.winrates.checkersWins}/{user.winrates.checkersLosses} : "W/L = " + 0)}
                     -
-                    {(user.winrates && user.winrates.checkersLosses !== undefined ? user.winrates.checkersLosses : 0)}
+                    {(user.elo && user.elo.checkers !== undefined ? "Elo = " + {Math.floor(user.elo.checkers)} :"Elo = " + 0)}
                 </p>
 
                 <p>
                     Connect4: 
-                    {(user.winrates && user.winrates.connectWins !== undefined ? user.winrates.connectWins : 0)}
+                    {(user.winrates && user.winrates.connectWins !== undefined && user.winrates.connectLosses !== undefined ?  "W/L = " + {user.winrates.connectWins}/{user.winrates.connectLosses} : "W/L = " + 0)}
                     -
-                    {(user.winrates && user.winrates.connectLosses !== undefined ? user.winrates.connectLosses : 0)}
+                    {(user.elo && user.elo.connect !== undefined ? "Elo = " + {Math.floor(user.elo.connect)} :"Elo = " + 0)}
                 </p>
 
                 <p>
                     Mania: 
-                    {(user.winrates && user.winrates.maniaWins !== undefined ? user.winrates.maniaWins : 0)}
+                  {(user.winrates && user.winrates.maniaWins !== undefined && user.winrates.maniaLosses !== undefined ?  "W/L = " + {user.winrates.maniaWins}/{user.winrates.maniaLosses} : "W/L = " + 0)}
                     -
-                    {(user.winrates && user.winrates.maniaLosses !== undefined ? user.winrates.maniaLosses : 0)}
+                    {(user.elo && user.elo.mania !== undefined ? "Elo = " + {Math.floor(user.elo.mania)} :"Elo = " + 0)}
                 </p>
 
                 <p>Friends:</p>

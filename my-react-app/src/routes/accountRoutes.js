@@ -171,8 +171,9 @@ router
     .route('/me')
     .get(async (req, res) => {
         if(req.session.user) {
-            //console.log(req.session.user);
-            return res.json(req.session.user);
+            const updatedUser = await accountData.getUser(req.session.user._id)
+            req.session.user = updatedUser
+            return res.json(req.session.user)
         } else {
             return res.status(401).json({error: 'Not logged in'});
         }

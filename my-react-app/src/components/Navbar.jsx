@@ -17,8 +17,17 @@ function NavBar() {
       <div className="nav-left">
         <h1 className="logo">MyChessApp</h1>
         <Link to="/chess" className="nav-link">Chess</Link>
+        <Link to="/chessleaderboard" className="nav-link">leaderboard</Link>
+ 
         <Link to="/checkers" className="nav-link">Checkers</Link>
+        <Link to="/checkersleaderboard" className="nav-link">leaderboard</Link>
+
         <Link to="/connect" className="nav-link">Connect</Link>
+        <Link to="/connectleaderboard" className="nav-link">leaderboard</Link>
+
+        <Link to="/mania" className="nav-link">Mania</Link>
+        <Link to="/manialeaderboard" className="nav-link">leaderboard</Link>
+        
         <Link to="/search" className="nav-link">Search</Link>
       </div>
 
