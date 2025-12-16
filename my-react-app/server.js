@@ -1,7 +1,7 @@
 import express from 'express';
 //import redis from 'redis';
 import app from 'express';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 const app2 = express();
 import session from 'express-session';
 import configRoutesFunction from './src/routes/index.js';
@@ -11,11 +11,11 @@ import {createServer} from 'http';
 //import * as flat from 'flat';
 import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
+import client from './redis.js'
 
 
 
-const client = createClient();
-client.connect().then(() => {});
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
@@ -116,7 +116,7 @@ io.on('connection', (socket) => {
     }
     if (connectMatchUpdated[index] === false) {
       connectMatchUpdated[index] = true //only let one socket message in
-      const updatedElos = await gameData.connectGameOver(userID, opponentUserID, gameState)
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "connect")
       console.log(updatedElos)
     }
   })

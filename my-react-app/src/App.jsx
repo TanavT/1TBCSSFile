@@ -14,6 +14,10 @@ import CheckersHomePage from './CheckersHome.jsx';
 import ConnectHomePage from './ConnectHome.jsx';
 import AccountPage from './AccountPage.jsx'; //page that lets us sign in
 import AccountInfo from './AccountInfo.jsx';
+import ConnectLeaderboard from './ConnectLeaderboard.jsx';
+import ChessLeaderboard from './ChessLeaderboard.jsx';
+import CheckersLeaderboard from './CheckersLeaderboard.jsx';
+import ManiaLeaderboard from './ManiaLeaderboard.jsx';
 
 
 function App() {
@@ -28,6 +32,11 @@ function App() {
         <Route path='/checkersMatch' element ={<CheckersGame/>}/>
         <Route path='/connect' element={<ConnectHomePage/>} />
         <Route path='/connectMatch' element ={<ConnectGame/>}/>
+
+        <Route path='/connectLeaderboard' element={<ConnectLeaderboard/>}/>
+        <Route path='/chessLeaderboard' element={<ChessLeaderboard/>}/>
+        <Route path='/checkersLeaderboard' element={<CheckersLeaderboard/>}/>
+        <Route path='/maniaLeaderboard' element={<ManiaLeaderboard/>}/>
 
         <Route path='/login' element={<AccountPage/>} />
         <Route path='/account' element={<AccountInfo/>}/>

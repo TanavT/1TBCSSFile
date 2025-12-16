@@ -5,29 +5,29 @@ import axios from 'axios';
 
 function AccountInfo() {
     const [user, setUser] = useState(null);
-    
+    const fetchUser = async () => {
+        const res = await axios.get(
+            "http://localhost:3000/account/me",{withCredentials: true}
+        );
+        setUser(res.data);
+    };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const res = await axios.get(
-                "http://localhost:3000/account/me",{withCredentials: true}
-            );
-            setUser(res.data);
-        };
-
         fetchUser();
 
-        socket.on("eloUpdated", fetchUser);
+        // socket.on("eloUpdated", fetchUser);
 
-        return () => {
-            socket.off("eloUpdated", fetchUser);
-        };
+        // return () => {
+        //     socket.off("eloUpdated", fetchUser);
+        // };
     }, []);
 
 
     console.log(user);
   return (
     <div>
+        {user ? (<button onClick={fetchUser}>Refresh</button>) : <></>}
+
         {user ? (
             <div>
                 <h2>{user.username} </h2>

@@ -1,9 +1,19 @@
 import axios from 'axios';
 import {accounts} from './mongo/MongoCollections.js';
 import bcrypt from 'bcrypt';
+import { ObjectId } from 'mongodb';
 const saltRounds = 10;
 
 const exportedMethods = {
+    async getUser(id){
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({_id: new ObjectId(id) });
+        if (!user) throw "user not found";
+        
+        // console.log(user);
+        return user;
+    },
+
     async login(username, password){
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
@@ -15,8 +25,9 @@ const exportedMethods = {
         if (!passwordCompare) throw "Either the username or password is invalid"
         console.log(user);
         return user;
-        return { id: user._id, username: user.username };
+        // return { id: user._id, username: user.username };
     },
+
 
     async signup(username, password){
         const accountsCollection = await accounts();
@@ -37,12 +48,16 @@ const exportedMethods = {
             password: hashedPassword, 
             winrates: {
                 chessWins: 0,
+                chessTies: 0,
                 chessLosses: 0,
                 checkersWins: 0,
+                checkersTies: 0,
                 checkersLosses: 0,
                 connectWins: 0,
+                connectTies: 0,
                 connectLosses: 0,
                 maniaWins: 0,
+                maniaTies: 0,
                 maniaLosses: 0
             },
             elo: {
