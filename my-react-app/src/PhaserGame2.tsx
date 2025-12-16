@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
-import StartGame from './game/main';
+import StartGame from './game/main2';
 import { EventBus } from './game/EventBus';
 import Connect4Main from './game/scenes/Connect4Main';
 

@@ -22,19 +22,10 @@ function ConnectHomePage(){
         // };
     }
 
-    const handlePrivateMatch = async () => {
-        if(user){
-            navigate("/connectMatch");
-        } else {
-            navigate("/login");
-        }
-    }
-
     return (
         <div>
             <h2>CONNECT 4</h2>
-            <button onClick={handleRandomQueue}>Random Match</button>
-            <button onClick={handlePrivateMatch}>Challenge a friend</button>
+            <button onClick={handleRandomQueue}>Queue Random Match</button>
         </div>
         
     )
