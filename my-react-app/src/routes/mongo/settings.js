@@ -1,4 +1,4 @@
 export const mongoConfig = {
-  serverUrl: process.env.MONGODB_URL,
+  serverUrl: process.env.MONGO_URLy,
   database: 'WD2-GameApp'
 };
