@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { PhaserGame } from './PhaserGame';
+import ChatBox from './components/ChatBox.jsx';
 
 function CheckersGame(){
     const [user, setUser] = useState(null);
@@ -20,8 +21,9 @@ function CheckersGame(){
     return (
         <div>
             <h2>CHECKERS</h2>
-             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} />
+             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} type="queue" />
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            <ChatBox />
         </div>
         
     )

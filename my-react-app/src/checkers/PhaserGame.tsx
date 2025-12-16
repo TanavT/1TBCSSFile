@@ -10,19 +10,23 @@ export interface IRefPhaserGame
 
 interface IProps
 {
-    currentActiveScene?: (scene_instance: Phaser.Scene) => void
+    currentActiveScene?: (scene_instance: Phaser.Scene) => void;
+    user?: any;
+    gametype?: any;
+    opp?: any;
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref)
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp}, ref) //USER IN PHASER 2: add user to props here
 {
+    //console.log("test: " + test);
     const game = useRef<Phaser.Game | null>(null!);
+    //console.log("Props in PhaserGame:", { user, gametype, opp });
 
     useLayoutEffect(() =>
     {
         if (game.current === null)
         {
-
-            game.current = StartGame("game-container");
+            game.current = StartGame("game-container", {user, gametype, opp}); //USER IN PHASER 3: user passed to start game function
 
             if (typeof ref === 'function')
             {
@@ -45,7 +49,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
                 }
             }
         }
-    }, [ref]);
+    }, [ref, user, opp]); //USER IN PHASER 4: add user here. next step in main.ts
 
     useEffect(() =>
     {

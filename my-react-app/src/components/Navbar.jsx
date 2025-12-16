@@ -19,6 +19,7 @@ function NavBar() {
         <Link to="/chess" className="nav-link">Chess</Link>
         <Link to="/checkers" className="nav-link">Checkers</Link>
         <Link to="/connect" className="nav-link">Connect</Link>
+        <Link to="/search" className="nav-link">Search</Link>
       </div>
 
       <div className="nav-right">

@@ -147,13 +147,36 @@ export default class Connect4Main extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
 	}
 
+	gametype: string;
+	opp: any;
+	me: any;
+
+	init() {
+		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
+		console.log("got user: " + user.username);
+		this.me = user.username
+
+		const gametype = this.game.registry.get("gametype");
+		console.log("got gametype: " + gametype);
+		this.gametype = gametype;
+
+		const opp = this.game.registry.get("opp");
+		console.log("got opp: " + opp);
+		this.opp = opp;
+	}
+
 	preload(){
 		console.log("It's preloadin time")
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketConnect", 'test')
+			if(this.gametype == "queue"){
+				this.socket.emit("realSocketConnect", 'test')
+			} else {
+				this.socket.emit("customJoinConnect", {me:this.me, opp:this.opp})
+			}
+			
   		});
 
 		this.socket.on('timer', ({timeRed, timeYellow}) => {
@@ -202,6 +225,46 @@ export default class Connect4Main extends Phaser.Scene {
 		this.socket.on('error', ({id, message}) => {
 			console.log("I am "+id+" and the message is: " + message)
 		})
+
+		this.socket.on("customOtherPlaced", (collumn) => {
+			
+			  this.myTurn = true;
+			  this.turnText.text = `Turn: ${this.color}`
+			  console.log(collumn.x);
+			  let collumnNumber = Math.floor((collumn.x - 200)/100);
+			  if(collumn.x === 196) collumnNumber = 0
+			  if(this.countCollum[collumnNumber] < 6){
+			  if(this.opponentColor == "red"){
+			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
+
+			  tempThingy.scaleX = 0.3;
+			  tempThingy.scaleY = 0.3;
+			  	this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'R'
+			  }
+			  else{
+			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
+
+			  tempThingy.scaleX = 0.18;
+			  tempThingy.scaleY = 0.18;
+			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
+			  }
+			  this.circleList.push(tempThingy)
+			  console.log(this.globalGameState)
+			//this.turn = 1-this.turn;
+              const t = this.tweens.add({
+                    targets: [tempThingy],
+                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
+                    duration: 200,
+                    easing: 'bounce',
+                    yoyo: false,
+                    paused: true
+                })
+              t.play()
+			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
+			  this.checkGameOver(this.globalGameState);
+			  }
+			}
+		)
 		this.socket.on("otherPlaced", (collumn) => {
 			  this.myTurn = true;
 			  this.turnText.text = `Turn: ${this.color}`
@@ -244,15 +307,15 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.load.image(
 		'Connect4_Empty_Grid',
-		'assets/Connect4_Empty_Grid.png'
+		'/assets/Connect4_Empty_Grid.png'
 		);
 		this.load.image(
 		'Red_Circle_full',
-		'assets/Red_Circle_full.png'
+		'/assets/Red_Circle_full.png'
 		);
 		this.load.image(
 		'Yellow_Circle',
-		'assets/Yellow_Circle.png'
+		'/assets/Yellow_Circle.png'
 		);
 
 	}
@@ -361,9 +424,15 @@ export default class Connect4Main extends Phaser.Scene {
         collumns.forEach((collumn) => {
             collumn.on('pointerdown', () => {
 			  if(this.myTurn && this.gameOver == false){
-			  this.myTurn = false;
-			  this.turnText.text = `Turn: ${this.opponentColor}`
-			  this.socket.emit("placePiece", (collumn))
+			  
+				this.myTurn = false;
+				this.turnText.text = `Turn: ${this.opponentColor}`
+			  if(this.gametype == "queue"){
+				this.socket.emit("placePiece", (collumn))
+			  } else {
+				this.socket.emit("customConnectPlacePiece", ({collumn: collumn, me:this.me, opp:this.opp}))
+			  }
+			  
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
 			  if(collumn.x === 196) collumnNumber = 0

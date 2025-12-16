@@ -8,8 +8,9 @@ const exportedMethods = {
         if (!user) throw "User not found";
 
         //password check;
-        console.log(user);
+        //console.log(user);
         return user;
+        
         return { id: user._id, username: user.username };
     },
 
@@ -23,7 +24,7 @@ const exportedMethods = {
         //const month = today.getMonth() + 1;
         //const day = today.getDate();
         const todayString = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
-        console.log(todayString); 
+        //console.log(todayString); 
 
 
         //const passwordHash = await bcrypt.hash(password, 12);
@@ -40,13 +41,211 @@ const exportedMethods = {
                 maniaWins: 0,
                 maniaLosses: 0
             },
-            signupDate: todayString
+            signupDate: todayString,
+            friendList: [],
+            challenges:[]
 
         };
-        console.log(newUser);
+        //console.log(newUser);
         const insertInfo = await accountsCollection.insertOne(newUser);
 
+        return {
+            id: insertInfo.insertedId,
+            username: newUser.username,
+            signupDate: newUser.signupDate,
+            winrates: newUser.winrates,
+            friendList: newUser.friendList,
+            challenges: newUser.challenges
+        };
+
         return { id: insertInfo.insertedId, username };
+
+    },
+
+    async challengeUser(from, to){
+        const accountsCollection = await accounts();
+        const victim = await accountsCollection.findOne({ username: to } );
+
+        const challenger = await accountsCollection.findOne({ username: from });
+
+
+        if(victim === null) {
+            throw `Error: No opponent with that ID exists within the database!`;
+        }
+
+        if(challenger === null) {
+            throw `Error: No account with that ID exists within the database!`;
+        }
+
+        if(victim.challenges.some(c => c.from === from)) {
+            throw `Error: User is already challenging  ${victim.username}`;
+        }
+
+        if(from === to) {
+            throw `Error: Cannot challenge yourself`
+        }
+
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: to },
+                { $push: { challenges: {from: from, game:"checkers" } } }
+        );
+        console.log("done challenging");
+        return updateResult;
+    },
+
+    async challengeUserChess(from, to){
+        const accountsCollection = await accounts();
+        const victim = await accountsCollection.findOne({ username: to } );
+
+        const challenger = await accountsCollection.findOne({ username: from });
+
+
+        if(victim === null) {
+            throw `Error: No opponent with that ID exists within the database!`;
+        }
+
+        if(challenger === null) {
+            throw `Error: No account with that ID exists within the database!`;
+        }
+
+        if(victim.challenges.some(c => c.from === from)) {
+            throw `Error: User is already challenging  ${victim.username}`;
+        }
+
+        if(from === to) {
+            throw `Error: Cannot challenge yourself`
+        }
+
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: to },
+                { $push: { challenges: {from: from, game:"chess"} } }
+        );
+        console.log("done challenging");
+        return updateResult;
+    },
+
+    async challengeUserConnect(from, to){
+        const accountsCollection = await accounts();
+        const victim = await accountsCollection.findOne({ username: to } );
+
+        const challenger = await accountsCollection.findOne({ username: from });
+
+
+        if(victim === null) {
+            throw `Error: No opponent with that ID exists within the database!`;
+        }
+
+        if(challenger === null) {
+            throw `Error: No account with that ID exists within the database!`;
+        }
+
+        if(victim.challenges.some(c => c.from === from)) {
+            throw `Error: User is already challenging  ${victim.username}`;
+        }
+
+        if(from === to) {
+            throw `Error: Cannot challenge yourself`
+        }
+
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: to },
+                { $push: { challenges: {from: from, game:"connect" } } }
+        );
+        console.log("done challenging");
+        return updateResult;
+    },
+
+    
+
+    async unchallengeFriend(from, to){
+        const accountsCollection = await accounts();
+        const victim = await accountsCollection.findOne({ username: to } );
+
+        const challenger = await accountsCollection.findOne({ username: from });
+
+
+        if(victim === null) {
+            throw `Error: No opponent with that ID exists within the database!`;
+        }
+
+        if(challenger === null) {
+            throw `Error: No account with that ID exists within the database!`;
+        }
+
+        if(!victim.challenges.some(c => c.from === from)) {
+            throw `Error: User is not challenging  ${victim.username}`;
+        }
+
+        if(from === to) {
+            throw `Error: Cannot challenge yourself`
+        }
+
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: to },
+                { $pull: { challenges: from } }
+        );
+
+        return updateResult;
+    },
+
+    //returns the user after searching
+    async searchUser(username) {
+        //console.log("searching");
+        //console.log(username);
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({ username });
+        
+        if (!user) {
+            throw "User not found";
+        }
+        
+        return {
+            id: user._id,
+            username: user.username,
+            signupDate: user.signupDate,
+            winrates: user.winrates,
+            friendList: user.friendList,
+            challenges: user.challenges
+        };
+    },
+
+    async addFriend(userUsername, friendUsername) {
+        userUsername = userUsername.trim();
+        friendUsername = friendUsername.trim();
+        if(typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
+            throw `Error: Please enter a valid username!`;
+        }
+
+        const accountsCollection = await accounts();
+        const user = await accountsCollection.findOne({username: userUsername});
+        const friend = await accountsCollection.findOne({username: friendUsername});
+
+        if(user === null) {
+            throw `Error: No user with that ID exists within the database!`;
+        }
+
+        if(friend === null) {
+            throw `Error: No friend with that ID exists within the database!`;
+        }
+
+        if(user.friendList.includes(friendUsername)) {
+            throw `Error: User is already friends with ${friendUsername}`;
+        }
+
+        if(userUsername === friendUsername) {
+            throw `Error: Cannot friend yourself`
+        }
+
+        const updateResult = await accountsCollection.updateOne(
+                { username: userUsername },
+                { $push: { friendList: friendUsername } }
+        );
+
+        return updateResult;
     }
 }
 

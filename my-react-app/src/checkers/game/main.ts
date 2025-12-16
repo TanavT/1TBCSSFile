@@ -19,9 +19,28 @@ const config: Phaser.Types.Core.GameConfig = {
     ]
 };
 
-const StartGame = (parent: string) => {
-
-    return new Game({ ...config, parent });
+const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => { //USER IN PHASER 5: include options as a parameter holding user
+    console.log(options);
+    return new Game({ 
+        ...config,
+         parent,
+         callbacks: { //USER IN PHASER 6: add preboot function to get user if it exists (it better) and add it to the game registry. Final step in CheckersMain.ts
+            preBoot: (game) => {
+                if(options?.user) {
+                    console.log("USER AHAHA");
+                    game.registry.set("user", options.user);
+                }
+                if(options?.gametype) {
+                    console.log("GAMETYPE LOLOLOL");
+                    game.registry.set("gametype", options.gametype)
+                }
+                if(options?.opp) {
+                    console.log("got opp");
+                    game.registry.set("opp", options.opp)
+                }
+            }
+         }
+        });
 
 }
 

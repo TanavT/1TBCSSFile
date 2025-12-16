@@ -29,12 +29,36 @@ export default class ChessGame extends Phaser.Scene {
 
 	gameOver:boolean = false;
 
+	gametype: string;
+	opp: any;
+	me: any;
+
+	init() {
+		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
+		console.log("got user: " + user.username);
+		this.me = user.username
+
+		const gametype = this.game.registry.get("gametype");
+		console.log("got gametype: " + gametype);
+		this.gametype = gametype;
+
+		const opp = this.game.registry.get("opp");
+		console.log("got opp: " + opp);
+		this.opp = opp;
+	}
+
 	preload(){
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketChess", 'test')
+			if(this.gametype == "queue"){
+				this.socket.emit("realSocketChess", 'test')
+			} else {
+				console.log("custom match");
+				this.socket.emit("chessCustomConnect", {me: this.me, opp: this.opp})
+			}
+			
   		});
 
 		this.socket.on('timer', ({timeWhite, timeBlack}) => {
@@ -213,8 +237,10 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.load.image(
 		'blackKingChess',
-		'assets/blackKingChess.png'
+		'/assets/blackKingChess.png'
 		);
+
+
 	}
 
 	editorCreate(): void {
@@ -608,9 +634,9 @@ export default class ChessGame extends Phaser.Scene {
 	numberToSquareConverter(numberParam: integer): string{
 		let letterFinal = 'X'
 		let numberFinal = Math.floor(numberParam/8) + 1
-		console.log(numberParam)
-		 console.log(numberParam % 8)
-		 console.log(typeof(numberParam))
+		//console.log(numberParam)
+		// console.log(numberParam % 8)
+		// console.log(typeof(numberParam))
 		switch (numberParam % 8){
 			case 0:
 				letterFinal ='a'
@@ -937,7 +963,13 @@ export default class ChessGame extends Phaser.Scene {
                     yoyo: false,
                     paused: true
                 	})
-					this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: ""}))
+					if(this.gametype == "queue"){
+						console.log("queue move made");
+						this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: ""}))
+					} else {
+						console.log("custom move made");
+						this.socket.emit('customPlacePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(moveToSquareInt), castleStr: "", me:this.me, opp:this.opp}))
+					}
 					this.chess = chess
 					clickedSquareString = ""
 					t.play()
@@ -994,7 +1026,12 @@ export default class ChessGame extends Phaser.Scene {
                 	})
 					let temp:string = this.numberToSquareConverter(moveToSquareInt)
 					console.log("HOOOOOOOW " + temp)
-					this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: ""}))
+					if(this.gametype == "queue"){
+						this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: ""}))
+					} else {
+						console.log("custom move made");
+						this.socket.emit('customPlacePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: temp2.texture.key, startSquareStr: clickedSquareString, destinationSquareStr: temp, castleStr: "", me: this.me, opp: this.opp}))
+					}
 					//this.socket.emit('placePieceChess', ({promote: true, promoteLetter: this.chosenUpgradeLetter, promoteTexture: this.chosenUpgrade.key, startSquareStr: 'a1', destinationSquareStr: 'x8', castleStr: ""}))
 					//console.log("this is where the loopin happens")
 					t.play()
@@ -1260,7 +1297,11 @@ export default class ChessGame extends Phaser.Scene {
 					this.myTurn = false
 					this.turnText.text = `Turn: ${this.opponentColor}`
 					if(promoteChecker == false)
-						this.socket.emit('placePieceChess', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
+						if(this.gametype == "queue"){
+							this.socket.emit('placePieceChess', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
+						} else {
+							this.socket.emit('customPlacePieceChess', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr, me: this.me, opp: this.opp}))
+						}
 					this.chess = chess
 					castleStr = ""
 					if(promoteChecker == false)
