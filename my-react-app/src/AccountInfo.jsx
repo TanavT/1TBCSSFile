@@ -100,30 +100,30 @@ function AccountInfo() {
 
                 <p>
                     Chess: 
-                    {(user.winrates && user.winrates.chessWins !== undefined && user.winrates.chessLosses !== undefined ?  "W/L = " + {user.winrates.chessWins}/{user.winrates.chessLosses} : "W/L = " + 0)}
+                    {(user.winrates && user.winrates.chessWins !== undefined && user.winrates.chessLosses !== undefined ?  "W/L = " + user.winrates.chessWins/user.winrates.chessLosses : "W/L = " + 0)}
                     -
-                    {(user.elo && user.elo.chess !== undefined ? "Elo = " + {Math.floor(user.elo.chess)} :"Elo = " + 0)}
+                    {(user.elo && user.elo.chess !== undefined ? "Elo = " + Math.floor(user.elo.chess) : "Elo = " + 0)}
                 </p>
 
                 <p>
                     Checkers: 
-                    {(user.winrates && user.winrates.checkersWins !== undefined && user.winrates.checkersLosses !== undefined ?  "W/L =" + {user.winrates.checkersWins}/{user.winrates.checkersLosses} : "W/L = " + 0)}
+                    {(user.winrates && user.winrates.checkersWins !== undefined && user.winrates.checkersLosses !== undefined ?  "W/L =" + user.winrates.checkersWins/user.winrates.checkersLosses : "W/L = " + 0)}
                     -
-                    {(user.elo && user.elo.checkers !== undefined ? "Elo = " + {Math.floor(user.elo.checkers)} :"Elo = " + 0)}
+                    {(user.elo && user.elo.checkers !== undefined ? "Elo = " + Math.floor(user.elo.checkers) :"Elo = " + 0)}
                 </p>
 
                 <p>
                     Connect4: 
-                    {(user.winrates && user.winrates.connectWins !== undefined && user.winrates.connectLosses !== undefined ?  "W/L = " + {user.winrates.connectWins}/{user.winrates.connectLosses} : "W/L = " + 0)}
+                    {(user.winrates && user.winrates.connectWins !== undefined && user.winrates.connectLosses !== undefined ?  "W/L = " + user.winrates.connectWins/user.winrates.connectLosses : "W/L = " + 0)}
                     -
-                    {(user.elo && user.elo.connect !== undefined ? "Elo = " + {Math.floor(user.elo.connect)} :"Elo = " + 0)}
+                    {(user.elo && user.elo.connect !== undefined ? "Elo = " + Math.floor(user.elo.connect) :"Elo = " + 0)}
                 </p>
 
                 <p>
                     Mania: 
-                  {(user.winrates && user.winrates.maniaWins !== undefined && user.winrates.maniaLosses !== undefined ?  "W/L = " + {user.winrates.maniaWins}/{user.winrates.maniaLosses} : "W/L = " + 0)}
+                  {(user.winrates && user.winrates.maniaWins !== undefined && user.winrates.maniaLosses !== undefined ?  "W/L = " + user.winrates.maniaWins/user.winrates.maniaLosses : "W/L = " + 0)}
                     -
-                    {(user.elo && user.elo.mania !== undefined ? "Elo = " + {Math.floor(user.elo.mania)} :"Elo = " + 0)}
+                    {(user.elo && user.elo.mania !== undefined ? "Elo = " + Math.floor(user.elo.mania) :"Elo = " + 0)}
                 </p>
 
                 <p>Friends:</p>
