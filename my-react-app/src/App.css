@@ -1,21 +1,36 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F7F2ED; /* Match your dark background */
+  min-height: 100vh;
 }
 
-.logo {
+#root {
+  min-height: calc(100vh - 100px);
+  width: 100%;
+  margin-top: 100px;
+  
+  background-color: #F7F2ED;
+  color: #08205B;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vite-logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.vite-logo:hover {
+  filter: drop-shadow(0 0 2em #7096D1aa);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.vite-logo.react:hover {
+  filter: drop-shadow(0 0 2em #D0E4FFaa);
 }
 
 @keyframes logo-spin {
@@ -28,15 +43,83 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  a:nth-of-type(2) .vite-logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
 .card {
   padding: 2em;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(8, 32, 91, 0.08);
 }
 
 .read-the-docs {
-  color: #888;
+  color: #7096D1;
+}
+
+/* account page */
+/* .loginButton, .signupButton {
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: background-color 0.2s, color 0.2s;
+} */
+
+.centerBox {
+  background-color: #08205B;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 0; 
+  color: white; 
+}
+
+.centerBox {
+  background-color: #08205B;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 0;
+  color: white;
+  
+  text-align: center;
+}
+
+/* game home screens */
+.centerBox .matchButton {
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* search screen */
+.centerBox .friends .friendButton, .searchButton {
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.searchInput {
+  background-color: #F7F2ED;
+  color: #08205B;
+  padding: 0rem 0rem
 }

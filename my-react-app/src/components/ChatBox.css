@@ -1,40 +1,57 @@
 .chatBox { 
-    border: 1px solid #333;
-    background: purple;
-    padding: 10px;
-    width: 300px; 
+  border: 1px solid #7096D1;
+  background: #F7F2ED;
+  padding: 12px;
+  width: 300px;
+  border-radius: 8px;
 }
 
 .messageBox {
-    height: 200px;
-    background: white;
-    padding: 5px;
-    color: black;
-    overflow-y: auto; 
-    border: 1px solid #ccc;
+  height: 200px;
+  background: #ffffff;
+  padding: 8px;
+  color: #08205B;
+
+  overflow-y: auto;
+  border: 1px solid #D0E4FF;
+  border-radius: 6px;
 }
 
 .messageBox div {
-    margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
+/* input + button row */
 .messageForm {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .inputBox {
-    width: 150px;
+  width: 160px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #7096D1;
 }
 
 .sendButton {
-    background: white;
-    color: purple;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  background: #08205B;
+  color: #F7F2ED;
+
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 4px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+}
+
+.sendButton:hover {
+  background: #7096D1;
 }

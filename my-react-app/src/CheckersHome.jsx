@@ -30,10 +30,10 @@ function CheckersHomePage(){
     }
 
     return (
-        <div>
+        <div className="centerBox">
             <h2>CHECKERS</h2>
-            <button onClick={handleRandomQueue}>Random Match</button>
-            <button onClick={handlePrivateMatch}>Challenge a friend</button>
+            <button onClick={handleRandomQueue} className='matchButton'>Random Match</button>
+            <button onClick={handlePrivateMatch} className='matchButton'>Challenge a friend</button>
         </div>
         
     )

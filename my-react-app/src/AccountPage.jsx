@@ -40,15 +40,15 @@ function AccountPage() {
     }
 
     return (
-        <div>
+        <div className="centerBox">
             <div>
                 <input type="text" placeholders="Username" value={username} onChange={e =>setUsername(e.target.value)} />
                 <input type="text" placeholders="Password" value={password} onChange={e =>setPassword(e.target.value)} />
             </div>
 
             <div>
-                <button onClick={handleLogin}>Login</button>
-                <button onClick={handleSignup}>Signup</button>
+                <button onClick={handleLogin} className="loginButton">Login</button>
+                <button onClick={handleSignup} className="signupButton">Signup</button>
             </div>
             {message && <p>{message}</p>}
         </div>
