@@ -72,17 +72,52 @@ function SearchUsers() {
         }
     }
 
-    // Check if the user can be added as a friend
+    async function handleDeleteFriend(friendUsername) {
+        if (window.confirm(`Are you sure you want to delete ${friendUsername} as a friend?`)) {
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/account/deleteFriend',
+                    {
+                        userUsername: currentUser.username,
+                        friendUsername: friendUsername
+                    },
+                    { withCredentials: true }
+                );
+
+                alert(`${friendUsername} removed as a friend!`);
+                
+                // refresh current user data to get updated friend list
+                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Error deleting friend:", err);
+                alert(err.response?.data?.error || "Failed to delete friend");
+            }
+        }
+    }
+
     function canAddFriend(user) {
         if (!currentUser) return false;
         
-        // Don't show button if it's the current user
         if (user.username === currentUser.username) {
             return false;
         }
         
-        // Don't show button if already in friend list
         if (currentUser.friendList && currentUser.friendList.includes(user.username)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    function canDeleteFriend(user) {
+        if (!currentUser) return false;
+        
+        if (user.username === currentUser.username) {
+            return false;
+        }
+        
+        if (currentUser.friendList && !currentUser.friendList.includes(user.username)) {
             return false;
         }
         
@@ -127,6 +162,16 @@ function SearchUsers() {
                                 <p><em>This is you</em></p>
                             ) : (
                                 <p><em>Already friends</em></p>
+                            )}
+
+                            {canDeleteFriend(user) ? (
+                                <button onClick={() => handleDeleteFriend(user.username)}>
+                                    Delete Friend
+                                </button>
+                            ) : user.username === currentUser.username ? (
+                                <br />
+                            ) : (
+                                <br />
                             )}
                             <hr />
                         </div>

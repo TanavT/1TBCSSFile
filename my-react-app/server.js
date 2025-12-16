@@ -15,6 +15,80 @@ client.connect().then(() => {});
 const httpServer = createServer(app2);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
+//chat message socket
+const chat = io.of("/chat");
+let chatNumClients = 0;
+let chatClientList = [];
+
+chat.on("connection", (socket) => {
+  console.log("Chat socket connected:", socket.id);
+  
+  let thisChatClient;
+
+  socket.on("joinRoom", (roomName, username) => {
+    thisChatClient = chatNumClients;
+    chatClientList.push(socket);
+    
+    // player 1 join message
+    socket.emit("userJoined", {
+      id: socket.id,
+      username: username,
+      message: thisChatClient % 2 === 0 ? "Waiting for partner..." : ` has joined!`,
+      clientNumber: thisChatClient
+    });
+    
+    // player 2 join message
+    if (thisChatClient % 2 === 1) {
+      chatClientList[thisChatClient - 1].emit("userJoined", {
+        id: socket.id,
+        username: username,
+        message: ` has joined!!`,
+        clientNumber: thisChatClient
+      });
+    }
+    
+    chatNumClients++;
+    console.log(`${socket.id} joined room ${roomName}, client #${thisChatClient}`);
+  });
+
+  socket.on("chatMessage", ({ room, username, text }) => {
+    // send message only to the paired partner
+    if (thisChatClient % 2 === 0) {
+      // even numbered client sends to odd numbered client (thisChatClient + 1)
+      if (chatClientList[thisChatClient + 1]) {
+        chatClientList[thisChatClient + 1].emit("chatMessage", {
+          username,
+          text
+        });
+      }
+    } else {
+      // odd numbered client sends to even numbered client (thisChatClient - 1)
+      if (chatClientList[thisChatClient - 1]) {
+        chatClientList[thisChatClient - 1].emit("chatMessage", {
+          username,
+          text
+        });
+      }
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Chat socket disconnected:", socket.id);
+    // notify partner that user disconnected
+    if (thisChatClient !== undefined) {
+      if (thisChatClient % 2 === 0 && chatClientList[thisChatClient + 1]) {
+        chatClientList[thisChatClient + 1].emit("partnerDisconnected", {
+          message: "Your partner has disconnected"
+        });
+      } else if (thisChatClient % 2 === 1 && chatClientList[thisChatClient - 1]) {
+        chatClientList[thisChatClient - 1].emit("partnerDisconnected", {
+          message: "Your partner has disconnected"
+        });
+      }
+    }
+  });
+});
+
 let checkersCustomClients = {}
 let checkersCustomTimers = {}
 

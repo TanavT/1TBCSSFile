@@ -1,14 +1,20 @@
 import {Router} from 'express';
 import accountData from './accountData.js';
+import xss from 'xss';
 const router = Router();
 
 router
     .route('/login')
     .post(async (req, res) => {
         try {
-            const {username, password} = req.body;
-            const user = await accountData.login(username, password);
-            //console.log(user);
+            let cleanUsername = xss(req.body.username);
+            let cleanPassword = xss(req.body.password);
+            const user = await accountData.login(cleanUsername, cleanPassword);
+
+            if(!user) {
+                throw `Error: Could not find user!`;
+            }
+
             req.session.user = user;
             return res.json(user);
         } catch (e){
@@ -21,10 +27,14 @@ router
     .route('/signup')
     .post(async (req, res) => {
         try {
-            const {username, password} = req.body;
-            const user = await accountData.signup(username, password);
-            //console.log("signup");
-            //console.log(user);
+            let cleanUsername = xss(req.body.username);
+            let cleanPassword = xss(req.body.password);
+            const user = await accountData.signup(cleanUsername, cleanPassword);
+
+            if(!user) {
+                throw `Error: Could not find user!`;
+            }
+
             req.session.user = user;
             return res.json(user);
         } catch (e){
@@ -172,12 +182,12 @@ router
     .route('/search')
     .get(async (req, res) => {
         try {
-            const username = req.query.username;
-            if (!username || username.trim() === '') {
+            const cleanUsername = xss(req.query.username);
+            if (!cleanUsername || cleanUsername.trim() === '') {
                 return res.status(400).json({ error: 'Username required' });
             }
             
-            const user = await accountData.searchUser(username.trim());
+            const user = await accountData.searchUser(cleanUsername.trim());
             return res.json(user);
         } catch (e) {
             console.log(e);
@@ -187,7 +197,8 @@ router
 
 router.post('/addFriend', async (req, res) => {
     try {
-        const { userUsername, friendUsername } = req.body;
+        let userUsername = xss(req.body.userUsername);
+        let friendUsername = xss(req.body.friendUsername);
         
         if (!userUsername || !friendUsername) {
             return res.status(400).json({ error: 'Both usernames are required' });
@@ -195,14 +206,39 @@ router.post('/addFriend', async (req, res) => {
         
         const result = await accountData.addFriend(userUsername, friendUsername);
         
-        // Update the session with fresh user data
+        // update the session with fresh user data
         const updatedUser = await accountData.searchUser(userUsername);
         req.session.user = updatedUser;
         
         return res.status(200).json({ 
             success: true, 
             message: `${friendUsername} added as friend`,
-            user: updatedUser  // Send back the updated user
+            user: updatedUser
+        });
+    } catch (error) {
+        return res.status(400).json({ error: error.toString() });
+    }
+});
+
+router.post('/deleteFriend', async (req, res) => {
+    try {
+        let userUsername = xss(req.body.userUsername);
+        let friendUsername = xss(req.body.friendUsername);
+        
+        if (!userUsername || !friendUsername) {
+            return res.status(400).json({ error: 'Both usernames are required' });
+        }
+        
+        const result = await accountData.deleteFriend(userUsername, friendUsername);
+        
+        // update the session with updated user data
+        const updatedUser = await accountData.searchUser(userUsername);
+        req.session.user = updatedUser;
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: `${friendUsername} removed as a friend`,
+            user: updatedUser
         });
     } catch (error) {
         return res.status(400).json({ error: error.toString() });

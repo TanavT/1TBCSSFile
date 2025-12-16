@@ -44,7 +44,6 @@ function App() {
         <Route path='/login' element={<AccountPage/>} />
         <Route path='/account' element={<AccountInfo/>}/>
       </Routes>
-      {/* <ChatBox/> */}
    </div>
   )
 }

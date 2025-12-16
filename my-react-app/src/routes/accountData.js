@@ -1,8 +1,17 @@
 import axios from 'axios';
 import {accounts} from './mongo/MongoCollections.js';
+import { validationMethods } from './helpers.js';
 
 const exportedMethods = {
     async login(username, password){
+        if(typeof username !== "string" || username.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty username`;
+        }
+
+        if(typeof password !== "string" || password.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty password`;
+        }
+
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
         if (!user) throw "User not found";
@@ -15,6 +24,9 @@ const exportedMethods = {
     },
 
     async signup(username, password){
+        username = validationMethods.checkUsername(username);
+        password = validationMethods.checkPassword(password);
+
         const accountsCollection = await accounts();
         const existing = await accountsCollection.findOne({ username });
         if (existing) throw "User already exists";
@@ -194,13 +206,17 @@ const exportedMethods = {
 
     //returns the user after searching
     async searchUser(username) {
+        if(typeof username !== "string" || username.trim().length <= 0) {
+            throw `Error: Please enter a valid non-empty username`;
+        }
+
         //console.log("searching");
         //console.log(username);
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
         
         if (!user) {
-            throw "User not found";
+            throw `Error: User not found`;
         }
         
         return {
@@ -232,7 +248,7 @@ const exportedMethods = {
             throw `Error: No friend with that ID exists within the database!`;
         }
 
-        if(user.friendList.includes(friendUsername)) {
+        if(user.friendList && user.friendList.includes(friendUsername)) {
             throw `Error: User is already friends with ${friendUsername}`;
         }
 
@@ -246,7 +262,48 @@ const exportedMethods = {
         );
 
         return updateResult;
+    },
+
+    async deleteFriend(userUsername, friendUsername) {
+        userUsername = userUsername.trim();
+        friendUsername = friendUsername.trim();
+
+        if (typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
+            throw `Error: Please enter a valid username!`;
+        }
+
+        const accountsCollection = await accounts();
+
+        const user = await accountsCollection.findOne({ username: userUsername });
+        const friend = await accountsCollection.findOne({ username: friendUsername });
+
+        if (!user) {
+            throw `Error: No user with that username exists within the database!`;
+        }
+
+        if (!friend) {
+            throw `Error: No friend with that username exists within the database!`;
+        }
+
+        if (userUsername === friendUsername) {
+            throw `Error: Cannot unfriend yourself`;
+        }
+
+        // safeguard against missing friendList
+        const friendList = user.friendList || [];
+
+        if (!friendList.includes(friendUsername)) {
+            throw `Error: User is not friends with ${friendUsername}`;
+        }
+
+        const updateResult = await accountsCollection.updateOne(
+            { username: userUsername },
+            { $pull: { friendList: friendUsername } }
+        );
+
+        return updateResult;
     }
+
 }
 
 export default exportedMethods;

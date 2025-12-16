@@ -15,20 +15,6 @@ function ChatBox() {
     const room = location.pathname.replace("/", "");
 
     useEffect(() => {
-        socketRef.current = io("http://localhost:4000/chat");
-
-        socketRef.current.emit("joinRoom", room);
-
-        socketRef.current.on("chatMessage", (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-
-        return () => {
-            socketRef.current.disconnect();
-        };
-    }, []);
-
-    useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
             .then(res => {
                 setUser(res.data);
@@ -39,12 +25,33 @@ function ChatBox() {
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (!user) return;
+
+        socketRef.current = io("http://localhost:4000/chat");
+
+        socketRef.current.on("userJoined", (msg) => {
+            let message = {username: msg.username, text: msg.message};
+            setMessages((prev) => [...prev, message]);
+        }, [])
+        
+        socketRef.current.on("chatMessage", (msg) => {
+            setMessages((prev) => [...prev, msg]);
+        });
+        
+        socketRef.current.emit("joinRoom", room, user.username);
+
+        return () => {
+            socketRef.current.disconnect();
+        };
+    }, [user]);
     
     function sendMessage(e) {
         e.preventDefault();
 
         if (input.trim() === "" || !user) return;
-
+        setMessages((prev) => [...prev, {username: user.username, text: input}]); // save current client's messages
         socketRef.current.emit("chatMessage", {
             room,
             username: user.username,
@@ -52,6 +59,82 @@ function ChatBox() {
         });
 
         setInput("");
+    }
+
+    async function handleAddFriend(friendUsername) {
+        if (window.confirm(`Are you sure you want to add ${friendUsername} as a friend?`)) {
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/account/addFriend',
+                    {
+                        userUsername: currentUser.username,
+                        friendUsername: friendUsername
+                    },
+                    { withCredentials: true }
+                );
+
+                alert(`${friendUsername} added as friend!`);
+                
+                // Refresh current user data to get updated friend list
+                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Error adding friend:", err);
+                alert(err.response?.data?.error || "Failed to add friend");
+            }
+        }
+    }
+
+    async function handleDeleteFriend(friendUsername) {
+        if (window.confirm(`Are you sure you want to delete ${friendUsername} as a friend?`)) {
+            try {
+                const response = await axios.post(
+                    'http://localhost:3000/account/deleteFriend',
+                    {
+                        userUsername: currentUser.username,
+                        friendUsername: friendUsername
+                    },
+                    { withCredentials: true }
+                );
+
+                alert(`${friendUsername} removed as a friend!`);
+                
+                // refresh current user data to get updated friend list
+                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                setCurrentUser(userRes.data);
+            } catch (err) {
+                console.error("Error deleting friend:", err);
+                alert(err.response?.data?.error || "Failed to delete friend");
+            }
+        }
+    }
+
+    function canAddFriend(user) {
+        if (!currentUser) return false;
+        
+        if (user.username === currentUser.username) {
+            return false;
+        }
+        
+        if (currentUser.friendList && currentUser.friendList.includes(user.username)) {
+            return false;
+        }
+        
+        return true;
+    }
+
+    function canDeleteFriend(user) {
+        if (!currentUser) return false;
+        
+        if (user.username === currentUser.username) {
+            return false;
+        }
+        
+        if (currentUser.friendList && !currentUser.friendList.includes(user.username)) {
+            return false;
+        }
+        
+        return true;
     }
 
     // don't render until we know if user is logged in

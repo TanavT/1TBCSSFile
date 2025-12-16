@@ -2,6 +2,7 @@ import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import {useParams} from "react-router-dom";
 import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
+import ChatBox from './components/ChatBox.jsx';
 
 function CheckersCustom(){
     const [user, setUser] = useState(null);
@@ -27,6 +28,7 @@ function CheckersCustom(){
                     <h2>CHECKERS</h2>
                     <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" opp={params.enemyId} /> 
                     {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+                    <ChatBox />
                 </div>
                 
             )
