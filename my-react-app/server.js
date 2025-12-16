@@ -19,6 +19,7 @@ app2.use(express.json());
 app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
+console.log("CORS origin:", process.env.FRONTEND_CLIENT);
 app2.use(cors({
   origin: process.env.FRONTEND_CLIENT, // frontend URL
   credentials: true                // allow cookies/session
@@ -38,7 +39,8 @@ app2.use(
 configRoutesFunction(app2);
 
 // const httpServer = createServer(app);
-const httpServer = app2.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
+const httpServer = app2.listen(PORT, () => {
   console.log("We've now got a server!");
   console.log(`Your routes will be running on ${process.env.BACKEND_SERVER}`);
 });
@@ -46,7 +48,7 @@ const httpServer = app2.listen(3000, () => {
 const client = createClient({
   socket: {
     host: process.env.REDIS_URL,
-    port: process.env.REDIS_PORT
+    port: Number(process.env.REDIS_PORT)
   },
   password: process.env.REDIS_PASSWORD
 });
