@@ -64,6 +64,8 @@ function SearchUsers() {
                 
                 // Refresh current user data to get updated friend list
                 const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                console.log("REFRESHING USER FROM SEARCH PAGE");
+                console.log(userRes);
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error adding friend:", err);

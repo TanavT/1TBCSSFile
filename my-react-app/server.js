@@ -12,6 +12,7 @@ import { accounts } from './src/routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
 import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
+import axios from 'axios';
 //import client from './redis.js'
 
 
@@ -136,6 +137,9 @@ io.on('connection', (socket) => {
   let thisColor = ""
   let thisClient
 
+  let oppName;
+  let myName;
+
   socket.on("gameDone", ({game, winner}) => {
     if(game == "chess")
       if(dataListMania[Math.floor(thisClient / 2)].chessWin == null){
@@ -197,6 +201,9 @@ io.on('connection', (socket) => {
   let fun = true;
 
    socket.on('chessCustomConnect', ({me, opp}) => {
+
+    oppName = opp;
+    myName = me;
     chessCustomClients[me] = socket;
 
     if(chessCustomClients[opp]) {
@@ -222,6 +229,9 @@ io.on('connection', (socket) => {
   socket.on('customJoinConnect', ({me, opp}) => {
     connectCustomClients[me] = socket;
 
+    oppName = opp;
+    myName = me;
+
     if(connectCustomClients[opp]) {
       const roomName = `${me}-${opp}`; 
       socket.join(roomName);
@@ -244,6 +254,9 @@ io.on('connection', (socket) => {
   socket.on('checkersCustomConnect', ({me, opp}) => {
     checkersCustomClients[me] = socket;
     console.log("custom join. " + me + " vs " + opp);
+
+    oppName = opp;
+    myName = me;
 
     if(checkersCustomClients[opp]) {
       console.log("start the showdown");
@@ -443,10 +456,11 @@ io.on('connection', (socket) => {
 
     
     //console.log("custom black move");
-
+    console.log(i);
     if(i == 0){
       i++
-      //console.log("weird ass interval");
+      console.log(i);
+      console.log("weird ass interval");
        chessCustomTimers[roomName].interval = setInterval((() => {
         if(chessCustomTimers[roomName].turn == "red"){
           chessCustomTimers[roomName].redTimer -= 1
@@ -1074,18 +1088,35 @@ io.on('connection', (socket) => {
     //io.emit('message', {name, message});
   });
 
- socket.on('disconnect', () => {
+ socket.on('disconnect', async() => {
     console.log('Disconnect Fired on ' + socket.id);
     for(const [username, userSocket] of Object.entries(checkersCustomClients)) {
       if(userSocket.id === socket.id){
         delete checkersCustomClients[username];
-        console.log("removed from client list")
+        console.log("removed from client list");
+        console.log("opponent name was" + oppName);
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallenge',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that was already accepted");
+        }
+        
       }
     }
 
     for(const [roomName, timer] of Object.entries(checkersCustomTimers)) {
-      if (timer.whoRed === socket.id || timer.whoBlack) {
-        clearInteval(timer.interval);
+      console.log(roomName);
+      console.log(timer);
+      if (timer.whoRed === myName || timer.whoRed === oppName) {
+        clearInterval(timer.interval);
         delete checkersCustomTimers[roomName];
         console.log("removed from timer")
       }
@@ -1095,13 +1126,55 @@ io.on('connection', (socket) => {
       if(userSocket.id === socket.id){
         delete chessCustomClients[username];
         console.log("removed from client list")
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallengeChess',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that chess was already accepted");
+        }
       }
     }
 
     for(const [roomName, timer] of Object.entries(chessCustomTimers)) {
-      if (timer.whoRed === socket.id || timer.whoBlack) {
-        clearInteval(timer.interval);
+      if (timer.whoWhite === myName || timer.whoWhite == oppName) {
+        clearInterval(timer.interval);
         delete chessCustomTimers[roomName];
+        console.log("removed chess from timer")
+        console.log(chessCustomTimers);
+      }
+    }
+
+    for(const [username, userSocket] of Object.entries(connectCustomClients)) {
+      if(userSocket.id === socket.id){
+        delete connectCustomClients[username];
+        console.log("removed from client list")
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallengeConnect',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that connect was already accepted");
+        }
+      }
+    }
+
+    for(const [roomName, timer] of Object.entries(connectCustomTimers)) {
+      if (timer.whoRed === myName || timer.whoRed == oppName) {
+        clearInterval(timer.interval);
+        delete connectCustomTimers[roomName];
         console.log("removed from timer")
       }
     }

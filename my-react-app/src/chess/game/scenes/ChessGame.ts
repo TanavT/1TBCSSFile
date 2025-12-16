@@ -116,8 +116,8 @@ export default class ChessGame extends Phaser.Scene {
 			let startSquareInt = this.squareToNumberConverter(startSquareStr)
 			let destSquareInt = this.squareToNumberConverter(destinationSquareStr)
 			console.log("int int int" + startSquareInt)
-			console.log(destSquareInt)
-			console.log(startSquareStr)
+			console.log("dest: " + destSquareInt)
+			console.log("start: " + startSquareInt)
 			console.log(destinationSquareStr)
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
