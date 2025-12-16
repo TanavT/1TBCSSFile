@@ -83,14 +83,20 @@ export default class CheckersMain extends Phaser.Scene {
 	opponentColor:string;
 
 	gametype: string;
+	opp: any;
+	me: any;
 
 	init() {
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
+		this.me = user.username
 
 		const gametype = this.game.registry.get("gametype");
 		console.log("got gametype: " + gametype);
 		this.gametype = gametype;
+
+		const opp = this.game.registry.get("opp");
+		this.opp = opp;
 	}
 
     preload() {
@@ -106,6 +112,8 @@ export default class CheckersMain extends Phaser.Scene {
 				this.socket.emit("realSocketCheckers", 'test');
 			} else {
 				console.log("custom match");
+				console.log("opponent name: " + this.opp);
+				this.socket.emit("checkersCustomConnect", {me: this.me, opp: this.opp})
 			}
 			
 		})
@@ -151,11 +159,11 @@ export default class CheckersMain extends Phaser.Scene {
 			}
 		})
 
-        this.load.image('board', 'assets/checkersBoardSmall.png');
-        this.load.image('redPiece', 'assets/redPiece.png');
-        this.load.image('blackPiece', 'assets/blackPiece.png');
-		this.load.image('blackKing', 'assets/blackKing.png');
-		this.load.image('redKing', 'assets/redKing.png');
+        this.load.image('board', '/assets/checkersBoardSmall.png');
+        this.load.image('redPiece', '/assets/redPiece.png');
+        this.load.image('blackPiece', '/assets/blackPiece.png');
+		this.load.image('blackKing', '/assets/blackKing.png');
+		this.load.image('redKing', '/assets/redKing.png');
         //this.load.image('logo', 'assets/phaser.png');
 
         //  The ship sprite is CC0 from https://ansimuz.itch.io - check out his other work!
@@ -890,8 +898,13 @@ export default class CheckersMain extends Phaser.Scene {
                         });
 
 						if(this.myColor == "red"){
-							this.socket.emit("redMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
-							this.socket.emit("redMove", {row: row, col: col});
+							if(this.gametype == "custom"){
+								this.socket.emit("checkersCustomRedMove", {row:this.selectedPiece.row, col: this.selectedPiece.col, me: this.me, opp: this.opp});
+								this.socket.emit("checkersCustomRedMove", {row: row, col: col, me: this.me, opp:this.opp});
+							} else {
+								this.socket.emit("redMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
+								this.socket.emit("redMove", {row: row, col: col});
+							}
 						}
 						
                         
@@ -975,8 +988,13 @@ export default class CheckersMain extends Phaser.Scene {
                         });
 
 						if(this.myColor == "black"){
-							this.socket.emit("blackMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
-							this.socket.emit("blackMove", {row: row, col: col});
+							if(this.gametype == "custom"){
+								this.socket.emit("checkersCustomBlackMove", {row:this.selectedPiece.row, col: this.selectedPiece.col, me: this.me, opp: this.opp});
+								this.socket.emit("checkersCustomBlackMove", {row: row, col: col, me: this.me, opp:this.opp});
+							} else {
+								this.socket.emit("blackMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
+								this.socket.emit("blackMove", {row: row, col: col});
+							}
 						}
 						
                         

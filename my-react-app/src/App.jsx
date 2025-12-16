@@ -10,6 +10,8 @@ import ChatBox from './components/ChatBox.jsx';
 import ChessGame from './ChessGame.jsx';
 import CheckersGame from './CheckersGame.tsx';
 import CheckersCustomGame from './CheckersCustomGame.tsx';
+import ChessCustomGame from './ChessCustom.tsx';
+import ConnectCustom from './ConnectCustom.tsx';
 import ConnectGame from './ConnectGame.jsx';
 import ChessHomePage from './ChessHome.jsx'; //page that lets us queue for chess
 import CheckersHomePage from './CheckersHome.jsx';
@@ -27,7 +29,9 @@ function App() {
         <Route path='/chessMatch' element ={<ChessGame/>}/>
         <Route path='/checkers' element={<CheckersHomePage/>} />
         <Route path='/checkersMatch' element ={<CheckersGame/>}/>
-        <Route path='/checkersCustom' element ={<CheckersCustomGame/>}/>
+        <Route path='/checkersCustom/:enemyId' element ={<CheckersCustomGame/>}/>
+        <Route path='/chessCustom/:enemyId' element ={<ChessCustomGame/>}/>
+        <Route path='/connectCustom/:enemyId' element={<ConnectCustom/>}/>
         <Route path='/connect' element={<ConnectHomePage/>} />
         <Route path='/connectMatch' element ={<ConnectGame/>}/>
 

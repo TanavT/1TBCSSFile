@@ -19,7 +19,7 @@ const config: Phaser.Types.Core.GameConfig = {
     ]
 };
 
-const StartGame = (parent: string, options?: {user?: any, gametype?: string}) => { //USER IN PHASER 5: include options as a parameter holding user
+const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => { //USER IN PHASER 5: include options as a parameter holding user
     console.log(options);
     return new Game({ 
         ...config,
@@ -33,6 +33,10 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string}) =>
                 if(options?.gametype) {
                     console.log("GAMETYPE LOLOLOL");
                     game.registry.set("gametype", options.gametype)
+                }
+                if(options?.opp) {
+                    console.log("got opp");
+                    game.registry.set("opp", options.opp)
                 }
             }
          }

@@ -1,10 +1,12 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import { IRefPhaserGame, PhaserGame } from './chess/PhaserGame';
+import {useParams} from "react-router-dom";
+import { IRefPhaserGame, PhaserGame } from './chess/PhaserGame.js';
 import ChatBox from './components/ChatBox.jsx';
 
-function ChessGame(){
+function ChessCustomGame(){
     const [user, setUser] = useState(null);
+    const params = useParams();
     
      const phaserRef = useRef<IRefPhaserGame | null>(null);
 
@@ -18,15 +20,20 @@ function ChessGame(){
         //todo?
     }
 
-    return (
+    if(user){
+        return (
         <div>
             <h2>CHESS</h2>
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" />
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="custom" opp={params.enemyId} />
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
             <ChatBox />
-        </div>
-        
-    )
+        </div>  
+        )
+    } else {
+        return <p>loading...</p>
+    }
+
+    
 }
 
-export default ChessGame;
+export default ChessCustomGame;

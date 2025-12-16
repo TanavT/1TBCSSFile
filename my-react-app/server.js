@@ -16,6 +16,13 @@ const httpServer = createServer(app2);
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
 let checkersCustomClients = {}
+let checkersCustomTimers = {}
+
+let chessCustomClients = {}
+let chessCustomTimers = {}
+
+let connectCustomClients = {}
+let connectCustomTimers = {}
 
 
 let switcher = 1
@@ -41,23 +48,72 @@ io.on('connection', (socket) => {
 
   let fun = true;
 
+  socket.on('chessCustomConnect', ({me, opp}) => {
+    chessCustomClients[me] = socket;
+
+    if(chessCustomClients[opp]) {
+      const roomName = `${me}-${opp}`;
+      socket.join(roomName);
+
+      chessCustomClients[opp].join(roomName);
+
+      let white = Math.floor(Math.random() * 2)
+      chessCustomTimers[roomName] = ({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? me : opp})
+      if(white == 0){
+        chessCustomClients[me].emit('color', {id:chessCustomClients[me].id, color:"white" });
+        chessCustomClients[opp].emit('color', {id:chessCustomClients[opp].id, color:"black"})
+      }
+      else{
+        chessCustomClients[me].emit('color', {id:chessCustomClients[me].id, color:"white" });
+        chessCustomClients[opp].emit('color', {id:chessCustomClients[opp].id, color:"black"})
+      }
+    }
+
+  })
+
+  socket.on('customJoinConnect', ({me, opp}) => {
+    connectCustomClients[me] = socket;
+
+    if(connectCustomClients[opp]) {
+      const roomName = `${me}-${opp}`; 
+      socket.join(roomName);
+      connectCustomClients[opp].join(roomName);
+
+      let red = Math.floor(Math.random() * 2)
+      console.log("making custom timer");
+      connectCustomTimers[roomName] = ({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? me : opp})
+      if (red == 0){
+        connectCustomClients[me].emit('color', {id:connectCustomClients[me].id, color:"red" });
+        connectCustomClients[opp].emit('color', {id:connectCustomClients[opp].id, color:"yellow"})
+      } else {
+        connectCustomClients[me].emit('color', {id:connectCustomClients[me].id, color:"yellow" });
+        connectCustomClients[opp].emit('color', {id: connectCustomClients[opp].id, color:"red"})
+      }
+      console.log(connectCustomTimers[roomName]);
+    }
+  })
+
   socket.on('checkersCustomConnect', ({me, opp}) => {
     checkersCustomClients[me] = socket;
+    console.log("custom join. " + me + " vs " + opp);
 
     if(checkersCustomClients[opp]) {
+      console.log("start the showdown");
       const roomName = `${me}-${opp}`; 
       socket.join(roomName);
       checkersCustomClients[opp].join(roomName);
 
       let red = Math.floor(Math.random() * 2)
-      //checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      console.log("making custom timer");
+      checkersCustomTimers[roomName] = ({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? me : opp})
       if (red == 0){
         checkersCustomClients[me].emit('checkersColor', {id:checkersCustomClients[me].id, color:"red" });
         checkersCustomClients[opp].emit('checkersColor', {id:checkersCustomClients[opp].id, color:"black"})
       } else {
-        checkersCustomClients[opp].emit('checkersColor', {id:checkersCustomClients[me].id, color:"black" });
-        checkersCustomClients[me].emit('checkersColor', {id: checkersCustomClients[opp].id, color:"red"})
+        checkersCustomClients[me].emit('checkersColor', {id:checkersCustomClients[me].id, color:"black" });
+        checkersCustomClients[opp].emit('checkersColor', {id: checkersCustomClients[opp].id, color:"red"})
       }
+      console.log(checkersCustomTimers[roomName]);
     }
   })
 
@@ -124,6 +180,73 @@ io.on('connection', (socket) => {
 
   let i = 0;
 
+  socket.on('checkersCustomBlackMove', ({row,col, me, opp}) => {
+    console.log("blackMove");
+    let roomName = `${me}-${opp}`; 
+    if(!checkersCustomTimers[roomName]){
+      console.log("   no timer?");
+      console.log("      " + roomName);
+      console.log(checkersCustomTimers[roomName]);
+      roomName = `${opp}-${me}`;
+    }
+
+    if(!checkersCustomTimers[roomName]){
+      console.log("   STILL no timer?");
+      console.log("      " + roomName);
+      console.log(checkersCustomTimers[roomName]);
+    }
+
+    
+    console.log("custom black move");
+
+    if(i == 0){
+      //console.log("whjat");
+      i++
+      //if (checkersTimers[Math.floor(thisClient / 2)].whoRed == thisClient){
+        //console.log("MADE AN INTERVAL")
+       checkersCustomTimers[roomName].interval = setInterval((() => {
+        //console.log("timer");
+        if(checkersCustomTimers[roomName].turn == "red"){
+          checkersCustomTimers[roomName].redTimer -= 1
+        }
+        else{
+          checkersCustomTimers[roomName].blackTimer -= 1
+        }
+        //let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+        //console.log("OTHER OTHER OTHER " + other)
+        io.to(roomName).emit('timer', {timeRed: checkersCustomTimers[roomName].redTimer, timeBlack: checkersCustomTimers[roomName].blackTimer});
+        //clientListCheckers[other].emit('timer',{timeRed: checkersTimers[Math.floor(thisClient / 2)].redTimer, timeBlack: checkersTimers[Math.floor(thisClient / 2)].blackTimer});
+      }), 1000)
+      console.log("why isn't it working")
+      //}
+    }
+
+
+    
+    if(!fun){
+      console.log("flipping");
+      if(checkersCustomTimers[roomName].turn == "red"){
+        console.log("flipped to black");
+        checkersCustomTimers[roomName].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersCustomTimers[roomName].turn = "red"
+      }
+      fun = !fun;
+    } else {
+      console.log("not flipping");
+      fun = !fun;
+    }
+    
+    //checkersCustomTimers[roomName].turn)
+
+
+    io.to(roomName).emit("redRecieve", {row: row, col: col});
+  
+  })
+  
+
   socket.on('blackMove', ({row, col}) => {
     console.log("HELL      AAAH");
     console.log(i);
@@ -176,6 +299,48 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('checkersCustomRedMove', ({row,col, me, opp}) => {
+    let roomName = `${me}-${opp}`; 
+    if(!checkersCustomTimers[roomName]){
+      console.log("no timer?");
+      console.log(roomName);
+      console.log(checkersCustomTimers[roomName]);
+      roomName = `${opp}-${me}`;
+    }
+      
+    if(!checkersCustomTimers[roomName]){
+      console.log("STILL no timer?");
+      console.log(roomName);
+      console.log(checkersCustomTimers[roomName]);
+    }
+
+    
+
+    if(checkersCustomTimers[roomName].turn == "red"){
+      checkersCustomTimers[roomName].turn = "black"
+    }
+    else{
+      checkersCustomTimers[roomName].turn = "red"
+    }
+    //checkersCustomTimers[roomName].turn)
+
+    if(!fun){
+      if(checkersCustomTimers[roomName].turn == "red"){
+        console.log("flipped to black");
+        checkersCustomTimers[roomName].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersCustomTimers[roomName].turn = "red"
+      }
+      fun = !fun
+    } else {
+      fun = !fun;
+    }
+
+    io.to(roomName).emit("blackRecieve", {row: row, col: col});
+  })
+
   socket.on('redMove', ({row, col}) => {
     if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
       checkersTimers[Math.floor(thisClient / 2)].turn = "black"
@@ -207,6 +372,56 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('customConnectPlacePiece', ({collumn, me, opp}) => {
+    console.log("custom move");
+    let roomName = `${me}-${opp}`; 
+    if(!connectCustomTimers[roomName]){
+      //console.log("   no timer?");
+      //console.log("      " + roomName);
+      //console.log(chessCustomTimers[roomName]);
+      roomName = `${opp}-${me}`;
+    }
+
+    if(!connectCustomTimers[roomName]){
+      //console.log("   STILL no timer?");
+      //console.log("      " + roomName);
+      //console.log(chessCustomTimers[roomName]);
+    }
+
+    if(i == 0){
+      i++
+      //console.log("weird ass interval");
+       connectCustomTimers[roomName].interval = setInterval((() => {
+        if(connectCustomTimers[roomName].turn == "red"){
+          connectCustomTimers[roomName].redTimer -= 1
+        }
+        else{
+          connectCustomTimers[roomName].blackTimer -= 1
+        }
+        io.to(roomName).emit('timer', {timeRed: connectCustomTimers[roomName].redTimer, timeYellow: connectCustomTimers[roomName].redTimer});
+      }), 1000)
+      //console.log("why isn't it working")
+      //}
+    }
+
+
+    
+      if(connectCustomTimers[roomName].turn == "red"){
+        //console.log("flipped to black");
+        connectCustomTimers[roomName].turn = "yellow"
+      }
+      else{
+        //console.log("flipped to white");
+        connectCustomTimers[roomName].turn = "red"
+      }
+    
+    //checkersCustomTimers[roomName].turn)
+
+
+    //io.to(roomName).emit("customOtherPlaced", (collumn));
+    connectCustomClients[opp].emit("customOtherPlaced", (collumn));
+  
+  })
 
   socket.on('placePiece', (collumn) => {
     if(i == 0){
@@ -244,13 +459,71 @@ io.on('connection', (socket) => {
 
 
     if (thisClient%2 == 0){
-      clientList[thisClient + 1].emit('otherPlaced', (collumn))
+      clientList[thisClient + 1].emit('customOtherPlaced', (collumn))
     }
     else{
-      clientList[thisClient - 1].emit('otherPlaced', (collumn))
+      clientList[thisClient - 1].emit('cusotmOtherPlaced', (collumn))
     }
   })
 
+  socket.on('customPlacePieceChess', (data) => {
+    //console.log("blackMove");
+    let roomName = `${data.me}-${data.opp}`; 
+    if(!chessCustomTimers[roomName]){
+      //console.log("   no timer?");
+      //console.log("      " + roomName);
+      //console.log(chessCustomTimers[roomName]);
+      roomName = `${data.opp}-${data.me}`;
+    }
+
+    if(!chessCustomTimers[roomName]){
+      //console.log("   STILL no timer?");
+      //console.log("      " + roomName);
+      //console.log(chessCustomTimers[roomName]);
+    }
+
+    
+    //console.log("custom black move");
+
+    if(i == 0){
+      i++
+      //console.log("weird ass interval");
+       chessCustomTimers[roomName].interval = setInterval((() => {
+        if(chessCustomTimers[roomName].turn == "red"){
+          chessCustomTimers[roomName].redTimer -= 1
+        }
+        else{
+          chessCustomTimers[roomName].blackTimer -= 1
+        }
+        io.to(roomName).emit('timer', {timeWhite: chessCustomTimers[roomName].whiteTimer, timeBlack: chessCustomTimers[roomName].blackTimer});
+      }), 1000)
+      //console.log("why isn't it working")
+      //}
+    }
+
+
+    
+    if(!fun){
+      if(chessCustomTimers[roomName].turn == "white"){
+        //console.log("flipped to black");
+        chessCustomTimers[roomName].turn = "black"
+      }
+      else{
+        //console.log("flipped to white");
+        chessCustomTimers[roomName].turn = "white"
+      }
+      fun = !fun;
+    } else {
+      //console.log("not flipping");
+      fun = !fun;
+    }
+    
+    //checkersCustomTimers[roomName].turn)
+
+
+    io.to(roomName).emit("otherPlaced", (data));
+  
+  })
 
 
   socket.on('placePieceChess', (data) => {
@@ -304,7 +577,36 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Disconnect Fired');
+    console.log('Disconnect Fired on ' + socket.id);
+    for(const [username, userSocket] of Object.entries(checkersCustomClients)) {
+      if(userSocket.id === socket.id){
+        delete checkersCustomClients[username];
+        console.log("removed from client list")
+      }
+    }
+
+    for(const [roomName, timer] of Object.entries(checkersCustomTimers)) {
+      if (timer.whoRed === socket.id || timer.whoBlack) {
+        clearInteval(timer.interval);
+        delete checkersCustomTimers[roomName];
+        console.log("removed from timer")
+      }
+    }
+
+    for(const [username, userSocket] of Object.entries(chessCustomClients)) {
+      if(userSocket.id === socket.id){
+        delete chessCustomClients[username];
+        console.log("removed from client list")
+      }
+    }
+
+    for(const [roomName, timer] of Object.entries(chessCustomTimers)) {
+      if (timer.whoRed === socket.id || timer.whoBlack) {
+        clearInteval(timer.interval);
+        delete chessCustomTimers[roomName];
+        console.log("removed from timer")
+      }
+    }
     //numClientsConnect--;
   });
 });

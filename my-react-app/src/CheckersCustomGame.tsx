@@ -1,9 +1,13 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
+import {useParams} from "react-router-dom";
 import axios from 'axios';
 import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
 
 function CheckersCustomGame(){
     const [user, setUser] = useState(null);
+
+    const params = useParams();
+    console.log(params.enemyId);
 
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
@@ -18,14 +22,18 @@ function CheckersCustomGame(){
     }
     console.log(user);
 
-    return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx
-        <div>
-            <h2>CHECKERS</h2>
-             <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="custom" /> 
-            {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
-        </div>
-        
-    )
+    if(user){
+        return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx
+            <div>
+                <h2>CHECKERS</h2>
+                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="custom" opp={params.enemyId} /> 
+                {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            </div>
+            
+        )
+    } else {
+        return <p>loading...</p>
+    }
 }
 
 export default CheckersCustomGame;
