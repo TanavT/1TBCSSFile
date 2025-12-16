@@ -101,7 +101,7 @@ export default class CheckersMain extends Phaser.Scene {
 
     preload() {
 
-		this.cameras.main.setZoom(0.80); 
+		this.cameras.main.setZoom(0.82); 
 		this.cameras.main.centerOn(210,300)
 		
 		this.socket = io('http://localhost:4000');
@@ -111,6 +111,7 @@ export default class CheckersMain extends Phaser.Scene {
 
 		this.socket.on("allOver", (whoWon) => {
 			this.blackRectangle.visible = true
+			this.gameOverBool = true
 		})
 
 		this.socket.on('user_join', (id) => {
@@ -222,7 +223,8 @@ export default class CheckersMain extends Phaser.Scene {
     	const boardHeight = boardWidth;
 
 
-        const board = this.add.image(this.scale.width/2, this.scale.height/2, 'board');
+        const board = this.add.image(this.scale.width/2, this.scale.height/2 + 5, 'board');
+		board.setCrop(0,45, this.scale.width + 200, this.scale.height - 110)
 
 		const startX = board.x - boardWidth / 2;
     	const startY = board.y - boardHeight / 2;
@@ -249,7 +251,7 @@ export default class CheckersMain extends Phaser.Scene {
 		winBlack.setStroke('#000000', 6);
 		this.winBlack = winBlack
 
-		const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
+		const rectangle_1 = this.add.rectangle(400, 384, 128, 128);
 		rectangle_1.scaleX = 8;
 		rectangle_1.scaleY = 6;
 		rectangle_1.visible = false;

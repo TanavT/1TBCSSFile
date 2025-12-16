@@ -10,10 +10,16 @@ import red_Circle_full from "../../assets/Red_Circle_full.png";
 import yellow_Circle from "../../assets/Yellow_Circle.png";
 import io from 'socket.io-client';
 import { Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 /* END-USER-IMPORTS */
 
-export default class Connect4Main extends Phaser.Scene {
+function SwitcherFunc () {
+	const navigate = useNavigate()
+	navigate('/connect')
+}
 
+export default class Connect4Main extends Phaser.Scene {
+	
 	constructor() {
 		super("Connect4Main");
 
@@ -76,10 +82,12 @@ export default class Connect4Main extends Phaser.Scene {
 		yourTimeText.text = "Your time: 10:00\n";
 		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourTimeText.setWordWrapWidth(1);
+		yourTimeText.visible = false;
 		this.yourTimeText = yourTimeText
 
 		// enemyTimeText
 		const enemyTimeText = this.add.text(902, 53, "", {});
+		yourTimeText.visible = false;
 		enemyTimeText.text = "Enemy time: 10:00\n";
 		enemyTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		enemyTimeText.setWordWrapWidth(1);
@@ -121,6 +129,9 @@ export default class Connect4Main extends Phaser.Scene {
 	/* START-USER-CODE */
 
 	// Write your code here
+	userID!:string;
+	opponentUserID:string;
+	matchID:string;
 
 	socket:Socket;
 
@@ -136,6 +147,7 @@ export default class Connect4Main extends Phaser.Scene {
 
 	gameOver:boolean = false;
 
+
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
     // Minutes
     var minutes = Math.floor(seconds/60);
@@ -147,42 +159,65 @@ export default class Connect4Main extends Phaser.Scene {
     return `${minutes}:${partInSeconds}`;
 	}
 
-	preload(){
-		this.cameras.main.setZoom(0.59); 
-		this.cameras.main.centerOn(515,380)
+	me
+	gametype
+	opp
 
+
+	init(data: { userID: string }) {
+    this.userID = data.userID;
+		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
+		console.log("got user: " + user.username);
+		this.me = user.username
+
+		const gametype = this.game.registry.get("gametype");
+		console.log("got gametype: " + gametype);
+		this.gametype = gametype;
+
+		const opp = this.game.registry.get("opp");
+		console.log("got opp: " + opp);
+		this.opp = opp;
+	}
+
+
+	preload(){
+		console.log(`UserId: ${this.userID}`)
 		console.log("It's preloadin time")
 		this.socket = io('http://localhost:4000');
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketConnectMania", 'test')
+			if(this.gametype == "queue"){
+				this.socket.emit("realSocketConnect", this.userID)
+			} else {
+				this.socket.emit("customJoinConnect", {me:this.me, opp:this.opp})
+			}
+			
   		});
 
-		this.socket.on("allOver", (whoWon) => {
-			this.blackRectangle.visible = true
-			this.gameOver = true
-		})
-
-		this.socket.on('timer', ({timeFirst, timeSecond}) => {
+		this.socket.on('timer', ({timeRed, timeYellow}) => {
+			return
 			if(this.gameOver) return
 			if(this.color == "red"){
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeFirst)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeSecond)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeRed)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeYellow)}`
 			}
 			else{
-				this.yourTimeText.text = `Your Time: ${this.formatTime(timeSecond)}`
-				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeFirst)}`
+				this.yourTimeText.text = `Your Time: ${this.formatTime(timeYellow)}`
+				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeRed)}`
 			}
-			if(timeFirst == 0){
+			if(timeRed == 0){
 				this.doGameOver("Y")
 			}
-			if(timeSecond == 0){
+			if(timeYellow == 0){
 				this.doGameOver("R")
 			}
   		});
 
-		this.socket.on('color', ({id, color}) => {
+		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
+			if(this.userID == opponentUserID){
+				//window.location.replace('/connect')
+			}
 			if (this.socket.id == id){
 				if(color == 'red'){
 					this.color="red"
@@ -203,20 +238,59 @@ export default class Connect4Main extends Phaser.Scene {
 					this.opponentColor="yellow"
 				}
 			}
+			this.matchID = matchID
+			this.opponentUserID = opponentUserID
 			console.log("COLOR:" + this.color)
+			console.log(`My id: ${this.userID}, opponent id: ${this.opponentUserID}`)
 			this.myTurn = (this.color == "red")
 			this.yourColorText.text = `Your color: ${this.color}`
   		})
 		this.socket.on('error', ({id, message}) => {
 			console.log("I am "+id+" and the message is: " + message)
 		})
-		this.socket.on('yourTurn', (data)=> {
-			this.myTurn = true
-			console.log("MY TURN connect")
-		})
+
+		this.socket.on("customOtherPlaced", (collumn) => {
+			
+			  this.myTurn = true;
+			  this.turnText.text = `Turn: ${this.color}`
+			  console.log(collumn.x);
+			  let collumnNumber = Math.floor((collumn.x - 200)/100);
+			  if(collumn.x === 196) collumnNumber = 0
+			  if(this.countCollum[collumnNumber] < 6){
+			  if(this.opponentColor == "red"){
+			  	var tempThingy = this.add.image(collumn.x, 0, "Red_Circle_full");
+
+			  tempThingy.scaleX = 0.3;
+			  tempThingy.scaleY = 0.3;
+			  	this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'R'
+			  }
+			  else{
+			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
+
+			  tempThingy.scaleX = 0.18;
+			  tempThingy.scaleY = 0.18;
+			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
+			  }
+			  this.circleList.push(tempThingy)
+			  console.log(this.globalGameState)
+			//this.turn = 1-this.turn;
+              const t = this.tweens.add({
+                    targets: [tempThingy],
+                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
+                    duration: 200,
+                    easing: 'bounce',
+                    yoyo: false,
+                    paused: true
+                })
+              t.play()
+			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
+			  this.checkGameOver(this.globalGameState);
+			  }
+			}
+		)
 		this.socket.on("otherPlaced", (collumn) => {
-			console.log("I GOT A MESSAGE")
-			  //this.myTurn = true;
+			console.log("I GOT THE OPPONENTS MESSAGE")
+			  this.myTurn = true;
 			  this.turnText.text = `Turn: ${this.color}`
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
@@ -257,15 +331,15 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.load.image(
 		'Connect4_Empty_Grid',
-		'assets/Connect4_Empty_Grid.png'
+		'/assets/Connect4_Empty_Grid.png'
 		);
 		this.load.image(
 		'Red_Circle_full',
-		'assets/Red_Circle_full.png'
+		'/assets/Red_Circle_full.png'
 		);
 		this.load.image(
 		'Yellow_Circle',
-		'assets/Yellow_Circle.png'
+		'/assets/Yellow_Circle.png'
 		);
 
 	}
@@ -338,20 +412,48 @@ export default class Connect4Main extends Phaser.Scene {
 	countCircles = 0
 
 	doGameOver(winner:string):void{
-		if(this.gameOver == true) return
 		console.log(winner + ' WINS FR!!!')
 		this.gameOver = true
+		let gameState //1 = this player won, 0.5 = tie, 0 = this player lost
 		if(winner == "R"){
-			this.socket.emit("gameDone", {game: "connect", winner: "red"});
 			this.winRed.visible = true
+			if (this.color === "red") {
+				gameState = 1
+			} else {
+				gameState = 0
+			}
+			console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverConnect", 
+				{ 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
 		}
 		else if(winner == "Y"){
-			this.socket.emit("gameDone", {game: "connect", winner: "yellow"});
+			if (this.color === "yellow") {
+				gameState = 1
+			} else {
+				gameState = 0
+			}
 			this.winYellow.visible = true
+			console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverConnect", 
+				{ 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
 		}
 		else{
-			this.socket.emit("gameDone", {game: "connect", winner: "tie"});
+			gameState = 0.5
 			this.tieGame.visible = true
+			this.socket.emit("gameOverConnect", 
+				{ 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
 		}
 		// this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
 		// this.turn = 0;
@@ -370,7 +472,7 @@ export default class Connect4Main extends Phaser.Scene {
 	tieGame
 
 	create() {
-
+		console.log(this.userID)
 		this.editorCreate();
 
 		const collumns = [this.rectangle, this.rectangle_1, this.rectangle_2, this.rectangle_3, this.rectangle_4, this.rectangle_5, this.rectangle_6]
@@ -378,9 +480,13 @@ export default class Connect4Main extends Phaser.Scene {
         collumns.forEach((collumn) => {
             collumn.on('pointerdown', () => {
 			  if(this.myTurn && this.gameOver == false){
-			  this.myTurn = false;
-			  this.turnText.text = `Turn: ${this.opponentColor}`
-			  this.socket.emit("placePieceMania", (collumn))
+				this.myTurn = false;
+				this.turnText.text = `Turn: ${this.opponentColor}`
+			  if(this.gametype == "queue"){
+				this.socket.emit("placePiece", (collumn))
+			  } else {
+				this.socket.emit("customConnectPlacePiece", ({collumn: collumn, me:this.me, opp:this.opp}))
+			  }
 			  console.log(collumn.x);
 			  let collumnNumber = Math.floor((collumn.x - 200)/100);
 			  if(collumn.x === 196) collumnNumber = 0
@@ -395,26 +501,26 @@ export default class Connect4Main extends Phaser.Scene {
 			  else{
 			    var tempThingy = this.add.image(collumn.x, 0, "Yellow_Circle");
 
-			  tempThingy.scaleX = 0.18;
-			  tempThingy.scaleY = 0.18;
-			  this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
-			  }
-			  this.circleList.push(tempThingy)
-			  console.log(this.globalGameState)
-			//this.turn = 1-this.turn;
-              const t = this.tweens.add({
-                    targets: [tempThingy],
-                    y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
-                    duration: 200,
-                    easing: 'bounce',
-                    yoyo: false,
-                    paused: true
-                })
-              t.play()
-			  this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
-			  this.checkGameOver(this.globalGameState);
-			  }
-              }
+				tempThingy.scaleX = 0.18;
+				tempThingy.scaleY = 0.18;
+				this.globalGameState[collumnNumber][this.countCollum[collumnNumber]] = 'Y'
+				}
+				this.circleList.push(tempThingy)
+				console.log(this.globalGameState)
+				//this.turn = 1-this.turn;
+				const t = this.tweens.add({
+						targets: [tempThingy],
+						y: {from: tempThingy.y, to:650 - this.countCollum[collumnNumber] * 105},
+						duration: 200,
+						easing: 'bounce',
+						yoyo: false,
+						paused: true
+					})
+				t.play()
+				this.countCollum[collumnNumber] = this.countCollum[collumnNumber] + 1
+				this.checkGameOver(this.globalGameState);
+				}
+				}
 			})
         })
 	
@@ -441,20 +547,6 @@ export default class Connect4Main extends Phaser.Scene {
 	tieGame.setStyle({ "fontSize": "100px" });
 	tieGame.setStroke('#000000', 6);
 	this.tieGame = tieGame
-
-	const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
-		rectangle_1.scaleX = 8;
-		rectangle_1.scaleY = 6;
-		rectangle_1.visible = false;
-		rectangle_1.isFilled = true;
-		rectangle_1.fillColor = 0;
-		rectangle_1.alpha = 0.5;
-		rectangle_1.alphaTopLeft = 0.5;
-		rectangle_1.alphaTopRight = 0.5;
-		rectangle_1.alphaBottomLeft = 0.5;
-		rectangle_1.alphaBottomRight = 0.5;
-		this.blackRectangle = rectangle_1
-
 	}
 
 	}

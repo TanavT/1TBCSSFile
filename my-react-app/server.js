@@ -165,6 +165,7 @@ io.on('connection', (socket) => {
             clientListMania[other].checkers.emit("allOver", "second")
             clientListMania[other].connect.emit("allOver", "second")
           }
+          }
           if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
           let tempString
           if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
@@ -178,19 +179,93 @@ io.on('connection', (socket) => {
             clientListMania[other].checkers.emit("allOver", tempString)
             clientListMania[other].connect.emit("allOver", tempString)
           }
-         }
+         
       }
     if(game == "checkers")
       if(dataListMania[Math.floor(thisClient / 2)].checkersWin == null){
         dataListMania[Math.floor(thisClient / 2)].maxMove -= 1
         dataListMania[Math.floor(thisClient / 2)].moveOfThree -= 1
          dataListMania[Math.floor(thisClient / 2)].checkersWin = winner
+         if(winner == "black"){
+          dataListMania[Math.floor(thisClient / 2)].score += 1
+          if(dataListMania[Math.floor(thisClient / 2)].score >= 2){
+            clientListMania[thisClient].chess.emit("allOver", "first")
+            clientListMania[thisClient].checkers.emit("allOver", "first")
+            clientListMania[thisClient].connect.emit("allOver", "first")
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", "first")
+            clientListMania[other].checkers.emit("allOver", "first")
+            clientListMania[other].connect.emit("allOver", "first")
+          }
+         }
+          if(winner == "red"){
+          dataListMania[Math.floor(thisClient / 2)].score -= 1
+          if(dataListMania[Math.floor(thisClient / 2)].score <= -2){
+            clientListMania[thisClient].chess.emit("allOver", "second")
+            clientListMania[thisClient].checkers.emit("allOver", "second")
+            clientListMania[thisClient].connect.emit("allOver", "second")
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", "second")
+            clientListMania[other].checkers.emit("allOver", "second")
+            clientListMania[other].connect.emit("allOver", "second")
+          }
+          }
+          if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
+          let tempString
+          if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
+          if(dataListMania[Math.floor(thisClient / 2)].score > 0) tempString = "first"
+          if(dataListMania[Math.floor(thisClient / 2)].score == 0) tempString = "tie"
+           clientListMania[thisClient].chess.emit("allOver", tempString)
+            clientListMania[thisClient].checkers.emit("allOver", tempString)
+            clientListMania[thisClient].connect.emit("allOver", tempString)
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", tempString)
+            clientListMania[other].checkers.emit("allOver", tempString)
+            clientListMania[other].connect.emit("allOver", tempString)
+          }
       }
     if(game == "connect")
       if(dataListMania[Math.floor(thisClient / 2)].connectWin == null){
         dataListMania[Math.floor(thisClient / 2)].maxMove -= 1
         dataListMania[Math.floor(thisClient / 2)].moveOfThree -= 1
          dataListMania[Math.floor(thisClient / 2)].connectWin = winner
+        if(winner == "red"){
+          dataListMania[Math.floor(thisClient / 2)].score += 1
+          if(dataListMania[Math.floor(thisClient / 2)].score >= 2){
+            clientListMania[thisClient].chess.emit("allOver", "first")
+            clientListMania[thisClient].checkers.emit("allOver", "first")
+            clientListMania[thisClient].connect.emit("allOver", "first")
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", "first")
+            clientListMania[other].checkers.emit("allOver", "first")
+            clientListMania[other].connect.emit("allOver", "first")
+          }
+         }
+          if(winner == "yellow"){
+          dataListMania[Math.floor(thisClient / 2)].score -= 1
+          if(dataListMania[Math.floor(thisClient / 2)].score <= -2){
+            clientListMania[thisClient].chess.emit("allOver", "second")
+            clientListMania[thisClient].checkers.emit("allOver", "second")
+            clientListMania[thisClient].connect.emit("allOver", "second")
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", "second")
+            clientListMania[other].checkers.emit("allOver", "second")
+            clientListMania[other].connect.emit("allOver", "second")
+          }
+          }
+          if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
+          let tempString
+          if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
+          if(dataListMania[Math.floor(thisClient / 2)].score > 0) tempString = "first"
+          if(dataListMania[Math.floor(thisClient / 2)].score == 0) tempString = "tie"
+           clientListMania[thisClient].chess.emit("allOver", tempString)
+            clientListMania[thisClient].checkers.emit("allOver", tempString)
+            clientListMania[thisClient].connect.emit("allOver", tempString)
+            let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+            clientListMania[other].chess.emit("allOver", tempString)
+            clientListMania[other].checkers.emit("allOver", tempString)
+            clientListMania[other].connect.emit("allOver", tempString)
+          }
       }
   });
 
@@ -648,7 +723,7 @@ io.on('connection', (socket) => {
         else{
           maniaTimers[Math.floor(thisClient / 2)].firstTimer -= 1
         }
-        
+        let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
         //console.log("OTHER OTHER OTHER " + other)
         clientListMania[thisClient].chess.emit('timer', {timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
         clientListMania[other].chess.emit('timer',{timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});

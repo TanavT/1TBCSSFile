@@ -10,7 +10,13 @@ import red_Circle_full from "../../assets/Red_Circle_full.png";
 import yellow_Circle from "../../assets/Yellow_Circle.png";
 import io from 'socket.io-client';
 import { Socket } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 /* END-USER-IMPORTS */
+
+function SwitcherFunc () {
+	const navigate = useNavigate()
+	navigate('/connect')
+}
 
 export default class Connect4Main extends Phaser.Scene {
 	
@@ -139,6 +145,7 @@ export default class Connect4Main extends Phaser.Scene {
 
 	gameOver:boolean = false;
 
+
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
     // Minutes
     var minutes = Math.floor(seconds/60);
@@ -205,6 +212,9 @@ export default class Connect4Main extends Phaser.Scene {
   		});
 
 		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
+			if(this.userID == opponentUserID){
+				window.location.replace('/connect')
+			}
 			if (this.socket.id == id){
 				if(color == 'red'){
 					this.color="red"
