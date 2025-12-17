@@ -3,28 +3,30 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 import "./ChatBox.css";
+import { useAuth } from "../AuthContext";
 
 
 function ChatBox() {
+    const {user} = useAuth()
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // const [user, setUser] = useState(null);
+    // const [loading, setLoading] = useState(true);
     const socketRef = useRef(null);
     const location = useLocation();
     const room = location.pathname.replace("/", "");
 
-    useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
-            .then(res => {
-                setUser(res.data);
-                setLoading(false);
-            })
-            .catch(() => {
-                setUser(null);
-                setLoading(false);
-            });
-    }, []);
+    // useEffect(() => {
+    //     axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+    //         .then(res => {
+    //             setUser(res.data);
+    //             setLoading(false);
+    //         })
+    //         .catch(() => {
+    //             setUser(null);
+    //             setLoading(false);
+    //         });
+    // }, []);
 
     useEffect(() => {
         if (!user) return;
@@ -70,7 +72,7 @@ function ChatBox() {
                 const response = await axios.post(
                     `${import.meta.env.VITE_BACKEND_SERVER}/account/addFriend`,
                     {
-                        userUsername: currentUser.username,
+                        userUsername: user.username,
                         friendUsername: friendUsername
                     },
                     { withCredentials: true }
@@ -94,7 +96,7 @@ function ChatBox() {
                 const response = await axios.post(
                     `${import.meta.env.VITE_BACKEND_SERVER}/account/deleteFriend`,
                     {
-                        userUsername: currentUser.username,
+                        userUsername: user.username,
                         friendUsername: friendUsername
                     },
                     { withCredentials: true }
@@ -113,13 +115,13 @@ function ChatBox() {
     }
 
     function canAddFriend(user) {
-        if (!currentUser) return false;
+        if (!user) return false;
         
-        if (user.username === currentUser.username) {
+        if (user.username === user.username) {
             return false;
         }
         
-        if (currentUser.friendList && currentUser.friendList.includes(user.username)) {
+        if (user.friendList && user.friendList.includes(user.username)) {
             return false;
         }
         
@@ -127,13 +129,13 @@ function ChatBox() {
     }
 
     function canDeleteFriend(user) {
-        if (!currentUser) return false;
+        if (!user) return false;
         
-        if (user.username === currentUser.username) {
+        if (user.username === user.username) {
             return false;
         }
         
-        if (currentUser.friendList && !currentUser.friendList.includes(user.username)) {
+        if (user.friendList && !user.friendList.includes(user.username)) {
             return false;
         }
         
@@ -141,9 +143,9 @@ function ChatBox() {
     }
 
     // don't render until we know if user is logged in
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    // if (loading) {
+    //     return <div>Loading...</div>;
+    // }
 
     if (!user) {
         return <div>Please log in to chat</div>;

@@ -90,7 +90,7 @@ function AccountInfo() {
                 } else if (game == "chess"){
                     console.log("got your ass");
                     const response2 = await axios.post(
-                    'http://localhost:3000/account/unchallengeChess',
+                    `${import.meta.env.VITE_BACKEND_SERVER}/account/unchallengeChess`,
                     {
                         from: friendUsername, 
                         to: user.username
@@ -103,7 +103,7 @@ function AccountInfo() {
                 } else if (game == "connect"){
 
                     const response2 = await axios.post(
-                    'http://localhost:3000/account/unchallengeConnect',
+                    `${import.meta.env.VITE_BACKEND_SERVER}/account/unchallengeConnect`,
                     {
                         from: friendUsername, 
                         to: user.username

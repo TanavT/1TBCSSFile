@@ -39,9 +39,9 @@ function ConnectGame(){
         //todo?
     }
 
-    if(loading) {
-        <p>Loading...</p>
-    }
+    // if(loading) {
+    //     <p>Loading...</p>
+    // }
 
     if(user){
         return (
