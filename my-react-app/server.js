@@ -28,9 +28,10 @@ app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
 app2.use(cors({
-  origin: process.env.FRONTEND_CLIENT,
+  origin: 'https://testing-game-1tbcss.web.app',
   credentials: true
 }));
+app2.options('*', cors());
 
 app2.use(session({
   name: 'AwesomeWebapp2',
