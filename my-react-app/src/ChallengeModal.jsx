@@ -32,7 +32,7 @@ function ChallengeModal({friendUsername, user, onClose}) {
             navigate(`/chessCustom/${friendUsername}`);
         } else if (game=="connect") {
             const response = await axios.post(
-                'http://localhost:3000/account/challenge',
+                'http://localhost:3000/account/challengeConnect',
                 {
                     from: user.username, 
                     to: friendUsername
@@ -41,7 +41,7 @@ function ChallengeModal({friendUsername, user, onClose}) {
             );
             alert(`${friendUsername} challenged!`);
 
-            navigate(`/conncetCustom/${friendUsername}`);
+            navigate(`/connectCustom/${friendUsername}`);
         } else {
             console.log("something else");
         }

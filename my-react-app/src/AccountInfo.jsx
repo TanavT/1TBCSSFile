@@ -18,6 +18,8 @@ function AccountInfo() {
         fetchUser();
     }, []);
 
+
+
     async function handleChallengeFriend(friendUsername){
         if( window.confirm(`Are you sure you want to challenge ${friendUsername}?`)){
             try {
@@ -38,22 +40,54 @@ function AccountInfo() {
         }
     }
 
-    async function handleChallengeAccept(friendUsername){
+    async function handleChallengeAccept(friendUsername, game){
         if( window.confirm(`Are you sure you want to accept the challenge from ${friendUsername}?`)){
             try {
-                const response2 = await axios.post(
+                if(game == "checkers"){
+                    const response2 = await axios.post(
                     'http://localhost:3000/account/unchallenge',
                     {
                         from: friendUsername, 
                         to: user.username
                     },
                     { withCredentials: true}
-                );
-                alert(`Challenge accepted!`);
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
+
                 navigate(`/checkersCustom/${friendUsername}`);
-            } catch (err) {
-                console.error("Error accepting challenge:", err);
-                alert(err.response?.data?.error || "Failed to accept challenge");
+
+                } else if (game == "chess"){
+                    //console.log("got your ass");
+                    const response2 = await axios.post(
+                    'http://localhost:3000/account/unchallengeChess',
+                    {
+                        from: friendUsername, 
+                        to: user.username
+                    },
+                    { withCredentials: true}
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
+
+                    navigate(`/chessCustom/${friendUsername}`);
+                } else if (game == "connect"){
+                    const response2 = await axios.post(
+                    'http://localhost:3000/account/unchallengeConnect',
+                    {
+                        from: friendUsername, 
+                        to: user.username
+                    },
+                    { withCredentials: true}
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
+
+                    navigate(`/connectCustom/${friendUsername}`);
+                }
+
+
+
+                } catch (err) {
+                    console.error("Error challenging friend:", err);
+                    alert(err.response?.data?.error || "Failed to challenge friend");
             }
         }
     }

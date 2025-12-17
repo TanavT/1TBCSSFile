@@ -14,7 +14,7 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 
-const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => {
+const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any, userID: any}) => {
     
     const game =  new Game({
          ...config,
@@ -33,11 +33,15 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp
                     console.log("got opp");
                     game.registry.set("opp", options.opp)
                 }
+                if(options?.userID) {
+                    console.log("got userID");
+                    game.registry.set("userID", options.userID);
+                }
             }
         }
      });
   
-     game.scene.add('Connect4Main', Connect4Main, false);
+     game.scene.add('Connect4Main', Connect4Main, true);
   return game;
 
 

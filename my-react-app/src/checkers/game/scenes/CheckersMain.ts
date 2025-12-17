@@ -121,6 +121,8 @@ export default class CheckersMain extends Phaser.Scene {
 		this.socket.on('checkersColor', ({id, color}) => {
 			console.log("I am " + id + " and my color is " + color);
 			this.myColor = color;
+			this.yourColorText.text = `Your Color: ${this.myColor}`;
+
 		});
 		this.socket.on('redRecieve', ({row, col}) => {
 			console.log('redRecieve');
@@ -129,6 +131,7 @@ export default class CheckersMain extends Phaser.Scene {
 			if(this.myColor == 'red'){
 				//console.log('and I am red');
 				this.handleTileClick(row, col);
+				this.turnText.text = `Turn: ${this.toMove}`
 			}
 		});
 		this.socket.on('blackRecieve', ({row, col}) => {
@@ -137,6 +140,7 @@ export default class CheckersMain extends Phaser.Scene {
 			if(this.myColor == 'black'){
 				//console.log('and I am black');
 				this.handleTileClick(row, col);
+				this.turnText.text = `Turn: ${this.toMove}`
 			}
 		})
 
@@ -179,6 +183,20 @@ export default class CheckersMain extends Phaser.Scene {
 		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourTimeText.setWordWrapWidth(1);
 		this.yourTimeText = yourTimeText
+
+		// yourColorText
+		const yourColorText = this.add.text(22, 621, "", {});
+		yourColorText.text = "Your Color: none";
+		yourColorText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
+		yourColorText.setWordWrapWidth(10);
+		this.yourColorText = yourColorText
+
+		// turnText
+		const turnText = this.add.text(906, 666, "", {});
+		turnText.text = "Turn: black";
+		turnText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
+		turnText.setWordWrapWidth(10);
+		this.turnText = turnText
 
 		// enemyTimeText
 		const enemyTimeText = this.add.text(902, 53, "", {});
@@ -905,6 +923,7 @@ export default class CheckersMain extends Phaser.Scene {
 								this.socket.emit("redMove", {row:this.selectedPiece.row, col: this.selectedPiece.col});
 								this.socket.emit("redMove", {row: row, col: col});
 							}
+							
 						}
 						
                         
@@ -978,7 +997,7 @@ export default class CheckersMain extends Phaser.Scene {
 						} else {
 							this.toMove = 'black';
 						}
-                        
+                        this.turnText.text = `Turn: ${this.toMove}`
                         this.pieceSelected = false;
                     //}      
                 }
@@ -1083,6 +1102,7 @@ export default class CheckersMain extends Phaser.Scene {
 							this.toMove = 'red';
 						}
                         //this.toMove = 'red';
+						this.turnText.text = `Turn: ${this.toMove}`
                         this.pieceSelected = false;
                         //console.log(theTile.team);
 
