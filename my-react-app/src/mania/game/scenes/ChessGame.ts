@@ -110,8 +110,12 @@ export default class ChessGame extends Phaser.Scene {
 		})
 
 		this.socket.on("yourTurn", (data) => {
+			console.log("CHESS DATA CHESS DATA" + data)
 			this.myTurn = true
 			this.turnText.text = "Turn: Yours"
+			if(data == "notYourTurn"){
+				this.turnText.text = "Turn: Opponent's"
+			}
 			//console.log("MY TURN CHESS")
 		} )
 
@@ -142,10 +146,11 @@ export default class ChessGame extends Phaser.Scene {
 		this.socket.on("otherPlaced", ({promote, promoteLetter, promoteTexture, startSquareStr, destinationSquareStr, castleStr}) => {
 			let startSquareInt = this.squareToNumberConverter(startSquareStr)
 			let destSquareInt = this.squareToNumberConverter(destinationSquareStr)
-			//console.log("int int int" + startSquareInt)
-			//console.log(destSquareInt)
-			//console.log(startSquareStr)
-			//console.log(destinationSquareStr)
+			console.log("int int int" + startSquareInt)
+			console.log("dest: " + destSquareInt)
+			console.log("start: " + startSquareInt)
+			console.log(destinationSquareStr)
+			//console.log('-----');
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
 			y: {from: this.piecesOnSquares[startSquareInt].y, to: this.squares[destSquareInt].y},
@@ -157,7 +162,7 @@ export default class ChessGame extends Phaser.Scene {
 			})
 
 			if(promote){
-				//console.log("promote promote promote")
+				console.log("promote promote promote")
 				this.chess.move({from: startSquareStr, to: destinationSquareStr, promotion: promoteLetter})
 				this.piecesOnSquares[startSquareInt].setTexture(promoteTexture)
 			}
@@ -165,8 +170,10 @@ export default class ChessGame extends Phaser.Scene {
 				this.chess.move({from: startSquareStr, to: destinationSquareStr})
 
 			if(castleStr.length !== 0){
-				if(chess.turn() == 'b'){
-							if(thisNumber == 62){//king side black
+				if(true){
+						castleStr = "yesidkthestringdoesntmatter"
+						if(this.chess.turn() == 'w'){
+							if(destSquareInt == 62){//king side black
 								var tttt = this.tweens.add({
 								targets: [this.piecesOnSquares[63]],
 								y: {from: this.piecesOnSquares[63].y, to: this.squares[61].y},
@@ -176,6 +183,8 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[61] = this.piecesOnSquares[63]
+								this.piecesOnSquares[63] = null
 							}
 							else{
 								var tttt = this.tweens.add({
@@ -187,12 +196,14 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[59] = this.piecesOnSquares[56]
+								this.piecesOnSquares[56] = null
 							}
 						}
 
 
 						else{
-							if(thisNumber == 6){//king side white
+							if(destSquareInt == 6){//king side white
 								var tttt = this.tweens.add({
 								targets: [this.piecesOnSquares[7]],
 								y: {from: this.piecesOnSquares[7].y, to: this.squares[5].y},
@@ -202,6 +213,8 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[5] = this.piecesOnSquares[7]
+								this.piecesOnSquares[7] = null
 							}
 							else{
 								var tttt = this.tweens.add({
@@ -213,8 +226,11 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[3] = this.piecesOnSquares[0]
+								this.piecesOnSquares[0] = null
 							}
 						}
+					}
 
 
 
@@ -229,19 +245,25 @@ export default class ChessGame extends Phaser.Scene {
 
 			if(this.piecesOnSquares[destSquareInt] !== null) {
 							this.piecesOnSquares[destSquareInt].destroy()
+							this.piecesOnSquares[destSquareInt] = null
 					}
-			else if(typePiece == 'P' && this.numberToSquareConverter(destSquareInt)[0] !== destinationSquareStr[0])
-				{
-					if(chess.turn() == 'b')
+			else if(typePiece == 'P' && destinationSquareStr[0] !== startSquareStr[0])
+				{	
+					console.log("IM HERE CHESS")
+					if(this.chess.turn() == 'b'){
 						this.piecesOnSquares[destSquareInt-8].destroy()
-					else
+						this.piecesOnSquares[destSquareInt-8] = null
+					}
+					else{
 						this.piecesOnSquares[destSquareInt+8].destroy()
+						this.piecesOnSquares[destSquareInt+8] = null
+					}
 				}
 			this.piecesOnSquares[destSquareInt] = this.piecesOnSquares[startSquareInt];
 			this.piecesOnSquares[startSquareInt] = null
 			ttt.play()
-			//this.myTurn = true
-			
+			// this.myTurn = true
+			// this.turnText.text = `Turn: ${this.color}`
 
 
 			if(this.chess.isGameOver()){
@@ -268,7 +290,12 @@ export default class ChessGame extends Phaser.Scene {
 			}
 
 
-		})
+
+		})	
+
+
+			
+
 
 		this.load.image(
 		'blackKingChess',
@@ -1018,6 +1045,7 @@ export default class ChessGame extends Phaser.Scene {
 
 					if(this.piecesOnSquares[moveToSquareInt] !== null) {
 							this.piecesOnSquares[moveToSquareInt].destroy()
+							this.piecesOnSquares[moveToSquareInt] = null
 						}
 					this.piecesOnSquares[moveToSquareInt] = this.piecesOnSquares[clickedSquareInt]
 					this.piecesOnSquares[clickedSquareInt] = null
@@ -1038,7 +1066,7 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					this.myTurn = false
-					this.turnText.text = `Turn: Opponent's`
+					//this.turnText.text = `Turn: Opponent's`
 					this.squares.forEach((square2) => {
 						square2.alphaTopLeft = 0;
 						square2.alphaTopRight = 0;
@@ -1073,6 +1101,7 @@ export default class ChessGame extends Phaser.Scene {
 					console
 					if(this.piecesOnSquares[moveToSquareInt] !== null) {
 							this.piecesOnSquares[moveToSquareInt].destroy()
+							this.piecesOnSquares[moveToSquareInt] = null
 						}
 					this.piecesOnSquares[moveToSquareInt] = this.piecesOnSquares[clickedSquareInt]
 					this.piecesOnSquares[clickedSquareInt] = null
@@ -1095,7 +1124,7 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					this.myTurn = false
-					this.turnText.text = `Turn: Opponent's`
+					//this.turnText.text = `Turn: Opponent's`
 					this.chess = chess
 					clickedSquareString = ""
 					this.squares.forEach((square2) => {
@@ -1303,13 +1332,18 @@ export default class ChessGame extends Phaser.Scene {
 
 						if(this.piecesOnSquares[thisNumber] !== null) {
 							this.piecesOnSquares[thisNumber].destroy()
+							this.piecesOnSquares[moveToSquareInt] = null
 						}
 						else if(typePiece == 'P' && this.numberToSquareConverter(thisNumber)[0] !== clickedSquareString[0])
 							{
-								if(chess.turn() == 'b')
+								if(chess.turn() == 'b'){
 									this.piecesOnSquares[thisNumber-8].destroy()
-								else
+									this.piecesOnSquares[moveToSquareInt] = null
+								}
+								else{
 									this.piecesOnSquares[thisNumber+8].destroy()
+									this.piecesOnSquares[moveToSquareInt] = null
+								}
 							}
 						this.piecesOnSquares[thisNumber] = this.piecesOnSquares[clickedSquareInt]
 						this.piecesOnSquares[clickedSquareInt] = null
@@ -1358,7 +1392,7 @@ export default class ChessGame extends Phaser.Scene {
 						if(chess.isThreefoldRepetition()) repetition.visible = true
 					}
 					this.myTurn = false
-					this.turnText.text = `Turn: Opponent's`
+					//this.turnText.text = `Turn: Opponent's`
 					if(promoteChecker == false)
 						this.socket.emit('placePieceChessMania', ({promote: false, promoteLetter: 'x', promoteTexture: 'x', startSquareStr: clickedSquareString, destinationSquareStr: this.numberToSquareConverter(thisNumber), castleStr: castleStr}))
 					this.chess = chess
@@ -1381,6 +1415,7 @@ export default class ChessGame extends Phaser.Scene {
 	
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
     // Minutes
+	if(seconds < 0) seconds = 0
     var minutes = Math.floor(seconds/60);
     // Seconds
     var partInSeconds = seconds%60;

@@ -46,6 +46,7 @@ export default class CheckersMain extends Phaser.Scene {
 
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
     // Minutes
+	if(seconds < 0) seconds = 0
     var minutes = Math.floor(seconds/60);
     // Seconds
     var partInSeconds = seconds%60;
@@ -133,6 +134,10 @@ export default class CheckersMain extends Phaser.Scene {
 		})
 
 		this.socket.on('checkersColor', ({id, color, opponentUserID, matchID}) => {
+			if(this.userID == opponentUserID){
+				//console.log("fuck");
+				window.location.replace('/checkers')
+			}
 			console.log("I am " + id + " and my color is " + color);
 			this.matchID = matchID
 			this.opponentUserID = opponentUserID
@@ -239,20 +244,6 @@ export default class CheckersMain extends Phaser.Scene {
 
 		const unselectText = this.add.text(825,50,"Unselect", {color: "#fff"});
 
-		const winRed = this.add.text(130, 320, "", {});
-		winRed.visible = false;
-		winRed.text = "Winner: Red";
-		winRed.setStyle({ "fontSize": "100px" });
-		winRed.setStroke('#000000', 6);
-		this.winRed = winRed
-
-		const winBlack = this.add.text(130, 320, "", {});
-		winBlack.visible = false;
-		winBlack.text = "Winner: Black";
-		winBlack.setStyle({ "fontSize": "100px" });
-		winBlack.setStroke('#000000', 6);
-		this.winBlack = winBlack
-
         this.fieldArray = [];
         //this.fieldGroup = this.add.group();
 
@@ -296,6 +287,20 @@ export default class CheckersMain extends Phaser.Scene {
         }
 
         this.setupBoard();
+
+		const winRed = this.add.text(130, 320, "", {});
+		winRed.visible = false;
+		winRed.text = "Winner: Red";
+		winRed.setStyle({ "fontSize": "100px" });
+		winRed.setStroke('#000000', 6);
+		this.winRed = winRed
+
+		const winBlack = this.add.text(130, 320, "", {});
+		winBlack.visible = false;
+		winBlack.text = "Winner: Black";
+		winBlack.setStyle({ "fontSize": "100px" });
+		winBlack.setStroke('#000000', 6);
+		this.winBlack = winBlack
     }
 
 
