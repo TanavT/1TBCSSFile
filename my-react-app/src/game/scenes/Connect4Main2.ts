@@ -82,10 +82,12 @@ export default class Connect4Main extends Phaser.Scene {
 		yourTimeText.text = "Your time: 10:00\n";
 		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourTimeText.setWordWrapWidth(1);
+		yourTimeText.visible = false;
 		this.yourTimeText = yourTimeText
 
 		// enemyTimeText
 		const enemyTimeText = this.add.text(902, 53, "", {});
+		yourTimeText.visible = false;
 		enemyTimeText.text = "Enemy time: 10:00\n";
 		enemyTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		enemyTimeText.setWordWrapWidth(1);
@@ -194,6 +196,7 @@ export default class Connect4Main extends Phaser.Scene {
   		});
 
 		this.socket.on('timer', ({timeRed, timeYellow}) => {
+			return
 			if(this.gameOver) return
 			if(this.color == "red"){
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeRed)}`
@@ -213,7 +216,7 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
 			if(this.userID == opponentUserID){
-				window.location.replace('/connect')
+				//window.location.replace('/connect')
 			}
 			if (this.socket.id == id){
 				if(color == 'red'){

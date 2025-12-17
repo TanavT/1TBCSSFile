@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
-import StartGame from './game/mainConnect';
+import StartGame from './game/main2';
 import { EventBus } from './game/EventBus';
+import Connect4Main from './game/scenes/Connect4Main';
 
 export interface IRefPhaserGame
 {
@@ -8,24 +9,30 @@ export interface IRefPhaserGame
     scene: Phaser.Scene | null;
 }
 
-
 interface IProps
 {
     currentActiveScene?: (scene_instance: Phaser.Scene) => void;
-    user?: any;
-    gametype?: any;
+
+    userID?: string
+
+    user?:any;
+    gametype?:string;
+    opp?:any
 }
 
-export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype}, ref) //USER IN PHASER 2: add user to props here
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp, userID}, ref)
+
 {
+    const sceneStarted = useRef(false);
     const game = useRef<Phaser.Game | null>(null!);
+    console.log(opp);
 
     useLayoutEffect(() =>
     {
         if (game.current === null)
         {
 
-            game.current = StartGame("game-container3", {user, gametype}); //USER IN PHASER 3: user passed to start game function
+            game.current = StartGame("game-container", {user, gametype, opp});
 
             if (typeof ref === 'function')
             {
@@ -48,8 +55,18 @@ export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function Pha
                 }
             }
         }
-    }, [ref, user]);
 
+    }, [ref, user]);
+    useEffect(() => {
+        if (!game.current || !userID || sceneStarted.current) return;
+
+
+        sceneStarted.current = true;
+
+        game.current.scene.start('Connect4Main', {
+            userID
+        });
+    }, [userID]);
     useEffect(() =>
     {
         EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>
@@ -77,7 +94,7 @@ export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function Pha
     }, [currentActiveScene, ref]);
 
     return (
-        <span id="game-container3"></span>
+        <div id="game-container"></div>
     );
 
 });
