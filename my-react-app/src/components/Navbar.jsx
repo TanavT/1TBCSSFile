@@ -15,7 +15,7 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="nav-left">
-        <h1 className="nav-logo">MyChessApp</h1>
+        <h1 className="nav-logo">Mania</h1>
         <Link to="/chess" className="nav-link">Chess</Link>
         <Link to="/checkers" className="nav-link">Checkers</Link>
         <Link to="/connect" className="nav-link">Connect</Link>

@@ -48,13 +48,41 @@ body {
   }
 }
 
-/* .card {
-  padding: 2em;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(8, 32, 91, 0.08);
-} */
+/* home screen */
+.homeComponents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #08205B;
+  padding: 40px;
+  margin: 20px auto;
+  max-width: 900px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(8, 32, 91, 0.1);
+}
 
+.homeComponents > div {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pawnPieceHome,
+.checkersPieceHome,
+.connect4PieceHome {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}
+
+.homeComponents h1 {
+  margin-top: 20px;
+  text-align: center;
+  color: #F7F2ED;
+}
 
 /* game home screens */
 .centerBox {
