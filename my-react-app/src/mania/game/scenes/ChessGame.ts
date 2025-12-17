@@ -98,11 +98,11 @@ export default class ChessGame extends Phaser.Scene {
 			//console.log("COLOR:" + this.color)
 			this.myTurn = (this.color == "white")
 			let temp = "First"
-			if(this.color == "white") temp = "Second"
-			this.yourColorText.text = `Your Go: ${temp}`
+			if(this.color == "black") temp = "Second"
+			this.yourColorText.text = `You Go: ${temp}`
 			let temp2 = "Turn: Yours"
-			if(this.color == "white") temp = "Turn: Opponent's"
-			this.turnText.text = temp
+			if(this.color == "black") temp2 = "Turn: Opponent's"
+			this.turnText.text = temp2
   		})
 
 		this.socket.on('error', ({id, message}) => {
@@ -111,10 +111,12 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.socket.on("yourTurn", (data) => {
 			this.myTurn = true
+			this.turnText.text = "Turn: Yours"
 			//console.log("MY TURN CHESS")
 		} )
 
 		this.socket.on("allOver", (whoWon) => {
+			console.log("ITS ALL OVER FOLKS" + whoWon)
 			this.gameOver = true
 			this.blackRectangle.visible = true
 			this.yourTimeText.visible = false
@@ -131,7 +133,7 @@ export default class ChessGame extends Phaser.Scene {
 			else if(whoWon == "second" && this.color == "white"){
 				this.opponentWins.visible = true
 			}
-			else{
+			else if (whoWon == "tie"){
 				this.yallTie.visible = true
 			}
 
@@ -239,7 +241,7 @@ export default class ChessGame extends Phaser.Scene {
 			this.piecesOnSquares[startSquareInt] = null
 			ttt.play()
 			//this.myTurn = true
-			this.turnText.text = `Turn: Yours`
+			
 
 
 			if(this.chess.isGameOver()){
@@ -652,26 +654,26 @@ export default class ChessGame extends Phaser.Scene {
 		rectangle_1.alphaBottomRight = 0.5;
 		this.blackRectangle = rectangle_1
 
-		const youWinText = this.add.text(200, -120, "", {});
+		const youWinText = this.add.text(260, -120, "", {});
 		youWinText.text = "YOU WIN";
 		youWinText.visible = false
 		youWinText.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
 
 		this.youWin = youWinText
 
-		const opponentWins = this.add.text(200, -120, "", {});
+		const opponentWins = this.add.text(230, -120, "", {});
 		opponentWins.text = "OPPONENT WINS";
 		opponentWins.visible = false
 		opponentWins.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
 
 		this.opponentWins = opponentWins
 
-		const yallTie = this.add.text(200, -120, "", {});
+		const yallTie = this.add.text(250, -120, "", {});
 		yallTie.text = "TIE GAME";
 		yallTie.visible = false
 		yallTie.setStyle({ "fontFamily": "Times", "fontSize": "80px" });
 
-		this.opponentWins = yallTie
+		this.yallTie = yallTie
 
 		for(let x = 0; x < 64; x++){
 			this.squares.push(eval(`location_dot_grey_svg_${x.toString()}`))

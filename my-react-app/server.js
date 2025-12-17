@@ -12,6 +12,7 @@ import { accounts } from './src/routes/mongo/MongoCollections.js';
 //import * as flat from 'flat';
 import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
+import axios from 'axios';
 //import client from './redis.js'
 
 const app2 = express();
@@ -112,6 +113,7 @@ const chat = io.of("/chat");
 let chatNumClients = 0;
 let chatClientList = [];
 
+
 chat.on("connection", (socket) => {
   console.log("Chat socket connected:", socket.id);
   
@@ -206,10 +208,16 @@ let clientListChess = []
 
 let numClientsCheckers = 0;
 let clientListCheckers = [];
+let checkersClientIDs = []
+let checkersMatches = []
+let checkersMatchUpdated = []
 
 let numClientsMania = 0;
 let clientListMania = []; //array of objects with sockets
 let dataListMania = []; //holds important data for mania matches
+let chessClientIDs = []
+let chessMatches = []
+let chessMatchUpdated = []
 
 let chessTimers = []
 let connectTimers = []
@@ -220,15 +228,20 @@ io.on('connection', (socket) => {
   let thisColor = ""
   let thisClient
 
+  let oppName;
+  let myName;
+
   socket.on("gameDone", ({game, winner}) => {
-    if(game == "chess")
-      if(dataListMania[Math.floor(thisClient / 2)].chessWin == null){
+    if(game == "chess"){
+      if(dataListMania[Math.floor(thisClient / 2)].chessWin == null && thisClient % 2 == 1){
+        dataListMania[Math.floor(thisClient / 2)].chessWin = winner
         dataListMania[Math.floor(thisClient / 2)].maxMove -= 1
         dataListMania[Math.floor(thisClient / 2)].moveOfThree -= 1
-         dataListMania[Math.floor(thisClient / 2)].chessWin = winner
          if(winner == "white"){
           dataListMania[Math.floor(thisClient / 2)].score += 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score >= 2){
+            console.log("1111111111111111111111111")
             clientListMania[thisClient].chess.emit("allOver", "first")
             clientListMania[thisClient].checkers.emit("allOver", "first")
             clientListMania[thisClient].connect.emit("allOver", "first")
@@ -240,7 +253,9 @@ io.on('connection', (socket) => {
          }
           if(winner == "black"){
           dataListMania[Math.floor(thisClient / 2)].score -= 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score <= -2){
+            console.log("2222222222222222222222222")
             clientListMania[thisClient].chess.emit("allOver", "second")
             clientListMania[thisClient].checkers.emit("allOver", "second")
             clientListMania[thisClient].connect.emit("allOver", "second")
@@ -250,7 +265,7 @@ io.on('connection', (socket) => {
             clientListMania[other].connect.emit("allOver", "second")
           }
           }
-          if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
+          if(dataListMania[Math.floor(thisClient / 2)].maxMove == 0){//if all 3 games played
           let tempString
           if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
           if(dataListMania[Math.floor(thisClient / 2)].score > 0) tempString = "first"
@@ -265,14 +280,18 @@ io.on('connection', (socket) => {
           }
          
       }
-    if(game == "checkers")
-      if(dataListMania[Math.floor(thisClient / 2)].checkersWin == null){
+    }
+
+    if(game == "checkers" ){
+      if(dataListMania[Math.floor(thisClient / 2)].checkersWin == null && thisClient % 2 == 1){
+        dataListMania[Math.floor(thisClient / 2)].checkersWin = winner
         dataListMania[Math.floor(thisClient / 2)].maxMove -= 1
         dataListMania[Math.floor(thisClient / 2)].moveOfThree -= 1
-         dataListMania[Math.floor(thisClient / 2)].checkersWin = winner
          if(winner == "black"){
           dataListMania[Math.floor(thisClient / 2)].score += 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score >= 2){
+            console.log("3333333333333333333333")
             clientListMania[thisClient].chess.emit("allOver", "first")
             clientListMania[thisClient].checkers.emit("allOver", "first")
             clientListMania[thisClient].connect.emit("allOver", "first")
@@ -284,7 +303,9 @@ io.on('connection', (socket) => {
          }
           if(winner == "red"){
           dataListMania[Math.floor(thisClient / 2)].score -= 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score <= -2){
+            console.log("444444444444444444444444")
             clientListMania[thisClient].chess.emit("allOver", "second")
             clientListMania[thisClient].checkers.emit("allOver", "second")
             clientListMania[thisClient].connect.emit("allOver", "second")
@@ -294,7 +315,7 @@ io.on('connection', (socket) => {
             clientListMania[other].connect.emit("allOver", "second")
           }
           }
-          if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
+          if(dataListMania[Math.floor(thisClient / 2)].maxMove == 0){//if all 3 games played
           let tempString
           if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
           if(dataListMania[Math.floor(thisClient / 2)].score > 0) tempString = "first"
@@ -308,14 +329,17 @@ io.on('connection', (socket) => {
             clientListMania[other].connect.emit("allOver", tempString)
           }
       }
-    if(game == "connect")
-      if(dataListMania[Math.floor(thisClient / 2)].connectWin == null){
+    }
+    if(game == "connect"){
+      if(dataListMania[Math.floor(thisClient / 2)].connectWin == null && thisClient % 2 == 1){
+        dataListMania[Math.floor(thisClient / 2)].connectWin = winner
         dataListMania[Math.floor(thisClient / 2)].maxMove -= 1
         dataListMania[Math.floor(thisClient / 2)].moveOfThree -= 1
-         dataListMania[Math.floor(thisClient / 2)].connectWin = winner
         if(winner == "red"){
           dataListMania[Math.floor(thisClient / 2)].score += 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score >= 2){
+            console.log("how tf am I here")
             clientListMania[thisClient].chess.emit("allOver", "first")
             clientListMania[thisClient].checkers.emit("allOver", "first")
             clientListMania[thisClient].connect.emit("allOver", "first")
@@ -327,7 +351,9 @@ io.on('connection', (socket) => {
          }
           if(winner == "yellow"){
           dataListMania[Math.floor(thisClient / 2)].score -= 1
+          console.log("SCORE SCORE SCORE" + dataListMania[Math.floor(thisClient / 2)].score)
           if(dataListMania[Math.floor(thisClient / 2)].score <= -2){
+            console.log("how tf am I here 2.0")
             clientListMania[thisClient].chess.emit("allOver", "second")
             clientListMania[thisClient].checkers.emit("allOver", "second")
             clientListMania[thisClient].connect.emit("allOver", "second")
@@ -337,7 +363,7 @@ io.on('connection', (socket) => {
             clientListMania[other].connect.emit("allOver", "second")
           }
           }
-          if(dataListMania[Math.floor(thisClient / 2)].moveOfThree == 0){//if all 3 games played
+          if(dataListMania[Math.floor(thisClient / 2)].maxMove == 0){//if all 3 games played
           let tempString
           if(dataListMania[Math.floor(thisClient / 2)].score < 0) tempString = "second"
           if(dataListMania[Math.floor(thisClient / 2)].score > 0) tempString = "first"
@@ -351,11 +377,15 @@ io.on('connection', (socket) => {
             clientListMania[other].connect.emit("allOver", tempString)
           }
       }
+    }
   });
 
   let fun = true;
 
    socket.on('chessCustomConnect', ({me, opp}) => {
+
+    oppName = opp;
+    myName = me;
     chessCustomClients[me] = socket;
 
     if(chessCustomClients[opp]) {
@@ -365,7 +395,7 @@ io.on('connection', (socket) => {
       chessCustomClients[opp].join(roomName);
 
       let white = Math.floor(Math.random() * 2)
-      chessCustomTimers[roomName] = ({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? me : opp})
+      chessCustomTimers[roomName] = ({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? opp : me})
       if(white == 0){
         chessCustomClients[me].emit('color', {id:chessCustomClients[me].id, color:"white" });
         chessCustomClients[opp].emit('color', {id:chessCustomClients[opp].id, color:"black"})
@@ -381,6 +411,9 @@ io.on('connection', (socket) => {
   socket.on('customJoinConnect', ({me, opp}) => {
     connectCustomClients[me] = socket;
 
+    oppName = opp;
+    myName = me;
+
     if(connectCustomClients[opp]) {
       const roomName = `${me}-${opp}`; 
       socket.join(roomName);
@@ -388,7 +421,7 @@ io.on('connection', (socket) => {
 
       let red = Math.floor(Math.random() * 2)
       console.log("making custom timer");
-      connectCustomTimers[roomName] = ({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? me : opp})
+      connectCustomTimers[roomName] = ({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? me : opp})
       if (red == 0){
         connectCustomClients[me].emit('color', {id:connectCustomClients[me].id, color:"red" });
         connectCustomClients[opp].emit('color', {id:connectCustomClients[opp].id, color:"yellow"})
@@ -403,6 +436,9 @@ io.on('connection', (socket) => {
   socket.on('checkersCustomConnect', ({me, opp}) => {
     checkersCustomClients[me] = socket;
     console.log("custom join. " + me + " vs " + opp);
+
+    oppName = opp;
+    myName = me;
 
     if(checkersCustomClients[opp]) {
       console.log("start the showdown");
@@ -551,16 +587,21 @@ io.on('connection', (socket) => {
 
     if(i == 0){
       i++
-      //console.log("weird ass interval");
-       connectCustomTimers[roomName].interval = setInterval((() => {
-        if(connectCustomTimers[roomName].turn == "red"){
-          connectCustomTimers[roomName].redTimer -= 1
-        }
-        else{
-          connectCustomTimers[roomName].blackTimer -= 1
-        }
-        io.to(roomName).emit('timer', {timeRed: connectCustomTimers[roomName].redTimer, timeYellow: connectCustomTimers[roomName].redTimer});
-      }), 1000)
+      console.log("bazinga!");
+      console.log(myName);
+      if(connectCustomTimers[roomName].whoRed == myName){ 
+         console.log("weird ass interval");
+        connectCustomTimers[roomName].interval = setInterval((() => {
+          if(connectCustomTimers[roomName].turn == "red"){
+            //console.log("red");
+            connectCustomTimers[roomName].redTimer -= 1
+          } else{
+            //console.log("yelloq");
+            connectCustomTimers[roomName].yellowTimer -= 1
+          }
+          io.to(roomName).emit('timer', {timeRed: connectCustomTimers[roomName].redTimer, timeYellow: connectCustomTimers[roomName].yellowTimer});
+        }), 1000)
+      }
       //console.log("why isn't it working")
       //}
     }
@@ -602,65 +643,83 @@ io.on('connection', (socket) => {
 
     
     //console.log("custom black move");
-
+    //console.log(i);
     if(i == 0){
       i++
-      //console.log("weird ass interval");
-       chessCustomTimers[roomName].interval = setInterval((() => {
-        if(chessCustomTimers[roomName].turn == "red"){
-          chessCustomTimers[roomName].redTimer -= 1
-        }
-        else{
-          chessCustomTimers[roomName].blackTimer -= 1
-        }
-        io.to(roomName).emit('timer', {timeWhite: chessCustomTimers[roomName].whiteTimer, timeBlack: chessCustomTimers[roomName].blackTimer});
-      }), 1000)
-      //console.log("why isn't it working")
-      //}
+      //console.log(chessCustomTimers[roomName])
+      if(chessCustomTimers[roomName].whoWhite == myName){ 
+        //console.log(i);
+        //console.log("weird ass interval");
+        chessCustomTimers[roomName].interval = setInterval((() => {
+          if(chessCustomTimers[roomName].turn == "white"){
+            chessCustomTimers[roomName].whiteTimer -= 1
+          }
+          else{
+            chessCustomTimers[roomName].blackTimer -= 1
+          }
+          io.to(roomName).emit('timer', {timeWhite: chessCustomTimers[roomName].whiteTimer, timeBlack: chessCustomTimers[roomName].blackTimer});
+        }), 1000)
+        //console.log("why isn't it working")
+        //}
+      }
     }
 
 
     
-    if(!fun){
-      if(chessCustomTimers[roomName].turn == "white"){
-        //console.log("flipped to black");
-        chessCustomTimers[roomName].turn = "black"
-      }
-      else{
-        //console.log("flipped to white");
-        chessCustomTimers[roomName].turn = "white"
-      }
-      fun = !fun;
-    } else {
-      //console.log("not flipping");
-      fun = !fun;
+
+    if(chessCustomTimers[roomName].turn == "white"){
+      //console.log("flipped to black");
+      chessCustomTimers[roomName].turn = "black"
     }
+    else{
+      //console.log("flipped to white");
+      chessCustomTimers[roomName].turn = "white"
+    }
+
     
-    //checkersCustomTimers[roomName].turn)
+    //console.log(chessCustomTimers[roomName]);
 
-
-    io.to(roomName).emit("otherPlaced", (data));
+    chessCustomClients[oppName].emit("otherPlaced", (data));
+    //io.to(roomName).emit("otherPlaced", (data));
   
   })
 
   
 
-  socket.on('realSocketCheckers', (teststr) => {
+  socket.on('realSocketCheckers', (userID) => {
     console.log('someone real connected to checkers')
     thisClient = numClientsCheckers
     clientListCheckers.push(socket)
+    checkersClientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
       checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      const matchID = uuid()
+      checkersMatches.push(matchID)
+      checkersMatchUpdated.push(false)
       if (red == 0){
-        socket.emit('checkersColor', {id:socket.id, color:"red" });
-        clientListCheckers[thisClient-1].emit('checkersColor', {id:socket.id, color:"black"})
+        socket.emit('checkersColor', {id:socket.id, color:"red", userID: userID, opponentUserID: checkersClientIDs[thisClient - 1], matchID: matchID});
+        clientListCheckers[thisClient-1].emit('checkersColor', {id:socket.id, color:"black", userID: checkersClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID})
       } else {
-        socket.emit('checkersColor', {id:socket.id, color:"black" });
-        clientListCheckers[thisClient-1].emit('checkersColor', {id: socket.id, color:"red"})
+        socket.emit('checkersColor', {id:socket.id, color:"black", userID: userID, opponentUserID: checkersClientIDs[thisClient - 1], matchID: matchID});
+        clientListCheckers[thisClient-1].emit('checkersColor', {id: socket.id, color:"red", userID: checkersClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID})
       }
     }
     numClientsCheckers++;
+  })
+    socket.on("gameOverCheckers", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = checkersMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      return
+    }
+    if (checkersMatchUpdated[index] === false) {
+      checkersMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "checkers")
+      console.log(updatedElos)
+    }
   })
 
   socket.on('realSocketConnect', (userID) => {
@@ -670,7 +729,7 @@ io.on('connection', (socket) => {
     clientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
-      connectTimers.push({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      connectTimers.push({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
       const matchID = uuid()
       connectMatches.push(matchID)
@@ -712,7 +771,7 @@ io.on('connection', (socket) => {
       }
     }
   })
-  socket.on('realSocketCheckersMania', (testStr) => {
+  socket.on('realSocketCheckersMania',  (testStr) => {
     console.log("user " + testStr.username)
     console.log(socket.id)
     console.log('someone real joined mania 3')
@@ -728,7 +787,8 @@ io.on('connection', (socket) => {
     console.log("client client " + thisClient)
     console.log("length length " + clientListMania.length)
 
-    if(thisClient%2 == 1){
+    let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+    if((thisClient%2 == 1 && clientListMania[thisClient - 1] && clientListMania[thisClient - 1].chess !== null && clientListMania[thisClient - 1].checkers !== null && clientListMania[thisClient - 1].connect !== null) || (thisClient % 2 == 0 && clientListMania[thisClient + 1] && clientListMania[thisClient + 1].chess !== null && clientListMania[thisClient + 1].checkers !== null && clientListMania[thisClient + 1].connect !== null)){
       let first = Math.floor(Math.random() * 2)
       maniaTimers.push({firstTimer: 600, secondTimer: 600, turn: "first", whoFirst: first == 0 ? thisClient : thisClient - 1})
       dataListMania.push({moveOfThree: 0, maxMove: 3, connectWin: null, chessWin: null, checkersWin: null, score: 0})
@@ -737,17 +797,17 @@ io.on('connection', (socket) => {
         clientListMania[thisClient].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"white"});
         clientListMania[thisClient].checkers.emit('checkersColor', {id: socket.id, color:"black"});
         clientListMania[thisClient].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"red"});
-        clientListMania[thisClient-1].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"white"});
-        clientListMania[thisClient-1].checkers.emit('checkersColor', {id: socket.id, color:"red"});
-        clientListMania[thisClient-1].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"red"});
+        clientListMania[other].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"white"});
+        clientListMania[other].checkers.emit('checkersColor', {id: socket.id, color:"red"});
+        clientListMania[other].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"red"});
       }
       else{
        clientListMania[thisClient].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"black"});
         clientListMania[thisClient].checkers.emit('checkersColor', {id: socket.id, color:"red"});
         clientListMania[thisClient].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"yellow"});
-        clientListMania[thisClient-1].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"black"});
-        clientListMania[thisClient-1].checkers.emit('checkersColor', {id: socket.id, color:"black"});
-        clientListMania[thisClient-1].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"yellow"});
+        clientListMania[other].chess.emit('color', {id: clientListMania[thisClient].chess.id, color:"black"});
+        clientListMania[other].checkers.emit('checkersColor', {id: socket.id, color:"black"});
+        clientListMania[other].connect.emit('color', {id: clientListMania[thisClient].connect.id, color:"yellow"});
       }
     }
 
@@ -768,28 +828,49 @@ io.on('connection', (socket) => {
     }
   })
 
-  socket.on('realSocketChess', (testStr) => {
+  socket.on('realSocketChess', (userID) => {
     console.log('someone real joined chess')
     thisClient = numClientsChess
     clientListChess.push(socket)
+    chessClientIDs.push(userID)
     if(thisClient%2 == 1){
       let white = Math.floor(Math.random() * 2)
       chessTimers.push({whiteTimer: 600, blackTimer: 600, turn: "white", whoWhite: white == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
+      const matchID = uuid()
+      chessMatches.push(matchID)
+      console.log(`MatchID ${matchID}`)
+      chessMatchUpdated.push(false)
       if(white == 0){
         thisColor = "white"
-        socket.emit('color', {id: socket.id, color:"white"});
-        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"white"});
+        socket.emit('color', {id: socket.id, color:"white", userID: userID, opponentUserID: chessClientIDs[thisClient - 1], matchID: matchID});
+        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"white", userID: chessClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID});
       }
       else{
         thisColor = "black"
-        socket.emit('color', {id: socket.id, color:"black"});
-        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"black"});
+        socket.emit('color', {id: socket.id, color:"black", opponentUserID: chessClientIDs[thisClient - 1], matchID: matchID});
+        clientListChess[thisClient - 1].emit('color', {id: socket.id, color:"black", opponentUserID: userID, matchID: matchID});
       }
     }
     numClientsChess++
   })
 
+  socket.on("gameOverChess", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = chessMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      return
+    }
+    if (chessMatchUpdated[index] === false) {
+      chessMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "chess")
+      console.log(updatedElos)
+    }
+  })
+
+  
   let i = 0;
 
   socket.on('blackMoveMania', ({row, col}) => {
@@ -1235,18 +1316,35 @@ io.on('connection', (socket) => {
     //io.emit('message', {name, message});
   });
 
- socket.on('disconnect', () => {
+ socket.on('disconnect', async() => {
     console.log('Disconnect Fired on ' + socket.id);
     for(const [username, userSocket] of Object.entries(checkersCustomClients)) {
       if(userSocket.id === socket.id){
         delete checkersCustomClients[username];
-        console.log("removed from client list")
+        console.log("removed from client list");
+        console.log("opponent name was" + oppName);
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallenge',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that was already accepted");
+        }
+        
       }
     }
 
     for(const [roomName, timer] of Object.entries(checkersCustomTimers)) {
-      if (timer.whoRed === socket.id || timer.whoBlack) {
-        clearInteval(timer.interval);
+      console.log(roomName);
+      console.log(timer);
+      if (timer.whoRed === myName || timer.whoRed === oppName) {
+        clearInterval(timer.interval);
         delete checkersCustomTimers[roomName];
         console.log("removed from timer")
       }
@@ -1256,13 +1354,55 @@ io.on('connection', (socket) => {
       if(userSocket.id === socket.id){
         delete chessCustomClients[username];
         console.log("removed from client list")
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallengeChess',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that chess was already accepted");
+        }
       }
     }
 
     for(const [roomName, timer] of Object.entries(chessCustomTimers)) {
-      if (timer.whoRed === socket.id || timer.whoBlack) {
-        clearInteval(timer.interval);
+      if (timer.whoWhite === myName || timer.whoWhite == oppName) {
+        clearInterval(timer.interval);
         delete chessCustomTimers[roomName];
+        console.log("removed chess from timer")
+        console.log(chessCustomTimers);
+      }
+    }
+
+    for(const [username, userSocket] of Object.entries(connectCustomClients)) {
+      if(userSocket.id === socket.id){
+        delete connectCustomClients[username];
+        console.log("removed from client list")
+
+        try {
+          const response2 = await axios.post(
+              'http://localhost:3000/account/unchallengeConnect',
+              {
+                  from: myName, 
+                  to: oppName
+              },
+              { withCredentials: true}
+          ); 
+        } catch (e) {
+          console.log("oh that connect was already accepted");
+        }
+      }
+    }
+
+    for(const [roomName, timer] of Object.entries(connectCustomTimers)) {
+      if (timer.whoRed === myName || timer.whoRed == oppName) {
+        clearInterval(timer.interval);
+        delete connectCustomTimers[roomName];
         console.log("removed from timer")
       }
     }

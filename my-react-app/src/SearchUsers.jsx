@@ -64,6 +64,8 @@ function SearchUsers() {
                 
                 // Refresh current user data to get updated friend list
                 const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true });
+                console.log("REFRESHING USER FROM SEARCH PAGE");
+                console.log(userRes);
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error adding friend:", err);
@@ -128,7 +130,7 @@ function SearchUsers() {
     if (!currentUser) return <div><p>Please log in to search for users.</p></div>;
 
     return (
-        <div>
+        <div className="centerBox">
             <h1>Search Users</h1>
             
             <form onSubmit={handleSearch}>
@@ -139,15 +141,16 @@ function SearchUsers() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Search for a user..."
+                        className="searchInput"
                     />
                 </label>
-                <button type="submit">Search</button>
+                <button type="submit" className="button">Search</button>
             </form>
 
             {loading && <div><p>Loading...</p></div>}
             {error && <div><p style={{color: 'red'}}>{error}</p></div>}
 
-            <div>
+            <div className="friends">
                 {userResults.length > 0 ? (
                     userResults.map((user) => (
                         <div key={user.id || user.username}>
@@ -155,7 +158,7 @@ function SearchUsers() {
                             <p>Signup Date: {user.signupDate}</p>
                             
                             {canAddFriend(user) ? (
-                                <button onClick={() => handleAddFriend(user.username)}>
+                                <button onClick={() => handleAddFriend(user.username)} className="button">
                                     Add Friend
                                 </button>
                             ) : user.username === currentUser.username ? (
@@ -165,7 +168,7 @@ function SearchUsers() {
                             )}
 
                             {canDeleteFriend(user) ? (
-                                <button onClick={() => handleDeleteFriend(user.username)}>
+                                <button onClick={() => handleDeleteFriend(user.username)} className="button">
                                     Delete Friend
                                 </button>
                             ) : user.username === currentUser.username ? (

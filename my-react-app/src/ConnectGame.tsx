@@ -2,6 +2,7 @@ import  {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { PhaserGame } from './PhaserGame';
 import type { IRefPhaserGame } from './PhaserGame';
+import { useNavigate } from 'react-router-dom';
 import ChatBox from './components/ChatBox.jsx';
 
 
@@ -10,6 +11,8 @@ function ConnectGame(){
     const [loading, setLoading] = useState(true);
 
      const phaserRef = useRef<IRefPhaserGame | null>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchUser() {
@@ -32,6 +35,10 @@ function ConnectGame(){
 
     const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?
+    }
+
+    if(loading) {
+        <p>Loading...</p>
     }
 
     if(user){

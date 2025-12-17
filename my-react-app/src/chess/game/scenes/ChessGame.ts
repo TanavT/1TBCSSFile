@@ -19,7 +19,9 @@ export default class ChessGame extends Phaser.Scene {
 		// Write your code here.
 		/* END-USER-CTR-CODE */
 	}
-
+	userID!:string;
+	opponentUserID:string;
+	matchID:string;
 	socket:Socket;
 
 	color:string;
@@ -34,6 +36,12 @@ export default class ChessGame extends Phaser.Scene {
 	me: any;
 
 	init() {
+		
+		//const chessData = this.registry.get('chessData');
+        //this.userID = chessData.userID;
+		this.userID = this.game.registry.get("userID");
+		console.log("Chess user ID" + this.userID)
+
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
@@ -46,15 +54,30 @@ export default class ChessGame extends Phaser.Scene {
 		console.log("got opp: " + opp);
 		this.opp = opp;
 	}
+	
+	callGameover(gameState: number) {
+		console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverChess", { 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
+			this.time.delayedCall(5000, () => {
+				this.socket.disconnect();
+			}, [], this);
+
+			
+	}
 
 	preload(){
+		
 		this.editorCreate();
 		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketChess", 'test')
+				this.socket.emit("realSocketChess", this.userID)
 			} else {
 				console.log("custom match");
 				this.socket.emit("chessCustomConnect", {me: this.me, opp: this.opp})
@@ -65,10 +88,12 @@ export default class ChessGame extends Phaser.Scene {
 		this.socket.on('timer', ({timeWhite, timeBlack}) => {
 			if(this.gameOver) return
 			if(this.color == "white"){
+				console.log("white recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeWhite)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeBlack)}`
 			}
 			else{
+				console.log("black recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeBlack)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeWhite)}`
 			}
@@ -82,7 +107,7 @@ export default class ChessGame extends Phaser.Scene {
 			}
   		});
 		
-		this.socket.on('color', ({id, color}) => {
+		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
 			if (this.socket.id == id){
 				if(color == 'white'){
 					this.color="white"
@@ -103,6 +128,9 @@ export default class ChessGame extends Phaser.Scene {
 					this.opponentColor="black"
 				}
 			}
+			this.matchID = matchID
+			this.opponentUserID = opponentUserID
+			console.log(`My id: ${this.userID}, opponent id: ${this.opponentUserID}, matchID: ${matchID}`)
 			console.log("COLOR:" + this.color)
 			this.myTurn = (this.color == "white")
 			this.yourColorText.text = `Your Color: ${this.color}`
@@ -116,9 +144,10 @@ export default class ChessGame extends Phaser.Scene {
 			let startSquareInt = this.squareToNumberConverter(startSquareStr)
 			let destSquareInt = this.squareToNumberConverter(destinationSquareStr)
 			console.log("int int int" + startSquareInt)
-			console.log(destSquareInt)
-			console.log(startSquareStr)
+			console.log("dest: " + destSquareInt)
+			console.log("start: " + startSquareInt)
 			console.log(destinationSquareStr)
+			//console.log('-----');
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
 			y: {from: this.piecesOnSquares[startSquareInt].y, to: this.squares[destSquareInt].y},
@@ -219,18 +248,44 @@ export default class ChessGame extends Phaser.Scene {
 
 			if(this.chess.isGameOver()){
 				//rectangle_1.visible = true
+				let gameState:number = -1 //1 = this player won, 0.5 = tie, 0 = this player lost
 				if(this.chess.isCheckmate()){
 					if(this.chess.turn() == 'b'){
+						if(this.color === "white") {
+							gameState = 1
+						} else {
+							gameState = 0
+						}
 						this.winWhite.visible = true
 					}
-					else this.winBlack.visible = true
+					else {
+						if(this.color === "black") {
+							gameState = 1
+						} else {
+							gameState = 0
+						}
+						this.winBlack.visible = true
+					}
 				}
 				if(this.chess.isStalemate()){
 					this.stalemate.visible = true
+					gameState = 0.5
 				}
-				if(this.chess.isInsufficientMaterial()) this.insufficient.visible = true
-				if(this.chess.isDrawByFiftyMoves()) this._50move.visible = true
-				if(this.chess.isThreefoldRepetition()) this.repetition.visible = true
+				if(this.chess.isInsufficientMaterial()) {
+					this.insufficient.visible = true
+					gameState = 0.5
+				}
+				if(this.chess.isDrawByFiftyMoves()){
+					 this._50move.visible = true
+					 gameState = 0.5
+				}
+				if(this.chess.isThreefoldRepetition()) {
+					this.repetition.visible = true
+					gameState = 0.5
+				}
+				if (gameState !== -1 ) {
+					this.callGameover(gameState)
+				}
 			}
 
 
@@ -240,10 +295,55 @@ export default class ChessGame extends Phaser.Scene {
 		'blackKingChess',
 		'/assets/blackKingChess.png'
 		);
+		this.load.image(
+		'blackBishop',
+		'/assets/blackBishop.png'
+		);
+		this.load.image(
+		'blackKnight',
+		'/assets/blackKnight.png'
+		);
+		this.load.image(
+		'blackQueen',
+		'/assets/blackQueen.png'
+		);
+		this.load.image(
+		'blackRook',
+		'/assets/blackRook.png'
+		);
+		this.load.image(
+		'blackPawn',
+		'/assets/blackPawn.png'
+		);
+		this.load.image(
+		'whiteKing',
+		'/assets/whiteKing.png'
+		);
+		this.load.image(
+		'whiteBishop',
+		'/assets/whiteBishop.png'
+		);
+		this.load.image(
+		'whiteKnight',
+		'/assets/whiteKnight.png'
+		);
+		this.load.image(
+		'whiteQueen',
+		'/assets/whiteQueen.png'
+		);
+		this.load.image(
+		'whiteRook',
+		'/assets/whiteRook.png'
+		);
+		this.load.image(
+		'whitePawn',
+		'/assets/whitePawn.png'
+		);
+		
 
 
 	}
-
+	chessBoardLowLife: any;
 	editorCreate(): void {
 
 		// chessboard
@@ -251,6 +351,7 @@ export default class ChessGame extends Phaser.Scene {
 		chessboard.scaleX = 2.6;
 		chessboard.scaleY = 2.6;
 		chessboard.angle = 90;
+		this.chessBoardLowLife = chessboard;
 
 		// location_dot_grey_svg_0
 		const location_dot_grey_svg_0 = this.add.image(215, 681, "Location_dot_grey.svg");
@@ -702,7 +803,7 @@ export default class ChessGame extends Phaser.Scene {
 	_50move
 
 	create() {
-
+		
 
 		const whiteRook = this.add.image(this.squares[0].x, this.squares[0].y + 5, "whiteRook");
 		whiteRook.scaleX = 1.6;
@@ -1280,19 +1381,44 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					if(chess.isGameOver()){
-						//rectangle_1.visible = true
-						if(chess.isCheckmate()){
-							if(chess.turn() == 'b'){
-								winWhite.visible = true
+						let gameState:number = -1 //1 = this player won, 0.5 = tie, 0 = this player lost
+						if(this.chess.isCheckmate()){
+							if(this.chess.turn() == 'b'){
+								if(this.color === "white") {
+									gameState = 1
+								} else {
+									gameState = 0
+								}
+								this.winWhite.visible = true
 							}
-							else winBlack.visible = true
+							else {
+								if(this.color === "black") {
+									gameState = 1
+								} else {
+									gameState = 0
+								}
+								this.winBlack.visible = true
+							}
 						}
-						if(chess.isStalemate()){
-							stalemate.visible = true
+						if(this.chess.isStalemate()){
+							this.stalemate.visible = true
+							gameState = 0.5
 						}
-						if(chess.isInsufficientMaterial()) insufficient.visible = true
-						if(chess.isDrawByFiftyMoves()) _50move.visible = true
-						if(chess.isThreefoldRepetition()) repetition.visible = true
+						if(this.chess.isInsufficientMaterial()) {
+							this.insufficient.visible = true
+							gameState = 0.5
+						}
+						if(this.chess.isDrawByFiftyMoves()){
+							this._50move.visible = true
+							gameState = 0.5
+						}
+						if(this.chess.isThreefoldRepetition()) {
+							this.repetition.visible = true
+							gameState = 0.5
+						}
+						if (gameState !== -1 ) {
+							this.callGameover(gameState)
+						}
 					}
 					this.myTurn = false
 					this.turnText.text = `Turn: ${this.opponentColor}`

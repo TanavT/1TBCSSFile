@@ -21,12 +21,10 @@ function ConnectLeaderboard() {
     if (loading) return <p>Loading...</p>;
     console.log(leaderboard)
    return (
-    <div>
-        {leaderboard ? (<button onClick={fetchLeaderboard}>Refresh</button>) : <></>}
-
+    <div className="connectLeaderboard">
         {leaderboard ? (
             <div className="leaderboard">
-            <h2>Connect4</h2>
+            <h2>Leaderboard</h2>
 
             <table className="leaderboard-table">
                 <thead>
@@ -58,6 +56,8 @@ function ConnectLeaderboard() {
             </div>
 
             ): <></>}
+
+        {leaderboard ? (<button onClick={fetchLeaderboard} className="button">Refresh</button>) : <></>}
     </div>
     
   )

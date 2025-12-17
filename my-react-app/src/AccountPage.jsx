@@ -21,6 +21,7 @@ function AccountPage() {
             setMessage(`Logged in as ${res.data.username}`);
         } catch (e) {
             console.log(e);
+            setMessage(JSON.stringify(e.response?.data.error) || e.message);
             setMessage('Login failed');
         }
     }
@@ -30,27 +31,46 @@ function AccountPage() {
             const res = await axios.post(
                 `${import.meta.env.VITE_BACKEND_SERVER}/account/signup`,
                 { username, password },
-                { withCredentials: true } // include session cookie
+                { withCredentials: true }
             );
             navigate('/chess');
             setMessage(`Signed up as ${res.data.username}`);
         } catch (e) {
-            setMessage(`Signup failed`);
+            setMessage(JSON.stringify(e.response?.data.error) || e.message);
+            console.log('Full error:', e.response);
         }
     }
 
     return (
-        <div>
-            <div>
-                <input type="text" placeholders="Username" value={username} onChange={e =>setUsername(e.target.value)} />
-                <input type="text" placeholders="Password" value={password} onChange={e =>setPassword(e.target.value)} />
+        <div className="centerBox">
+            <h2>Account</h2>
+            
+            <div className="account-form-group">
+                <label>Username:</label>
+                <input 
+                    type="text" 
+                    placeholder="Username" 
+                    value={username} 
+                    onChange={e => setUsername(e.target.value)}
+                />
             </div>
 
-            <div>
-                <button onClick={handleLogin}>Login</button>
-                <button onClick={handleSignup}>Signup</button>
+            <div className="account-form-group">
+                <label>Password:</label>
+                <input 
+                    type="password" 
+                    placeholder="Password" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)}
+                />
             </div>
-            {message && <p>{message}</p>}
+
+            <div className="account-buttons">
+                <button onClick={handleLogin} className="button">Login</button>
+                <button onClick={handleSignup} className="button">Signup</button>
+            </div>
+            
+            {message && <p className="account-message">{message}</p>}
         </div>
     );
 }

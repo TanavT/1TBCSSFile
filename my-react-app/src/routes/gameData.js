@@ -60,9 +60,10 @@ const exportedMethods = {
     async getLeaderboard(gameType, limit = 10) { //routes
         const leaderboard = `leaderboard:${gameType}`
         const current = await redisClient.zRangeWithScores(leaderboard, 0, limit - 1, {REV: true})
+        console.log(current)
         let leaderboard_spots = current.map(async (x, index) => ({
             rank: index + 1,
-            user: await accountData.getUser(x.value),
+            user: await accountData.getUser(new ObjectId(x.value)),
             elo: Math.floor(x.score)
         }))
         leaderboard_spots = await Promise.all(leaderboard_spots)

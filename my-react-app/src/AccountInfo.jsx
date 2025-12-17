@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, {useContext, useState, useEffect} from 'react';
-//import "./NavBar.css";
 import axios from 'axios';
 import ChallengeModal from './ChallengeModal.jsx';
 
@@ -13,19 +12,12 @@ function AccountInfo() {
         );
         setUser(res.data);
     };
-    //const [showModal, setShowModal] = useState(false);
     const [challengedFriend, setChallengedFriend] = useState(null);
-    console.log(user);
 
     useEffect(() => {
         fetchUser();
-
-        // socket.on("eloUpdated", fetchUser);
-
-        // return () => {
-        //     socket.off("eloUpdated", fetchUser);
-        // };
     }, []);
+
 
 
     async function handleChallengeFriend(friendUsername){
@@ -39,7 +31,6 @@ function AccountInfo() {
                     },
                     { withCredentials: true}
                 );
-                console.log("did this finish?");
                 alert(`${friendUsername} challenged!`);
 
                 /*const response2 = await axios.post(
@@ -53,7 +44,6 @@ function AccountInfo() {
                 alert(`${friendUsername} unchallenged too!`);*/
 
                 navigate(`/checkersCustom/${friendUsername}`);
-
             } catch (err) {
                 console.error("Error challenging friend:", err);
                 alert(err.response?.data?.error || "Failed to challenge friend");
@@ -61,96 +51,217 @@ function AccountInfo() {
         }
     }
 
-    async function handleChallengeAccept(friendUsername){
+    async function handleChallengeAccept(friendUsername, game){
+        console.log(game);
         if( window.confirm(`Are you sure you want to accept the challenge from ${friendUsername}?`)){
             try {
-
-
-                const response2 = await axios.post(
+                if(game == "checkers"){
+                    const response2 = await axios.post(
                     `${import.meta.env.VITE_BACKEND_SERVER}/account/unchallenge`,
                     {
                         from: friendUsername, 
                         to: user.username
                     },
                     { withCredentials: true}
-                );
-                alert(`${friendUsername} unchallenged too!`);
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
 
                 navigate(`/checkersCustom/${friendUsername}`);
 
-            } catch (err) {
-                console.error("Error challenging friend:", err);
-                alert(err.response?.data?.error || "Failed to challenge friend");
+                } else if (game == "chess"){
+                    console.log("got your ass");
+                    const response2 = await axios.post(
+                    'http://localhost:3000/account/unchallengeChess',
+                    {
+                        from: friendUsername, 
+                        to: user.username
+                    },
+                    { withCredentials: true}
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
+
+                    navigate(`/chessCustom/${friendUsername}`);
+                } else if (game == "connect"){
+
+                    const response2 = await axios.post(
+                    'http://localhost:3000/account/unchallengeConnect',
+                    {
+                        from: friendUsername, 
+                        to: user.username
+                    },
+                    { withCredentials: true}
+                    );
+                    alert(`${friendUsername}'s challenge accepted!`);
+
+                    navigate(`/connectCustom/${friendUsername}`);
+                }
+
+
+
+                } catch (err) {
+                    console.error("Error challenging friend:", err);
+                    alert(err.response?.data?.error || "Failed to challenge friend");
             }
         }
     }
 
-
-    console.log(user);
-    console.log(user ? user.friendList : "");
-  return (
-    <div>
-        {user ? (<button onClick={fetchUser}>Refresh</button>) : <></>}
-
-        {user ? (
-            <div>
-                <p>your name is {user.username ? user.username : 'unknown'}</p>
-
-                <p>Signed up: {user.signupDate ? user.signupDate : 'unknown'}</p>
-
-                <p>
-                    Chess: 
-                    {(user.winrates && user.winrates.chessWins !== undefined && user.winrates.chessLosses !== undefined ?  "W/L = " + user.winrates.chessWins/user.winrates.chessLosses : "W/L = " + 0)}
-                    -
-                    {(user.elo && user.elo.chess !== undefined ? "Elo = " + Math.floor(user.elo.chess) : "Elo = " + 0)}
-                </p>
-
-                <p>
-                    Checkers: 
-                    {(user.winrates && user.winrates.checkersWins !== undefined && user.winrates.checkersLosses !== undefined ?  "W/L =" + user.winrates.checkersWins/user.winrates.checkersLosses : "W/L = " + 0)}
-                    -
-                    {(user.elo && user.elo.checkers !== undefined ? "Elo = " + Math.floor(user.elo.checkers) :"Elo = " + 0)}
-                </p>
-
-                <p>
-                    Connect4: 
-                    {(user.winrates && user.winrates.connectWins !== undefined && user.winrates.connectLosses !== undefined ?  "W/L = " + user.winrates.connectWins/user.winrates.connectLosses : "W/L = " + 0)}
-                    -
-                    {(user.elo && user.elo.connect !== undefined ? "Elo = " + Math.floor(user.elo.connect) :"Elo = " + 0)}
-                </p>
-
-                <p>
-                    Mania: 
-                  {(user.winrates && user.winrates.maniaWins !== undefined && user.winrates.maniaLosses !== undefined ?  "W/L = " + user.winrates.maniaWins/user.winrates.maniaLosses : "W/L = " + 0)}
-                    -
-                    {(user.elo && user.elo.mania !== undefined ? "Elo = " + Math.floor(user.elo.mania) :"Elo = " + 0)}
-                </p>
-
-                <p>Friends:</p>
-                {user.friendList && user.friendList.length > 0
-                    ? user.friendList.map((username) => <li key={username}>{username}<button onClick={()=> handleChallengeAccept(challenger.from)}>Accept Challenge</button></li>)
-                    : <p>No friends yet</p>
-                }
-                {user.challenges.map((challenger) => (
-                    <li key={challenger}>
-                        {challenger.from}
-                        <button onClick={()=> handleChallengeAccept(challenger.from)}>Accept Challenge</button>
-                    </li>
-                ))}
-
-                {challengedFriend && (
-                    <ChallengeModal friendUsername={challengedFriend} user={user} onClose={()=>setChallengedFriend(null)}/>
-                )}
-
-            </div>
-        ) : (
-            <p>not signed in</p>
-        )}
-    </div>
-
-
+    const getGameStats = (wins, losses, ties) => {
+        const w = wins || 0;
+        const l = losses || 0;
+        const t = ties || 0;
+        const total = w + l + t;
+        const winRate = total > 0 ? ((w / total) * 100).toFixed(1) : 0;
+        return { w, l, t, total, winRate };
+    };
     
-  )
+    return (
+        <div className="account-container">
+            {user ? (
+                <div>
+                    <div className="account-header">
+                        <h2>Account Information</h2>
+                        <p><strong>Username:</strong> {user.username || 'unknown'}</p>
+                        <p><strong>Signed up:</strong> {user.signupDate || 'unknown'}</p>
+                    </div>
+
+                    <div className="stats-section">
+                        <h3>Game Statistics</h3>
+                        
+                        <div className="stats-grid">
+                            <div className="game-stat-card">
+                                <h4>Chess</h4>
+                                {(() => {
+                                    const stats = getGameStats(
+                                        user.winrates?.chessWins,
+                                        user.winrates?.chessLosses,
+                                        user.winrates?.chessTies
+                                    );
+                                    return (
+                                        <>
+                                            <p>Wins: {stats.w} | Losses: {stats.l} | Ties: {stats.t}</p>
+                                            <p>Total Games: {stats.total}</p>
+                                            <p>Win Rate: {stats.winRate}%</p>
+                                            <p>Elo: {user.elo?.chess ? Math.floor(user.elo.chess) : 800}</p>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            <div className="game-stat-card">
+                                <h4>Checkers</h4>
+                                {(() => {
+                                    const stats = getGameStats(
+                                        user.winrates?.checkersWins,
+                                        user.winrates?.checkersLosses,
+                                        user.winrates?.checkersTies
+                                    );
+                                    return (
+                                        <>
+                                            <p>Wins: {stats.w} | Losses: {stats.l} | Ties: {stats.t}</p>
+                                            <p>Total Games: {stats.total}</p>
+                                            <p>Win Rate: {stats.winRate}%</p>
+                                            <p>Elo: {user.elo?.checkers ? Math.floor(user.elo.checkers) : 800}</p>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            <div className="game-stat-card">
+                                <h4>Connect 4</h4>
+                                {(() => {
+                                    const stats = getGameStats(
+                                        user.winrates?.connectWins,
+                                        user.winrates?.connectLosses,
+                                        user.winrates?.connectTies
+                                    );
+                                    return (
+                                        <>
+                                            <p>Wins: {stats.w} | Losses: {stats.l} | Ties: {stats.t}</p>
+                                            <p>Total Games: {stats.total}</p>
+                                            <p>Win Rate: {stats.winRate}%</p>
+                                            <p>Elo: {user.elo?.connect ? Math.floor(user.elo.connect) : 800}</p>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+
+                            <div className="game-stat-card">
+                                <h4>Mania</h4>
+                                {(() => {
+                                    const stats = getGameStats(
+                                        user.winrates?.maniaWins,
+                                        user.winrates?.maniaLosses,
+                                        user.winrates?.maniaTies
+                                    );
+                                    return (
+                                        <>
+                                            <p>Wins: {stats.w} | Losses: {stats.l} | Ties: {stats.t}</p>
+                                            <p>Total Games: {stats.total}</p>
+                                            <p>Win Rate: {stats.winRate}%</p>
+                                            <p>Elo: {user.elo?.mania ? Math.floor(user.elo.mania) : 800}</p>
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="friends-section">
+                        <h3>Friends</h3>
+                        {user.friendList && user.friendList.length > 0 ? (
+                            <ul>
+                                {user.friendList.map((username) => (
+                                    <li key={username}>
+                                        <span>{username}</span>
+                                        <button 
+                                            onClick={() => setChallengedFriend(username)}
+                                            className="challenge-button"
+                                        >
+                                            Challenge
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No friends yet</p>
+                        )}
+                    </div>
+
+                    <div className="challenges-section">
+                        <h3>Pending Challenges</h3>
+                        {user.challenges && user.challenges.length > 0 ? (
+                            <ul>
+                                {user.challenges.map((challenger) => (
+                                    <li key={challenger.from}>
+                                        <span>{challenger.from}</span>
+                                        <button 
+                                            onClick={() => handleChallengeAccept(challenger.from, challenger.game)}
+                                            className="accept-button"
+                                        >
+                                            Accept Challenge
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No pending challenges</p>
+                        )}
+                    </div>
+
+                    {challengedFriend && (
+                        <ChallengeModal 
+                            friendUsername={challengedFriend} 
+                            user={user} 
+                            onClose={() => setChallengedFriend(null)}
+                        />
+                    )}
+                </div>
+            ) : (
+                <p className="not-signed-in">Not signed in</p>
+            )}
+            {user && <button onClick={fetchUser} className="refresh-button">Refresh</button>}
+        </div>
+    );
 }
 
 export default AccountInfo;

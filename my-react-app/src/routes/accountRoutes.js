@@ -39,7 +39,7 @@ router
             return res.json(user);
         } catch (e){
             console.log(e);
-            return res.status(500).send(e);
+            return res.status(500).json({ error: e.toString() });
         }
     })
 
@@ -139,6 +139,60 @@ router
     }
 )
 
+router
+    .route('/unchallengeConnect')
+    .post(async (req, res) => {
+        //console.log("unchallenging");
+        try {
+        const { from, to } = req.body;
+        
+        if (!to || !from) {
+            return res.status(400).json({ error: 'Both usernames are required' });
+        }
+        
+        const result = await accountData.unchallengeFriendConnect(from, to);
+        
+        // Update the session with fresh user data
+        const updatedUser = await accountData.searchUser(to);
+        req.session.user = updatedUser;
+        //console.log("really done unchallenging");
+        return res.status(200).json({ 
+            success: true, 
+            message: `${from} unchallenged`,
+            user: updatedUser  // Send back the updated user
+        });
+    } catch (error) {
+        return res.status(400).json({ error: error.toString() });
+    }
+})
+
+router
+    .route('/unchallengeChess')
+    .post(async (req, res) => {
+        //console.log("unchallenging");
+        try {
+        const { from, to } = req.body;
+        
+        if (!to || !from) {
+            return res.status(400).json({ error: 'Both usernames are required' });
+        }
+        
+        const result = await accountData.unchallengeFriendChess(from, to);
+        
+        // Update the session with fresh user data
+        const updatedUser = await accountData.searchUser(to);
+        req.session.user = updatedUser;
+        //console.log("really done unchallenging");
+        return res.status(200).json({ 
+            success: true, 
+            message: `${from} unchallenged`,
+            user: updatedUser  // Send back the updated user
+        });
+    } catch (error) {
+        return res.status(400).json({ error: error.toString() });
+    }
+})
+
 
 router
     .route('/unchallenge')
@@ -171,7 +225,11 @@ router
     .route('/me')
     .get(async (req, res) => {
         if(req.session.user) {
+            //console.log("getting me");
+            //console.log(req.session.user)
             const updatedUser = await accountData.getUser(req.session.user._id)
+            
+
             req.session.user = updatedUser
             return res.json(req.session.user)
         } else {
