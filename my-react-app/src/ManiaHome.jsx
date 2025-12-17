@@ -32,8 +32,8 @@ function ManiaHomePage(){
     return (
         <div>
             <h2>ManiaHomePage</h2>
-            <button onClick={handleRandomQueue}>Random Match</button>
-            <button onClick={handlePrivateMatch}>Challenge a friend</button>
+            <button onClick={handleRandomQueue}>Queue Random Match</button>
+            {/* <button onClick={handlePrivateMatch}>Challenge a friend</button> */}
         </div>
         
     )
