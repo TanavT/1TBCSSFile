@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import ChessLeaderboard from './ChessLeaderboard';
 
 
 function ChessHomePage(){
@@ -30,9 +31,12 @@ function ChessHomePage(){
     }
 
     return (
-        <div>
+        <div className='centerBox'>
             <h2>CHESS</h2>
-            <button onClick={handleRandomQueue}>Queue Random Match</button>
+            <button onClick={handleRandomQueue} className='button'>Random Match</button>
+            <br />
+            <br />
+            <ChessLeaderboard />
         </div>
         
     )

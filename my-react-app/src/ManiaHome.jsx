@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import ManiaLeaderboard from './ManiaLeaderboard';
 
 
 function ManiaHomePage(){
@@ -30,10 +31,11 @@ function ManiaHomePage(){
     }
 
     return (
-        <div>
-            <h2>ManiaHomePage</h2>
-            <button onClick={handleRandomQueue}>Queue Random Match</button>
-            {/* <button onClick={handlePrivateMatch}>Challenge a friend</button> */}
+        <div className='centerBox'>
+            <h2>MANIA</h2>
+            <button onClick={handleRandomQueue} className='button'>Random Match</button>
+           
+            <ManiaLeaderboard />
         </div>
         
     )

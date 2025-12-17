@@ -1,50 +1,71 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: visible;
+} 
+
 .navbar {
-  position:fixed;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  display:flex;
+  box-sizing: border-box;
+
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: purple;
-  padding: 0.2rem 0rem;
-  color: white;
+
+  background-color: #08205B;
+  color: #F7F2ED;
+
+  padding: 0 1.5rem;
   height: 100px;
+  z-index: 1000;
 }
 
-.logo {
-  margin-right: 1rem;
-  font-size: 1rem;
+.nav-logo {
+  font-size: 2.75rem;
   font-weight: bold;
+  letter-spacing: 0.5px;
 }
 
 .nav-left {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .nav-link {
-  margin-right: 1rem;
   text-decoration: none;
-  color: white;
+  color: #F7F2ED;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .nav-link:hover {
+  color: #D0E4FF;
   text-decoration: underline;
 }
 
+.nav-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-right: 0;
+}
 .nav-right .nav-button {
-  background-color: white;
-  color: purple;
-  padding: 0.3rem 0.7rem;
-  border-radius: 4px;
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: bold;
-  align-items: center;
+
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .nav-right .nav-button:hover {
-  background-color: #eee;
+  background-color: #D0E4FF;
 }

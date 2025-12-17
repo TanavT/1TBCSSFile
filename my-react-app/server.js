@@ -337,7 +337,7 @@ io.on('connection', (socket) => {
 
       let red = Math.floor(Math.random() * 2)
       console.log("making custom timer");
-      connectCustomTimers[roomName] = ({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? me : opp})
+      connectCustomTimers[roomName] = ({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? me : opp})
       if (red == 0){
         connectCustomClients[me].emit('color', {id:connectCustomClients[me].id, color:"red" });
         connectCustomClients[opp].emit('color', {id:connectCustomClients[opp].id, color:"yellow"})
@@ -645,7 +645,7 @@ io.on('connection', (socket) => {
     clientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
-      connectTimers.push({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      connectTimers.push({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
       const matchID = uuid()
       connectMatches.push(matchID)
@@ -1376,23 +1376,4 @@ app2.listen(3000, () => {
 });
 httpServer.listen(4000, () => { //we've got 2 servers here this is chaos idk whats goin on
   console.log(`listening on *:${4000}`);
-});
-
-app2.get('/api/users/search', async (req, res) => {
-    try {
-        const username = req.query.username;
-        if (!username) {
-            return res.status(400).json({ error: 'Username required' });
-        }
-        console.log("before accounts collection");
-        const accountsCollection = await accounts();
-        console.log("after grabbing accounts");
-        const result = await accountsCollection.findOne({ username: username });
-        console.log("after grabbing results");
-        
-        res.json(result ? [result] : []);
-    } catch (error) {
-        console.error("Error searching users:", error);
-        res.status(500).json({ error: 'Failed to search users' });
-    }
 });

@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
 import ChatBox from './components/ChatBox.jsx';
 
@@ -9,33 +9,31 @@ function CheckersCustom(){
     const [loading, setLoading] = useState(true);
 
     const params = useParams();
+    const navigate = useNavigate();
 
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
-        async function fetchUser() {
-            let data
-            try {
-                const request = await axios.get("http://localhost:3000/account/me", { withCredentials: true })
-                data = request.data
-                console.log(data)
-            } catch (e){
-                console.log(e)
-            }
-            try {
-                setUser(data)
-            } catch {
-                setUser(null)
-            }
-            setLoading(false)
-        }
-        fetchUser()
-    }, [])
+        axios.get("http://localhost:3000/account/me", { withCredentials: true })
+        .then(res => {
+            setUser(res.data);
+            setLoading(false);
+        })
+        .catch(() => {
+            setUser(null);
+            setLoading(false);
+            navigate('/login'); // redirect to home page if not logged in
+        });
+    }, [navigate])
 
     const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
     }
     console.log(user);
+
+    if(loading){
+        return <p>loading...</p>
+    }
     // console.log(`other user: ${params.enemyId}`)
     if (loading) return <p>Loading...</p>;
 

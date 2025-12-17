@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import ConnectLeaderboard from './ConnectLeaderboard';
 
 
 function ConnectHomePage(){
@@ -15,17 +16,29 @@ function ConnectHomePage(){
 
     const handleRandomQueue = async () => {
         navigate("/connectMatch"); //just making this here for now so its easier
-        // if(user){
-        //     navigate("/connectMatch");
-        // } else {
-        //     navigate("/login")
-        // };
+        if(user){
+            navigate("/connectMatch");
+        } else {
+            navigate("/login")
+        };
+    }
+
+    const handlePrivateMatch = async () => {
+        if(user){
+            navigate("/connectMatch");
+        } else {
+            navigate("/login");
+        }
     }
 
     return (
-        <div>
+        <div className='centerBox'>
             <h2>CONNECT 4</h2>
-            <button onClick={handleRandomQueue}>Queue Random Match</button>
+            <button onClick={handleRandomQueue} className='button'>Random Match</button>
+           
+           <br />
+            <br />
+            <ConnectLeaderboard />
         </div>
         
     )

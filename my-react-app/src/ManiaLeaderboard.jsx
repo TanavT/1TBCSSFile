@@ -22,11 +22,9 @@ function ManiaLeaderboard() {
     console.log(leaderboard)
    return (
     <div>
-        {leaderboard ? (<button onClick={fetchLeaderboard}>Refresh</button>) : <></>}
-
         {leaderboard ? (
             <div className="leaderboard">
-            <h2>Mania</h2>
+            <h2>Leaderboard</h2>
 
             <table className="leaderboard-table">
                 <thead>
@@ -58,6 +56,8 @@ function ManiaLeaderboard() {
             </div>
 
             ): <></>}
+
+        {leaderboard ? (<button onClick={fetchLeaderboard} className="button">Refresh</button>) : <></>}
     </div>
     
   )
