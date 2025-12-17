@@ -271,15 +271,15 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.load.image(
 		'Connect4_Empty_Grid',
-		'/public/assets/Connect4_Empty_Grid.png'
+		'/assets/Connect4_Empty_Grid.png'
 		);
 		this.load.image(
 		'Red_Circle_full',
-		'/public/assets/Red_Circle_full.png'
+		'/assets/Red_Circle_full.png'
 		);
 		this.load.image(
 		'Yellow_Circle',
-		'/public/assets/Yellow_Circle.png'
+		'/assets/Yellow_Circle.png'
 		);
 
 	}

@@ -95,7 +95,9 @@ export default class CheckersMain extends Phaser.Scene {
 				gameState: gameState,
 				userID: this.userID, 
 				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
+				matchID: this.matchID}, () => {
+						this.socket.disconnect();
+					})
 	}
 
 	init(/*data: { userID: string }*/) {
@@ -179,11 +181,11 @@ export default class CheckersMain extends Phaser.Scene {
 			}
 		})
 
-        this.load.image('board', '/public/assets/checkersBoardSmall.png');
-        this.load.image('redPiece', '/public/assets/redPiece.png');
-        this.load.image('blackPiece', '/public/assets/blackPiece.png');
-		this.load.image('blackKing', '/public/assets/blackKing.png');
-		this.load.image('redKing', '/public/assets/redKing.png');
+        this.load.image('board', '/assets/checkersBoardSmall.png');
+        this.load.image('redPiece', '/assets/redPiece.png');
+        this.load.image('blackPiece', '/assets/blackPiece.png');
+		this.load.image('blackKing', '/assets/blackKing.png');
+		this.load.image('redKing', '/assets/redKing.png');
         //this.load.image('logo', 'assets/phaser.png');
 
         //  The ship sprite is CC0 from https://ansimuz.itch.io - check out his other work!
@@ -385,9 +387,9 @@ export default class CheckersMain extends Phaser.Scene {
 			this.callGameover(gameState)
 		}
 
-		this.time.delayedCall(5000, () => {
-				this.socket.disconnect();
-			}, [], this);
+		// this.time.delayedCall(5000, () => {
+		// 		this.socket.disconnect();
+		// 	}, [], this);
 		//this.socket.disconnect();
 	}
 

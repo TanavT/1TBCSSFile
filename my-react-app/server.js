@@ -707,14 +707,15 @@ io.on('connection', (socket) => {
     }
     numClientsCheckers++;
   })
-    socket.on("gameOverCheckers", async ({gameState, userID, opponentUserID, matchID}) => {
+    socket.on("gameOverCheckers", async ({gameState, userID, opponentUserID, matchID}, ack) => {
     console.log(`UserID: ${userID} Game ended`)
     // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
     const index = checkersMatches.indexOf(matchID)
     if (index === -1){
-      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`},)
       return
     }
+    ack()
     if (checkersMatchUpdated[index] === false) {
       checkersMatchUpdated[index] = true //only let one socket message in
       const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "checkers")
@@ -814,13 +815,14 @@ io.on('connection', (socket) => {
 
   })
   
-  socket.on("gameOverConnect", async ({gameState, userID, opponentUserID, matchID}) => {
+  socket.on("gameOverConnect", async ({gameState, userID, opponentUserID, matchID}, ack) => {
     console.log(`UserID: ${userID} Game ended`)
     // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
     const index = connectMatches.indexOf(matchID)
     if (index === -1){
       socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
     }
+    ack()
     if (connectMatchUpdated[index] === false) {
       connectMatchUpdated[index] = true //only let one socket message in
       const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "connect")
@@ -855,7 +857,7 @@ io.on('connection', (socket) => {
     numClientsChess++
   })
 
-  socket.on("gameOverChess", async ({gameState, userID, opponentUserID, matchID}) => {
+  socket.on("gameOverChess", async ({gameState, userID, opponentUserID, matchID}, ack) => {
     console.log(`UserID: ${userID} Game ended`)
     // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
     const index = chessMatches.indexOf(matchID)
@@ -863,6 +865,7 @@ io.on('connection', (socket) => {
       socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
       return
     }
+    ack()
     if (chessMatchUpdated[index] === false) {
       chessMatchUpdated[index] = true //only let one socket message in
       const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "chess")
@@ -1326,7 +1329,7 @@ io.on('connection', (socket) => {
 
         try {
           const response2 = await axios.post(
-              'http://localhost:3000/account/unchallenge',
+              `${process.env.VITE_BACKEND_SERVER}/account/unchallenge`,
               {
                   from: myName, 
                   to: oppName
@@ -1357,7 +1360,7 @@ io.on('connection', (socket) => {
 
         try {
           const response2 = await axios.post(
-              'http://localhost:3000/account/unchallengeChess',
+              `${process.env.VITE_BACKEND_SERVER}/account/unchallengeChess`,
               {
                   from: myName, 
                   to: oppName
@@ -1386,7 +1389,7 @@ io.on('connection', (socket) => {
 
         try {
           const response2 = await axios.post(
-              'http://localhost:3000/account/unchallengeConnect',
+              `${process.env.VITE_BACKEND_SERVER}/account/unchallengeConnect`,
               {
                   from: myName, 
                   to: oppName

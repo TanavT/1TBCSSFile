@@ -61,10 +61,10 @@ export default class ChessGame extends Phaser.Scene {
 				gameState: gameState,
 				userID: this.userID, 
 				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
-			this.time.delayedCall(5000, () => {
-				this.socket.disconnect();
-			}, [], this);
+				matchID: this.matchID},
+				() => {
+						this.socket.disconnect();
+					})
 
 			
 	}
@@ -293,51 +293,51 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.load.image(
 		'blackKingChess',
-		'/public/assets/blackKingChess.png'
+		'/assets/blackKingChess.png'
 		);
 		this.load.image(
 		'blackBishop',
-		'/public/assets/blackBishop.png'
+		'/assets/blackBishop.png'
 		);
 		this.load.image(
 		'blackKnight',
-		'/public/assets/blackKnight.png'
+		'/assets/blackKnight.png'
 		);
 		this.load.image(
 		'blackQueen',
-		'/public/assets/blackQueen.png'
+		'/assets/blackQueen.png'
 		);
 		this.load.image(
 		'blackRook',
-		'/public/assets/blackRook.png'
+		'/assets/blackRook.png'
 		);
 		this.load.image(
 		'blackPawn',
-		'/public/assets/blackPawn.png'
+		'/assets/blackPawn.png'
 		);
 		this.load.image(
 		'whiteKing',
-		'/public/assets/whiteKing.png'
+		'/assets/whiteKing.png'
 		);
 		this.load.image(
 		'whiteBishop',
-		'/public/assets/whiteBishop.png'
+		'/assets/whiteBishop.png'
 		);
 		this.load.image(
 		'whiteKnight',
-		'/public/assets/whiteKnight.png'
+		'/assets/whiteKnight.png'
 		);
 		this.load.image(
 		'whiteQueen',
-		'/public/assets/whiteQueen.png'
+		'/assets/whiteQueen.png'
 		);
 		this.load.image(
 		'whiteRook',
-		'/public/assets/whiteRook.png'
+		'/assets/whiteRook.png'
 		);
 		this.load.image(
 		'whitePawn',
-		'/public/assets/whitePawn.png'
+		'/assets/whitePawn.png'
 		);
 		
 

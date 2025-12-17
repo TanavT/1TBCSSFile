@@ -331,15 +331,15 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.load.image(
 		'Connect4_Empty_Grid',
-		'/public/assets/Connect4_Empty_Grid.png'
+		'/assets/Connect4_Empty_Grid.png'
 		);
 		this.load.image(
 		'Red_Circle_full',
-		'/public/assets/Red_Circle_full.png'
+		'/assets/Red_Circle_full.png'
 		);
 		this.load.image(
 		'Yellow_Circle',
-		'/public/assets/Yellow_Circle.png'
+		'/assets/Yellow_Circle.png'
 		);
 
 	}
@@ -423,12 +423,6 @@ export default class Connect4Main extends Phaser.Scene {
 				gameState = 0
 			}
 			console.log(this.userID + " at gameover")
-			this.socket.emit("gameOverConnect", 
-				{ 
-				gameState: gameState,
-				userID: this.userID, 
-				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
 		}
 		else if(winner == "Y"){
 			if (this.color === "yellow") {
@@ -438,23 +432,22 @@ export default class Connect4Main extends Phaser.Scene {
 			}
 			this.winYellow.visible = true
 			console.log(this.userID + " at gameover")
-			this.socket.emit("gameOverConnect", 
-				{ 
-				gameState: gameState,
-				userID: this.userID, 
-				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
 		}
 		else{
 			gameState = 0.5
 			this.tieGame.visible = true
-			this.socket.emit("gameOverConnect", 
+
+		}
+		this.socket.emit("gameOverConnect", 
 				{ 
 				gameState: gameState,
 				userID: this.userID, 
 				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
-		}
+				matchID: this.matchID},
+					() => {
+						this.socket.disconnect();
+					}
+				)
 		// this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
 		// this.turn = 0;
 		// this.countCollum = [0,0,0,0,0,0,0];
@@ -463,7 +456,7 @@ export default class Connect4Main extends Phaser.Scene {
 		// })
 		// this.sceneShutdown();
 	}
-
+	
 	async idkFunc(){
 
 	}

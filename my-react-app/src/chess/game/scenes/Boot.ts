@@ -22,7 +22,7 @@ export default class Boot extends Scene
         this.scene.start('Preloader');
         this.load.image(
 		'chessboard',
-		'/public/assets/chessboard.png'
+		'/assets/chessboard.png'
 		);
     }
 }
