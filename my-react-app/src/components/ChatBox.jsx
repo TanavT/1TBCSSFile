@@ -29,7 +29,10 @@ function ChatBox() {
     useEffect(() => {
         if (!user) return;
 
-        socketRef.current = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
+        socketRef.current = io(
+            `${import.meta.env.VITE_BACKEND_SERVER}/chat`,
+            { withCredentials: true }
+        )
 
         socketRef.current.on("userJoined", (msg) => {
             let message = {username: msg.username, text: msg.message};
