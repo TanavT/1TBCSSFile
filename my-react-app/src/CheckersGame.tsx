@@ -7,7 +7,6 @@ import ChatBox from './components/ChatBox.jsx';
 function CheckersCustom(){
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [loading, setLoading] = useState(true);
 
     const params = useParams();
     const navigate = useNavigate();
