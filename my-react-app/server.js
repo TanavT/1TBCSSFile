@@ -27,9 +27,7 @@ const io = new Server(httpServer, {cors: {origin: '*'}});
 const chat = io.of("/chat");
 let chatNumClients = 0;
 let chatClientList = [];
-let checkersClientIDs = []
-let checkersMatches = []
-let checkersMatchUpdated = []
+
 
 chat.on("connection", (socket) => {
   console.log("Chat socket connected:", socket.id);
@@ -122,6 +120,19 @@ let connectMatchUpdated = []
 
 let numClientsChess = 0
 let clientListChess = []
+
+let numClientsCheckers = 0;
+let clientListCheckers = [];
+let checkersClientIDs = []
+let checkersMatches = []
+let checkersMatchUpdated = []
+
+let numClientsMania = 0;
+let clientListMania = []; //array of objects with sockets
+let dataListMania = []; //holds important data for mania matches
+let chessClientIDs = []
+let chessMatches = []
+let chessMatchUpdated = []
 
 let chessTimers = []
 let connectTimers = []
@@ -628,6 +639,227 @@ io.on('connection', (socket) => {
       }
     }
     numClientsChess++
+  })
+
+  socket.on("gameOverChess", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = chessMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      return
+    }
+    if (chessMatchUpdated[index] === false) {
+      chessMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "chess")
+      console.log(updatedElos)
+    }
+  })
+
+  
+  let i = 0;
+
+  socket.on('blackMoveMania', ({row, col}) => {
+    console.log("HELL      AAAH");
+    console.log(i);
+    console.log("moveOfThree: " + dataListMania[Math.floor(thisClient / 2)].moveOfThree)
+    if(i == 0){
+      console.log("whjat");
+      i++
+      if (dataListMania[Math.floor(thisClient / 2)].moveOfThree == 2){
+        console.log("MADE AN INTERVAL")
+       setInterval((() => {
+        //console.log("timer");
+        if(maniaTimers[Math.floor(thisClient / 2)].turn == "second"){
+          maniaTimers[Math.floor(thisClient / 2)].secondTimer -= 1
+        }
+        else{
+          maniaTimers[Math.floor(thisClient / 2)].firstTimer -= 1
+        }
+        
+        //console.log("OTHER OTHER OTHER " + other)
+        clientListMania[thisClient].chess.emit('timer', {timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+        clientListMania[other].chess.emit('timer',{timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+         clientListMania[thisClient].connect.emit('timer', {timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+        clientListMania[other].connect.emit('timer',{timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+         clientListMania[thisClient].checkers.emit('timer', {timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+        clientListMania[other].checkers.emit('timer',{timeSecond: maniaTimers[Math.floor(thisClient / 2)].secondTimer, timeFirst: maniaTimers[Math.floor(thisClient / 2)].firstTimer});
+      }), 1000)
+      console.log("why isn't it working")
+      }
+    }
+    
+
+    if(!fun){
+      dataListMania[Math.floor(thisClient / 2)].moveOfThree += 1
+      console.log("flipping");
+      if(dataListMania[Math.floor(thisClient / 2)].moveOfThree >= dataListMania[Math.floor(thisClient / 2)].maxMove){
+        console.log("flippy floppy turn checkers")
+        dataListMania[Math.floor(thisClient / 2)].moveOfThree = 0
+      if(maniaTimers[Math.floor(thisClient / 2)].turn == "second"){
+        console.log("flipped to black");
+        maniaTimers[Math.floor(thisClient / 2)].turn = "first"
+      }
+      else{
+        console.log("flipped to red");
+        maniaTimers[Math.floor(thisClient / 2)].turn = "second"
+      }
+
+      if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
+         console.log("it da first")
+        let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+        clientListMania[firstClientNum].chess.emit('yourTurn', null)
+        clientListMania[firstClientNum].checkers.emit('yourTurn', null)
+        clientListMania[firstClientNum].connect.emit('yourTurn', null)
+      }
+      else{
+         console.log("it da second")
+        let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+        let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other].chess.emit('yourTurn', null)
+        clientListMania[other].checkers.emit('yourTurn', null)
+        clientListMania[other].connect.emit('yourTurn', null)
+      }
+    }
+      fun = !fun;
+    } else {
+      console.log("not flipping");
+      fun = !fun;
+    }
+    
+    //console.log(checkersTimers[Math.floor(thisClient / 2)].turn)
+
+    if (thisClient%2 == 0){
+      clientListMania[thisClient + 1].checkers.emit("redRecieve", {row: row, col: col});
+    }
+    else{
+      clientListMania[thisClient - 1].checkers.emit("redRecieve", {row: row, col: col});
+    }
+  })
+
+  socket.on('blackMove', ({row, col}) => {
+    console.log("HELL      AAAH");
+    console.log(i);
+    if(i == 0){
+      console.log("whjat");
+      i++
+      //if (checkersTimers[Math.floor(thisClient / 2)].whoRed == thisClient){
+        console.log("MADE AN INTERVAL")
+       setInterval((() => {
+        //console.log("timer");
+        if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+          checkersTimers[Math.floor(thisClient / 2)].redTimer -= 1
+        }
+        else{
+          checkersTimers[Math.floor(thisClient / 2)].blackTimer -= 1
+        }
+        let other = (thisClient - 1) + (((thisClient + 1)%2) * 2)
+        //console.log("OTHER OTHER OTHER " + other)
+        socket.emit('timer', {timeRed: checkersTimers[Math.floor(thisClient / 2)].redTimer, timeBlack: checkersTimers[Math.floor(thisClient / 2)].blackTimer});
+        clientListCheckers[other].emit('timer',{timeRed: checkersTimers[Math.floor(thisClient / 2)].redTimer, timeBlack: checkersTimers[Math.floor(thisClient / 2)].blackTimer});
+      }), 1000)
+      console.log("why isn't it working")
+      //}
+    }
+
+
+    if(!fun){
+      console.log("flipping");
+      if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+        console.log("flipped to black");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "red"
+      }
+      fun = !fun;
+    } else {
+      console.log("not flipping");
+      fun = !fun;
+    }
+    
+    console.log(checkersTimers[Math.floor(thisClient / 2)].turn)
+
+    if (thisClient%2 == 0){
+      clientListCheckers[thisClient + 1].emit("redRecieve", {row: row, col: col});
+    }
+    else{
+      clientListCheckers[thisClient - 1].emit("redRecieve", {row: row, col: col});
+    }
+  })
+
+  socket.on('redMove', ({row, col}) => {
+
+
+    if(!fun){
+      if(checkersTimers[Math.floor(thisClient / 2)].turn == "red"){
+        console.log("flipped to black");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "black"
+      }
+      else{
+        console.log("flipped to red");
+        checkersTimers[Math.floor(thisClient / 2)].turn = "red"
+      }
+      fun = !fun
+    } else {
+      fun = !fun;
+    }
+
+    if (thisClient%2 == 0){
+      clientListCheckers[thisClient + 1].emit("blackRecieve", {row: row, col: col});
+    }
+    else{
+      clientListCheckers[thisClient - 1].emit("blackRecieve", {row: row, col: col});
+    }
+  })
+
+
+  socket.on('redMoveMania', ({row, col}) => {
+
+       console.log("moveOfThree: " + dataListMania[Math.floor(thisClient / 2)].moveOfThree)
+
+    if(!fun){
+      dataListMania[Math.floor(thisClient / 2)].moveOfThree += 1
+      if(dataListMania[Math.floor(thisClient / 2)].moveOfThree >= dataListMania[Math.floor(thisClient / 2)].maxMove){
+        dataListMania[Math.floor(thisClient / 2)].moveOfThree = 0
+        console.log("flippy floppy turn checkers")
+      if(maniaTimers[Math.floor(thisClient / 2)].turn == "second"){
+        console.log("flipped to black");
+        maniaTimers[Math.floor(thisClient / 2)].turn = "first"
+      }
+      else{
+        console.log("flipped to red");
+        maniaTimers[Math.floor(thisClient / 2)].turn = "second"
+      }
+
+      if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
+         console.log("it da first")
+        let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+        clientListMania[firstClientNum].chess.emit('yourTurn', null)
+        clientListMania[firstClientNum].checkers.emit('yourTurn', null)
+        clientListMania[firstClientNum].connect.emit('yourTurn', null)
+      }
+      else{
+         console.log("it da second")
+        let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+        let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other].chess.emit('yourTurn', null)
+        clientListMania[other].checkers.emit('yourTurn', null)
+        clientListMania[other].connect.emit('yourTurn', null)
+      }
+    }
+      fun = !fun
+    } else {
+      fun = !fun;
+    }
+
+    if (thisClient%2 == 0){
+      clientListMania[thisClient + 1].checkers.emit("blackRecieve", {row: row, col: col});
+    }
+    else{
+      clientListMania[thisClient - 1].checkers.emit("blackRecieve", {row: row, col: col});
+    }
   })
 
 

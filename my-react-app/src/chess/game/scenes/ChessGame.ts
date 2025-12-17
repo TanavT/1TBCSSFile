@@ -30,26 +30,16 @@ export default class ChessGame extends Phaser.Scene {
 	myTurn:boolean = false; //red goes first
 
 	gameOver:boolean = false;
-	
-	callGameover(gameState: number) {
-		console.log(this.userID + " at gameover")
-			this.socket.emit("gameOverChess", { 
-				gameState: gameState,
-				userID: this.userID, 
-				opponentUserID: this.opponentUserID,
-				matchID: this.matchID})
-	}
-	init() {
-    	const chessData = this.registry.get('chessData');
-        this.userID = chessData.userID;
-		console.log("Chess user ID" + this.userID)
-  	}
 
 	gametype: string;
 	opp: any;
 	me: any;
 
 	init() {
+		const chessData = this.registry.get('chessData');
+        this.userID = chessData.userID;
+		console.log("Chess user ID" + this.userID)
+
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
@@ -61,6 +51,15 @@ export default class ChessGame extends Phaser.Scene {
 		const opp = this.game.registry.get("opp");
 		console.log("got opp: " + opp);
 		this.opp = opp;
+	}
+	
+	callGameover(gameState: number) {
+		console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverChess", { 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
 	}
 
 	preload(){
