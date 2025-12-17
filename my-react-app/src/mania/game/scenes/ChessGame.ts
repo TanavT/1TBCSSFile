@@ -29,6 +29,20 @@ export default class ChessGame extends Phaser.Scene {
 
 	gameOver:boolean = false;
 
+	gametype
+	user
+
+	init() {
+		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
+		if(user)
+			console.log("got user: " + user.username);
+		this.user = user
+
+		const gametype = this.game.registry.get("gametype");
+		console.log("got gametype: " + gametype);
+		this.gametype = gametype;
+	}
+
 	preload(){
 		this.cameras.main.setZoom(0.57); 
 		this.cameras.main.centerOn(520,380)
@@ -36,7 +50,7 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.socket.on('user_join', (id) => {
 			//console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketChessMania", 'test')
+			this.socket.emit("realSocketChessMania", this.user)
   		});
 
 		this.socket.on('timer', ({timeFirst, timeSecond}) => {

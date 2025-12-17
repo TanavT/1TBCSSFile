@@ -84,11 +84,13 @@ export default class CheckersMain extends Phaser.Scene {
 	opponentColor:string;
 
 	gametype: string;
+	user
 
 	init() {
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		if(user)
 			console.log("got user: " + user.username);
+		this.user = user
 
 		const gametype = this.game.registry.get("gametype");
 		console.log("got gametype: " + gametype);
@@ -117,7 +119,7 @@ export default class CheckersMain extends Phaser.Scene {
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketCheckersMania", 'test');
+				this.socket.emit("realSocketCheckersMania", this.user);
 			} else {
 				console.log("custom match");
 			}
@@ -229,13 +231,14 @@ export default class CheckersMain extends Phaser.Scene {
 		const startX = board.x - boardWidth / 2;
     	const startY = board.y - boardHeight / 2;
 
-		const unselectButton = this.add.rectangle(850,50,100,40, 0xff0000)
+		const unselectButton = this.add.rectangle(350,20,100,40, 0xff0000)
 		.setInteractive()
 		.on("pointerdown", () => {
 			this.undoSelection();
 		});
 
-		const unselectText = this.add.text(825,50,"Unselect", {color: "#fff"});
+		const unselectText = this.add.text(310,15,"Unselect", {color: "#fff"});
+
 
 		const winRed = this.add.text(130, 320, "", {});
 		winRed.visible = false;

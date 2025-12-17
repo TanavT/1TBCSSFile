@@ -611,14 +611,15 @@ io.on('connection', (socket) => {
     console.log(socket.id)
     console.log('someone real joined mania')
     thisClient = numClientsMania
-    clientListMania.push({connect: socket, chess: null, checkers: null})
+    clientListMania.push({connect: socket, chess: null, checkers: null, user: testStr})
     numClientsMania++
   })
   socket.on('realSocketChessMania', (testStr) => {
+    console.log("user " + testStr.username)
     console.log(socket.id)
     console.log('someone real joined mania 2')
     for(let i = 0; i < clientListMania.length; i++){ //basically trying to solve concurrency issues
-      if(clientListMania[i].chess == null){
+      if(clientListMania[i].chess == null && clientListMania[i].user.username == testStr.username){
         clientListMania[i].chess = socket
         thisClient = i
         console.log("client client " + thisClient)
@@ -628,10 +629,11 @@ io.on('connection', (socket) => {
     }
   })
   socket.on('realSocketCheckersMania', (testStr) => {
+    console.log("user " + testStr.username)
     console.log(socket.id)
     console.log('someone real joined mania 3')
     for(let i = 0; i < clientListMania.length; i++){ //basically trying to solve concurrency issues
-      if(clientListMania[i].checkers == null){
+      if(clientListMania[i].checkers == null && clientListMania[i].user.username == testStr.username){
         clientListMania[i].checkers = socket
         thisClient = i
        console.log("client client " + thisClient)
