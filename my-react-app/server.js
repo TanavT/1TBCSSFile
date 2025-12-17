@@ -337,7 +337,7 @@ io.on('connection', (socket) => {
 
       let red = Math.floor(Math.random() * 2)
       console.log("making custom timer");
-      connectCustomTimers[roomName] = ({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? me : opp})
+      connectCustomTimers[roomName] = ({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? me : opp})
       if (red == 0){
         connectCustomClients[me].emit('color', {id:connectCustomClients[me].id, color:"red" });
         connectCustomClients[opp].emit('color', {id:connectCustomClients[opp].id, color:"yellow"})
