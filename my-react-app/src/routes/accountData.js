@@ -24,16 +24,27 @@ const exportedMethods = {
             throw `Error: Please enter a valid non-empty password`;
         }
 
+        username = validationMethods.checkUsername(username)
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({ username });
+
+        // console.log(user)
         if (!user) throw "Either the username or password is invalid";
         
         //password check;
         let passwordCompare = false;
         passwordCompare = await bcrypt.compare(password, user.password)
+        // console.log(passwordCompare)
         if (!passwordCompare) throw "Either the username or password is invalid"
         console.log(user);
-        return user;
+        return {
+            _id: user._id,
+            username: user.username,
+            signupDate: user.signupDate,
+            winrates: user.winrates,
+            friendList: user.friendList,
+            challenges: user.challenges
+        };
         // return { id: user._id, username: user.username };
     },
 
@@ -44,7 +55,7 @@ const exportedMethods = {
 
         const accountsCollection = await accounts();
         const existing = await accountsCollection.findOne({ username });
-        if (existing) throw "User already exists";
+        if (existing) throw "Username already taken";
 
         const today = new Date();
         //const year = today.getFullYear();
@@ -100,6 +111,8 @@ const exportedMethods = {
     },
 
     async challengeUser(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -132,6 +145,8 @@ const exportedMethods = {
     },
 
     async challengeUserChess(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -164,6 +179,8 @@ const exportedMethods = {
     },
 
     async challengeUserConnect(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -196,6 +213,8 @@ const exportedMethods = {
     },
 
     async unchallengeFriendChess(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -228,6 +247,8 @@ const exportedMethods = {
     },
 
     async unchallengeFriendConnect(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -260,6 +281,8 @@ const exportedMethods = {
     },
 
     async unchallengeFriend(from, to){
+        from = validationMethods.checkUsername(from)
+        to = validationMethods.checkUsername(to)
         const accountsCollection = await accounts();
         const victim = await accountsCollection.findOne({ username: to } );
 
@@ -296,6 +319,10 @@ const exportedMethods = {
         if(typeof username !== "string" || username.trim().length <= 0) {
             throw `Error: Please enter a valid non-empty username`;
         }
+        console.log(username)
+        username = validationMethods.checkUsername(username)
+        console.log(username)
+
 
         //console.log("searching");
         //console.log(username);
@@ -322,6 +349,8 @@ const exportedMethods = {
         if(typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
             throw `Error: Please enter a valid username!`;
         }
+        userUsername = validationMethods.checkUsername(userUsername)
+        friendUsername = validationMethods.checkUsername(friendUsername)
 
         const accountsCollection = await accounts();
         const user = await accountsCollection.findOne({username: userUsername});
@@ -358,6 +387,9 @@ const exportedMethods = {
         if (typeof userUsername !== 'string' || typeof friendUsername !== 'string' || userUsername.length < 1 || friendUsername.length < 1) {
             throw `Error: Please enter a valid username!`;
         }
+        //more like snakeUsername ... I'm going insane
+        userUsername = validationMethods.checkUsername(userUsername)
+        friendUsername = validationMethods.checkUsername(friendUsername)
 
         const accountsCollection = await accounts();
 

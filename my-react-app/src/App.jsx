@@ -21,7 +21,7 @@ import ConnectHomePage from './ConnectHome.jsx';
 import ManiaHomePage from './ManiaHome.jsx';
 import AccountPage from './AccountPage.jsx'; //page that lets us sign in
 import AccountInfo from './AccountInfo.jsx';
-
+import ProtectedRoute from "./ProtectedRoutes";
 import SearchUsers from './SearchUsers.jsx'; //lets the user search for otehr users by username
 function App() {
 
@@ -30,17 +30,17 @@ function App() {
       <Navbar/> 
       <Routes>
         <Route path='/' element={<HomePage />}/>
-        <Route path='/chess' element={<ChessHomePage/>} />
-        <Route path='/chessMatch' element ={<ChessGame/>}/>
-        <Route path='/checkers' element={<CheckersHomePage/>} />
-        <Route path='/checkersMatch' element ={<CheckersGame/>}/>
-        <Route path='/checkersCustom/:enemyId' element ={<CheckersCustomGame/>}/>
-        <Route path='/chessCustom/:enemyId' element ={<ChessCustomGame/>}/>
-        <Route path='/connectCustom/:enemyId' element={<ConnectCustom/>}/>
-        <Route path='/connect' element={<ConnectHomePage/>} />
-        <Route path='/connectMatch' element ={<ConnectGame/>}/> 
-         <Route path='/mania' element={<ManiaHomePage/>} />
-        <Route path='/maniaMatch' element ={<ManiaGame/>}/>
+        <Route path='/chess' element={ <ProtectedRoute><ChessHomePage/></ProtectedRoute>} />
+        <Route path='/chessMatch' element ={ <ProtectedRoute><ChessGame/></ProtectedRoute>}/>
+        <Route path='/checkers' element={ <ProtectedRoute><CheckersHomePage/></ProtectedRoute>} />
+        <Route path='/checkersMatch' element ={ <ProtectedRoute><CheckersGame/></ProtectedRoute>}/>
+        <Route path='/checkersCustom/:enemyId' element ={ <ProtectedRoute><CheckersCustomGame/></ProtectedRoute>}/>
+        <Route path='/chessCustom/:enemyId' element ={ <ProtectedRoute><ChessCustomGame/></ProtectedRoute>}/>
+        <Route path='/connectCustom/:enemyId' element={ <ProtectedRoute><ConnectCustom/></ProtectedRoute>}/>
+        <Route path='/connect' element={ <ProtectedRoute><ConnectHomePage/></ProtectedRoute>} />
+        <Route path='/connectMatch' element ={ <ProtectedRoute><ConnectGame/></ProtectedRoute>}/> 
+         <Route path='/mania' element={ <ProtectedRoute><ManiaHomePage/></ProtectedRoute>} />
+        <Route path='/maniaMatch' element ={ <ProtectedRoute><ManiaGame/></ProtectedRoute>}/>
 
         <Route path='/search' element={<SearchUsers/>}/>
 

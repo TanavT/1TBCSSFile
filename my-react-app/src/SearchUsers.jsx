@@ -1,26 +1,28 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "./AuthContext";
 
 function SearchUsers() {
+    const {user: currentUser, setUser: setCurrentUser} = useAuth();
     const [userResults, setUserResults] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [userLoading, setUserLoading] = useState(true);
+    // const [currentUser, setCurrentUser] = useState(null);
+    // const [userLoading, setUserLoading] = useState(true);
 
     // Get the current logged-in user
-    useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
-            .then(res => {
-                setCurrentUser(res.data);
-                setUserLoading(false);
-            })
-            .catch(() => {
-                setCurrentUser(null);
-                setUserLoading(false);
-            });
-    }, []);
+    // useEffect(() => {
+    //     axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+    //         .then(res => {
+    //             setCurrentUser(res.data);
+    //             setUserLoading(false);
+    //         })
+    //         .catch(() => {
+    //             setCurrentUser(null);
+    //             setUserLoading(false);
+    //         });
+    // }, []);
 
     async function handleSearch(e) {
         e.preventDefault();
@@ -126,7 +128,7 @@ function SearchUsers() {
         return true;
     }
 
-    if (userLoading) return <div><p>Loading user data...</p></div>;
+    // if (userLoading) return <div><p>Loading user data...</p></div>;
     if (!currentUser) return <div><p>Please log in to search for users.</p></div>;
 
     return (

@@ -2,15 +2,22 @@ import { Link, useNavigate } from "react-router-dom";
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import ChallengeModal from './ChallengeModal.jsx';
+import { useAuth } from "./AuthContext.tsx";
+
 
 function AccountInfo() {
+    const {user, setUser} = useAuth();
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
     const fetchUser = async () => {
-        const res = await axios.get(
-            `${import.meta.env.VITE_BACKEND_SERVER}/account/me`,{withCredentials: true}
-        );
-        setUser(res.data);
+        try {
+            const res = await axios.get(
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/me`,{withCredentials: true}
+            );
+            setUser(res.data);
+        } catch {
+            setUser(null)
+        }
     };
     const [challengedFriend, setChallengedFriend] = useState(null);
 
@@ -18,7 +25,19 @@ function AccountInfo() {
         fetchUser();
     }, []);
 
-
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post(
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/logout`,
+                {},
+                { withCredentials: true }
+            );
+            setUser(null);
+            navigate('/');
+        } catch (e) {
+            console.log('Full error:', (e.response?.data.error) || e.message);
+        }
+    }
 
     async function handleChallengeFriend(friendUsername){
         if( window.confirm(`Are you sure you want to challenge ${friendUsername}?`)){
@@ -260,6 +279,7 @@ function AccountInfo() {
                 <p className="not-signed-in">Not signed in</p>
             )}
             {user && <button onClick={fetchUser} className="refresh-button">Refresh</button>}
+            {user && <button onClick={handleLogout} className="button">Logout</button>}
         </div>
     );
 }

@@ -3,32 +3,33 @@ import axios from 'axios';
 import { PhaserGame } from './PhaserGame2';
 import type { IRefPhaserGame } from './PhaserGame2';
 import ChatBox from './components/ChatBox.jsx';
-
+import { useAuth } from './AuthContext';
 
 function ConnectGameUnlimited(){
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {user} = useAuth();
+    // const [user, setUser] = useState(null);
+    // const [loading, setLoading] = useState(true);
 
      const phaserRef = useRef<IRefPhaserGame | null>(null);
 
-    useEffect(() => {
-        async function fetchUser() {
-            let data
-            try {
-                const request = await axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
-                data = request.data
-            } catch (e){
-                console.log(e)
-            }
-            try {
-                setUser(data)
-            } catch {
-                setUser(null)
-            }
-            setLoading(false)
-        }
-        fetchUser()
-    }, [])
+    // useEffect(() => {
+    //     async function fetchUser() {
+    //         let data
+    //         try {
+    //             const request = await axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+    //             data = request.data
+    //         } catch (e){
+    //             console.log(e)
+    //         }
+    //         try {
+    //             setUser(data)
+    //         } catch {
+    //             setUser(null)
+    //         }
+    //         setLoading(false)
+    //     }
+    //     fetchUser()
+    // }, [])
 
     const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?

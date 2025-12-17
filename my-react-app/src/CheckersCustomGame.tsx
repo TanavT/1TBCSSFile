@@ -2,20 +2,21 @@ import React, {useContext, useState, useEffect, useRef} from 'react';
 import {useParams} from "react-router-dom";
 import axios from 'axios';
 import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
+import { useAuth } from "./AuthContext.tsx";
 
 function CheckersCustomGame(){
-    const [user, setUser] = useState(null);
+    const {user} = useAuth();
 
     const params = useParams();
     console.log(params.enemyId);
 
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
-    useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
-    }, [])
+    // useEffect(() => {
+    //     axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+    //     .then(res => setUser(res.data))
+    //     .catch(() => setUser(null));
+    // }, [])
 
     const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?

@@ -2,9 +2,12 @@ import { Link } from "react-router-dom";
 import React, {useContext, useState, useEffect} from 'react';
 import "./NavBar.css";
 import axios from 'axios';
+import { useAuth } from "../AuthContext.tsx";
 
 function NavBar() {
-    const [user, setUser] = useState(null);
+  
+    const { user, setUser} = useAuth();
+
 
     useEffect(() => {
         axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })

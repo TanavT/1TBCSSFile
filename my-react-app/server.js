@@ -14,6 +14,9 @@ import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
 import axios from 'axios';
 //import client from './redis.js'
+import { validationMethods } from './src/routes/helpers.js';
+
+const isCloud = process.env.NODE_ENV === "production";
 
 const app2 = express();
 
@@ -33,8 +36,8 @@ app2.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true,
-    sameSite: 'none',
+    secure: isCloud,
+    sameSite: isCloud ? "none" : "lax",
     maxAge: 1000 * 60 * 60
   }
 }));
@@ -63,10 +66,11 @@ if (process.env){
 //crteating an api to grab users from
 app2.get('/api/users/search', async (req, res) => {
     try {
-        const username = req.query.username;
+        let username = req.query.username;
         if (!username) {
             return res.status(400).json({ error: 'Username required' });
         }
+        username = validationMethods.checkUsername(username)
         console.log("before accounts collection");
         const accountsCollection = await accounts();
         console.log("after grabbing accounts");
@@ -83,10 +87,11 @@ app2.get('/api/users/search', async (req, res) => {
 
 app2.get('/api/users/search', async (req, res) => {
     try {
-        const username = req.query.username;
+        let username = req.query.username;
         if (!username) {
             return res.status(400).json({ error: 'Username required' });
         }
+        username = validationMethods.checkUsername(username)
         console.log("before accounts collection");
         const accountsCollection = await accounts();
         console.log("after grabbing accounts");

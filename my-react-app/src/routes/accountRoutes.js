@@ -12,29 +12,35 @@ router
             const user = await accountData.login(cleanUsername, cleanPassword);
 
             if(!user) {
-                throw `Error: Could not find user!`;
+                throw `Error: username or password incorrect`;
             }
 
             req.session.user = user;
             return res.json(user);
         } catch (e){
             console.log(e);
-            return res.status(500).send(e);
+            return res.status(400).json({ error: e.toString() });
         }
     })
 
 router
     .route('/signup')
     .post(async (req, res) => {
+        let user
+        let cleanUsername = xss(req.body.username);
+        let cleanPassword = xss(req.body.password);
         try {
-            let cleanUsername = xss(req.body.username);
-            let cleanPassword = xss(req.body.password);
-            const user = await accountData.signup(cleanUsername, cleanPassword);
-
+            user = await accountData.signup(cleanUsername, cleanPassword);
+        } catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e.toString() });
+        }
+        
+        try {
             if(!user) {
-                throw `Error: Could not find user!`;
+                throw `Error: Could not sign up user`;
             }
-
+        
             req.session.user = user;
             return res.json(user);
         } catch (e){
@@ -51,7 +57,7 @@ router
             return res.json({logout: true});
         } catch (e){
             console.log(e);
-            return res.status(500).send(e);
+            return res.status(500).json({ error: e.toString() });
         }
     })
 

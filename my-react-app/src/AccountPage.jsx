@@ -2,11 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import React from 'react'
+import { useAuth } from "./AuthContext.tsx";
+
 
 function AccountPage() {
-    const [username, setUsername] = useState(null);
-    const [password, setPassword] = useState(null);
-    const [message, setMessage] = useState(null);
+    const {setUser} = useAuth();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+    const [usernameError, setUsernameError] = useState("")
+    const [passwordError, setPasswordError] = useState("")
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -16,13 +21,14 @@ function AccountPage() {
                 { username, password },
                 { withCredentials: true }
             );
+            setUser(res.data)
             console.log(res);
             window.location.replace('/')
             setMessage(`Logged in as ${res.data.username}`);
         } catch (e) {
             console.log(e);
-            setMessage(JSON.stringify(e.response?.data.error) || e.message);
-            setMessage('Login failed');
+            setMessage(JSON.stringify(e.response?.data.error) || e);
+            // setMessage('Login failed');
         }
     }
 
@@ -33,7 +39,8 @@ function AccountPage() {
                 { username, password },
                 { withCredentials: true }
             );
-            navigate('/chess');
+            setUser(res.data)
+            navigate('/account');
             setMessage(`Signed up as ${res.data.username}`);
         } catch (e) {
             setMessage(JSON.stringify(e.response?.data.error) || e.message);
@@ -50,7 +57,7 @@ function AccountPage() {
                 <input 
                     type="text" 
                     placeholder="Username" 
-                    value={username} 
+                    // value={username} 
                     onChange={e => setUsername(e.target.value)}
                 />
             </div>
@@ -60,7 +67,7 @@ function AccountPage() {
                 <input 
                     type="password" 
                     placeholder="Password" 
-                    value={password} 
+                    // value={password} 
                     onChange={e => setPassword(e.target.value)}
                 />
             </div>

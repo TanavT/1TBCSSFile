@@ -5,10 +5,12 @@ import { PhaserGameCheckers } from './mania/PhaserGameCheckers';
 import { PhaserGameConnect } from './mania/PhaserGameConnect';
 import { useNavigate } from 'react-router-dom';
 import ChatBox from './components/ChatBox.jsx';
+import { useAuth } from './AuthContext';
 
 function ManiaGame(){
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {user} = useAuth();
+    // const [user, setUser] = useState(null);
+    // const [loading, setLoading] = useState(true);
     
      const phaserRef = useRef<IRefPhaserGame | null>(null);
      const phaserRef2 = useRef<IRefPhaserGame | null>(null);
@@ -18,7 +20,7 @@ function ManiaGame(){
     const [game2, setGame2] = useState(false);
     const [game3, setGame3] = useState(false);
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,18 +34,18 @@ function ManiaGame(){
     }, 1500);
   }, [game2]);
 
-    useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
-        .then(res => {
-            setUser(res.data);
-            setLoading(false);
-        })
-        .catch(() => {
-            setUser(null);
-            setLoading(false);
-            navigate('/login'); // redirect to home page if not logged in
-        });
-    }, [navigate])
+    // useEffect(() => {
+    //     axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+    //     .then(res => {
+    //         setUser(res.data);
+    //         setLoading(false);
+    //     })
+    //     .catch(() => {
+    //         setUser(null);
+    //         setLoading(false);
+    //         navigate('/login'); // redirect to home page if not logged in
+    //     });
+    // }, [navigate])
 
      const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?
@@ -55,9 +57,9 @@ function ManiaGame(){
         //todo?
     }
 
-    if(loading) {
-      <p>Loading...</p>
-    }
+    // if(loading) {
+    //   <p>Loading...</p>
+    // }
 
     return (
         <div className='maniaBox'>
