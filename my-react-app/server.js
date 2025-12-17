@@ -3,7 +3,6 @@ import express from 'express';
 import app from 'express';
 // import { createClient } from 'redis';
 import ioServer from './socket.js';
-const app2 = express();
 import session from 'express-session';
 import configRoutesFunction from './src/routes/index.js';
 import cors from 'cors';
@@ -15,28 +14,21 @@ import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
 //import client from './redis.js'
 
-if (process.env){
-  console.log(process.title)
-} else {
-  console.log(".env not detected! The server will not run properly") 
-}
+const app2 = express();
 
-// const httpServer = createServer(app);
+app2.set('trust proxy', 1);
 
-app2.use(express.json());
-app2.use(express.urlencoded({ extended: true }));
-
-// Allow us to send requests from react to here
 app2.use(cors({
   origin: process.env.FRONTEND_CLIENT,
   credentials: true
 }));
-// app2.options(/.*/, cors());
 
-app2.set('trust proxy', 1);
+app2.use(express.json());
+app2.use(express.urlencoded({ extended: true }));
+
 app2.use(session({
   name: 'AwesomeWebapp2',
-  secret: 'This is a secret.. shhh don\'t tell anyone',
+  secret: 'secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -45,6 +37,25 @@ app2.use(session({
     maxAge: 1000 * 60 * 60
   }
 }));
+
+
+
+const httpServer = createServer(app2);
+
+const io = ioServer(httpServer);
+
+
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log('Server listening on', PORT);
+});
+
+if (process.env){
+  console.log(process.title)
+} else {
+  console.log(".env not detected! The server will not run properly") 
+}
+
 
 
 
@@ -90,16 +101,11 @@ app2.get('/api/users/search', async (req, res) => {
 
 configRoutesFunction(app2);
 
-const PORT = process.env.PORT || 3000;
-const httpServer = app2.listen(PORT, () => {
-  console.log("We've now got a server!");
-  console.log(`Your routes will be running on PORT ${PORT}`);
-});
+
 
 // const client = createClient();
 // client.connect().then(() => {});
 
-const io = ioServer(httpServer)
 
 //chat message socket
 const chat = io.of("/chat");
