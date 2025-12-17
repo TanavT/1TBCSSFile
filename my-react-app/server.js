@@ -31,7 +31,7 @@ app2.use(cors({
   origin: process.env.FRONTEND_CLIENT,
   credentials: true
 }));
-app2.options(/.*/, cors());
+// app2.options(/.*/, cors());
 
 app2.set('trust proxy', 1);
 app2.use(session({

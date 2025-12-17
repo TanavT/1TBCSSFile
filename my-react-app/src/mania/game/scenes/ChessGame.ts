@@ -46,7 +46,7 @@ export default class ChessGame extends Phaser.Scene {
 	preload(){
 		this.cameras.main.setZoom(0.57); 
 		this.cameras.main.centerOn(520,380)
-		this.socket = io(`${process.env.VITE_BACKEND_SERVER}`);
+		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
 
 		this.socket.on('user_join', (id) => {
 			//console.log('A user joined their id is ' + id);

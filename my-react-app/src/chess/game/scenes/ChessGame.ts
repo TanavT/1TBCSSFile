@@ -49,7 +49,7 @@ export default class ChessGame extends Phaser.Scene {
 
 	preload(){
 		this.editorCreate();
-		this.socket = io(`${process.env.VITE_BACKEND_SERVER}`);
+		this.socket = io(`${import.meta.env.VITE_BACKEND_SERVER}`);
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
