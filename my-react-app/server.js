@@ -1237,22 +1237,3 @@ app2.listen(3000, () => {
 httpServer.listen(4000, () => { //we've got 2 servers here this is chaos idk whats goin on
   console.log(`listening on *:${4000}`);
 });
-
-app2.get('/api/users/search', async (req, res) => {
-    try {
-        const username = req.query.username;
-        if (!username) {
-            return res.status(400).json({ error: 'Username required' });
-        }
-        console.log("before accounts collection");
-        const accountsCollection = await accounts();
-        console.log("after grabbing accounts");
-        const result = await accountsCollection.findOne({ username: username });
-        console.log("after grabbing results");
-        
-        res.json(result ? [result] : []);
-    } catch (error) {
-        console.error("Error searching users:", error);
-        res.status(500).json({ error: 'Failed to search users' });
-    }
-});
