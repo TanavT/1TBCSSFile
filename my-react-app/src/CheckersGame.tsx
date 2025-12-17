@@ -6,27 +6,44 @@ import ChatBox from './components/ChatBox.jsx';
 
 function CheckersCustom(){
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const params = useParams();
 
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
+        async function fetchUser() {
+            let data
+            try {
+                const request = await axios.get("http://localhost:3000/account/me", { withCredentials: true })
+                data = request.data
+                console.log(data)
+            } catch (e){
+                console.log(e)
+            }
+            try {
+                setUser(data)
+            } catch {
+                setUser(null)
+            }
+            setLoading(false)
+        }
+        fetchUser()
     }, [])
 
     const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
     }
     console.log(user);
+    // console.log(`other user: ${params.enemyId}`)
+    if (loading) return <p>Loading...</p>;
 
     if(user){
         return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx
                 <div>
                     <h2>CHECKERS</h2>
-                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" opp={params.enemyId} /> 
+                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" opp={params.enemyId} userID={user? user._id: "testing"} /> 
                     {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
                     <ChatBox />
                 </div>

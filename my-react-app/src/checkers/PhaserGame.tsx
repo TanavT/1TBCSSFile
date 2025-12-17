@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
 import StartGame from './game/main';
 import { EventBus } from './game/EventBus';
+import CheckersMain from './game/scenes/CheckersMain';
 
 export interface IRefPhaserGame
 {
@@ -14,12 +15,14 @@ interface IProps
     user?: any;
     gametype?: any;
     opp?: any;
+    userID?: string
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp}, ref) //USER IN PHASER 2: add user to props here
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype, opp, userID }, ref) //USER IN PHASER 2: add user to props here
 {
     //console.log("test: " + test);
     const game = useRef<Phaser.Game | null>(null!);
+    const sceneStarted = useRef(false);
     //console.log("Props in PhaserGame:", { user, gametype, opp });
 
     useLayoutEffect(() =>
@@ -50,7 +53,15 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             }
         }
     }, [ref, user, opp]); //USER IN PHASER 4: add user here. next step in main.ts
+    useEffect(() => {
+        if (!game.current || !userID || sceneStarted.current) return;
 
+        sceneStarted.current = true;
+
+        game.current.scene.start('CheckersMain', {
+            userID
+        });
+    }, [userID]);
     useEffect(() =>
     {
         EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>

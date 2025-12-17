@@ -1,7 +1,7 @@
 import express from 'express';
 //import redis from 'redis';
 import app from 'express';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 const app2 = express();
 import session from 'express-session';
 import configRoutesFunction from './src/routes/index.js';
@@ -18,8 +18,8 @@ import gameData from './src/routes/gameData.js'
 
 const httpServer = createServer(app);
 
-const client = createClient();
-client.connect().then(() => {});
+// const client = createClient();
+// client.connect().then(() => {});
 
 const io = new Server(httpServer, {cors: {origin: '*'}});
 
@@ -493,22 +493,40 @@ io.on('connection', (socket) => {
 
   
 
-  socket.on('realSocketCheckers', (teststr) => {
+  socket.on('realSocketCheckers', (userID) => {
     console.log('someone real connected to checkers')
     thisClient = numClientsCheckers
     clientListCheckers.push(socket)
+    checkersClientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
-      checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      checkersTimers.push({redTimer: 10, blackTimer: 10, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      const matchID = uuid()
+      checkersMatches.push(matchID)
+      checkersMatchUpdated.push(false)
       if (red == 0){
-        socket.emit('checkersColor', {id:socket.id, color:"red" });
-        clientListCheckers[thisClient-1].emit('checkersColor', {id:socket.id, color:"black"})
+        socket.emit('checkersColor', {id:socket.id, color:"red", userID: userID, opponentUserID: checkersClientIDs[thisClient - 1], matchID: matchID});
+        clientListCheckers[thisClient-1].emit('checkersColor', {id:socket.id, color:"black", userID: checkersClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID})
       } else {
-        socket.emit('checkersColor', {id:socket.id, color:"black" });
-        clientListCheckers[thisClient-1].emit('checkersColor', {id: socket.id, color:"red"})
+        socket.emit('checkersColor', {id:socket.id, color:"black", userID: userID, opponentUserID: checkersClientIDs[thisClient - 1], matchID: matchID});
+        clientListCheckers[thisClient-1].emit('checkersColor', {id: socket.id, color:"red", userID: checkersClientIDs[thisClient - 1], opponentUserID: userID, matchID: matchID})
       }
     }
     numClientsCheckers++;
+  })
+    socket.on("gameOverCheckers", async ({gameState, userID, opponentUserID, matchID}) => {
+    console.log(`UserID: ${userID} Game ended`)
+    // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
+    const index = chessMatches.indexOf(matchID)
+    if (index === -1){
+      socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
+      return
+    }
+    if (chessMatchUpdated[index] === false) {
+      chessMatchUpdated[index] = true //only let one socket message in
+      const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "checkers")
+      console.log(updatedElos)
+    }
   })
 
   socket.on('realSocketConnect', (userID) => {
