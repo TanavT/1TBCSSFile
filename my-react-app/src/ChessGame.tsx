@@ -36,7 +36,7 @@ function ChessGame(){
     return (
         <div>
             <h2>CHESS</h2>
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" />
+            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" userID={user? user._id: "testing"}/>
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
             <ChatBox />
         </div>

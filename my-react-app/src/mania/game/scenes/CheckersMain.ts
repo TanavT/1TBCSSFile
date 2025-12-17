@@ -105,6 +105,7 @@ export default class CheckersMain extends Phaser.Scene {
 
 		this.cameras.main.setZoom(0.82); 
 		this.cameras.main.centerOn(210,300)
+		this.cameras.main.setRotation(Phaser.Math.DegToRad(180));
 		
 		this.socket = io('http://localhost:4000');
 		this.socket.on('checkersTest', ({id, message}) => {
@@ -231,13 +232,15 @@ export default class CheckersMain extends Phaser.Scene {
 		const startX = board.x - boardWidth / 2;
     	const startY = board.y - boardHeight / 2;
 
-		const unselectButton = this.add.rectangle(350,20,100,40, 0xff0000)
+		const unselectButton = this.add.rectangle(100,600,100,40, 0xff0000)
 		.setInteractive()
 		.on("pointerdown", () => {
 			this.undoSelection();
 		});
+		unselectButton.rotation = Phaser.Math.DegToRad(180);
 
-		const unselectText = this.add.text(310,15,"Unselect", {color: "#fff"});
+		const unselectText = this.add.text(138,605,"Unselect", {color: "#fff"});
+		unselectText.rotation = Phaser.Math.DegToRad(180);
 
 
 		const winRed = this.add.text(130, 320, "", {});
@@ -254,7 +257,7 @@ export default class CheckersMain extends Phaser.Scene {
 		winBlack.setStroke('#000000', 6);
 		this.winBlack = winBlack
 
-		const rectangle_1 = this.add.rectangle(400, 384, 128, 128);
+		const rectangle_1 = this.add.rectangle(300, 297, 100, 89);
 		rectangle_1.scaleX = 8;
 		rectangle_1.scaleY = 6;
 		rectangle_1.visible = false;

@@ -219,7 +219,7 @@ export default class Connect4Main extends Phaser.Scene {
 			//console.log(this.userID);
 			if(this.userID == opponentUserID){
 				//console.log("fuck");
-				//window.location.replace('/connect')
+				window.location.replace('/connect')
 			}
 			if (this.socket.id == id){
 				if(color == 'red'){
@@ -458,6 +458,7 @@ export default class Connect4Main extends Phaser.Scene {
 				opponentUserID: this.opponentUserID,
 				matchID: this.matchID})
 		}
+		this.socket.disconnect();
 		// this.globalGameState = [['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x'],['x','x','x','x','x','x','x']]
 		// this.turn = 0;
 		// this.countCollum = [0,0,0,0,0,0,0];

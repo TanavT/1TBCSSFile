@@ -7,6 +7,7 @@ import ChatBox from './components/ChatBox.jsx';
 function CheckersCustom(){
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     const params = useParams();
     const navigate = useNavigate();
@@ -34,12 +35,14 @@ function CheckersCustom(){
     if(loading){
         return <p>loading...</p>
     }
+    // console.log(`other user: ${params.enemyId}`)
+    if (loading) return <p>Loading...</p>;
 
     if(user){
         return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx
                 <div>
                     <h2>CHECKERS</h2>
-                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" opp={params.enemyId} /> 
+                    <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" opp={params.enemyId} userID={user? user._id: "testing"} /> 
                     {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
                     <ChatBox />
                 </div>
