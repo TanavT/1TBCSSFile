@@ -500,7 +500,7 @@ io.on('connection', (socket) => {
     checkersClientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
-      checkersTimers.push({redTimer: 10, blackTimer: 10, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      checkersTimers.push({redTimer: 300, blackTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
       const matchID = uuid()
       checkersMatches.push(matchID)
       checkersMatchUpdated.push(false)
@@ -517,13 +517,13 @@ io.on('connection', (socket) => {
     socket.on("gameOverCheckers", async ({gameState, userID, opponentUserID, matchID}) => {
     console.log(`UserID: ${userID} Game ended`)
     // socket.emit('error', {id: socket.id, message:`UserID: ${userID}`});
-    const index = chessMatches.indexOf(matchID)
+    const index = checkersMatches.indexOf(matchID)
     if (index === -1){
       socket.emit('error', {id: socket.id, message:`Match not found: ${matchID}`})
       return
     }
-    if (chessMatchUpdated[index] === false) {
-      chessMatchUpdated[index] = true //only let one socket message in
+    if (checkersMatchUpdated[index] === false) {
+      checkersMatchUpdated[index] = true //only let one socket message in
       const updatedElos = await gameData.gameOver(userID, opponentUserID, gameState, "checkers")
       console.log(updatedElos)
     }

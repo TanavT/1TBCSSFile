@@ -122,7 +122,7 @@ export default class CheckersMain extends Phaser.Scene {
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketCheckers", 'test');
+				this.socket.emit("realSocketCheckers", this.userID);
 			} else {
 				console.log("custom match");
 				console.log("opponent name: " + this.opp);
@@ -131,9 +131,10 @@ export default class CheckersMain extends Phaser.Scene {
 			
 		})
 
-		this.socket.on('checkersColor', ({id, color, matchID}) => {
+		this.socket.on('checkersColor', ({id, color, opponentUserID, matchID}) => {
 			console.log("I am " + id + " and my color is " + color);
 			this.matchID = matchID
+			this.opponentUserID = opponentUserID
 			this.myColor = color;
 		});
 		this.socket.on('redRecieve', ({row, col}) => {
