@@ -108,6 +108,10 @@ export default class ChessGame extends Phaser.Scene {
   		});
 		
 		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
+			if(this.userID == opponentUserID){
+				//console.log("fuck");
+				window.location.replace('/chess')
+			}
 			if (this.socket.id == id){
 				if(color == 'white'){
 					this.color="white"
@@ -167,7 +171,9 @@ export default class ChessGame extends Phaser.Scene {
 				this.chess.move({from: startSquareStr, to: destinationSquareStr})
 
 			if(castleStr.length !== 0){
-				if(this.chess.turn() == 'b'){
+				if(true){
+						castleStr = "yesidkthestringdoesntmatter"
+						if(this.chess.turn() == 'w'){
 							if(destSquareInt == 62){//king side black
 								var tttt = this.tweens.add({
 								targets: [this.piecesOnSquares[63]],
@@ -178,6 +184,8 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[61] = this.piecesOnSquares[63]
+								this.piecesOnSquares[63] = null
 							}
 							else{
 								var tttt = this.tweens.add({
@@ -189,6 +197,8 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[59] = this.piecesOnSquares[56]
+								this.piecesOnSquares[56] = null
 							}
 						}
 
@@ -204,6 +214,8 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[5] = this.piecesOnSquares[7]
+								this.piecesOnSquares[7] = null
 							}
 							else{
 								var tttt = this.tweens.add({
@@ -215,8 +227,11 @@ export default class ChessGame extends Phaser.Scene {
 								yoyo: false,
 								paused: true
 								})
+								this.piecesOnSquares[3] = this.piecesOnSquares[0]
+								this.piecesOnSquares[0] = null
 							}
 						}
+					}
 
 
 
@@ -231,13 +246,19 @@ export default class ChessGame extends Phaser.Scene {
 
 			if(this.piecesOnSquares[destSquareInt] !== null) {
 							this.piecesOnSquares[destSquareInt].destroy()
+							this.piecesOnSquares[destSquareInt] = null
 					}
-			else if(typePiece == 'P' && this.numberToSquareConverter(destSquareInt)[0] !== destinationSquareStr[0])
-				{
-					if(this.chess.turn() == 'b')
+			else if(typePiece == 'P' && destinationSquareStr[0] !== startSquareStr[0])
+				{	
+					console.log("IM HERE CHESS")
+					if(this.chess.turn() == 'b'){
 						this.piecesOnSquares[destSquareInt-8].destroy()
-					else
+						this.piecesOnSquares[destSquareInt-8] = null
+					}
+					else{
 						this.piecesOnSquares[destSquareInt+8].destroy()
+						this.piecesOnSquares[destSquareInt+8] = null
+					}
 				}
 			this.piecesOnSquares[destSquareInt] = this.piecesOnSquares[startSquareInt];
 			this.piecesOnSquares[startSquareInt] = null
@@ -1052,6 +1073,7 @@ export default class ChessGame extends Phaser.Scene {
 
 					if(this.piecesOnSquares[moveToSquareInt] !== null) {
 							this.piecesOnSquares[moveToSquareInt].destroy()
+							this.piecesOnSquares[moveToSquareInt] = null
 						}
 					this.piecesOnSquares[moveToSquareInt] = this.piecesOnSquares[clickedSquareInt]
 					this.piecesOnSquares[clickedSquareInt] = null
@@ -1113,6 +1135,7 @@ export default class ChessGame extends Phaser.Scene {
 					console
 					if(this.piecesOnSquares[moveToSquareInt] !== null) {
 							this.piecesOnSquares[moveToSquareInt].destroy()
+							this.piecesOnSquares[moveToSquareInt] = null
 						}
 					this.piecesOnSquares[moveToSquareInt] = this.piecesOnSquares[clickedSquareInt]
 					this.piecesOnSquares[clickedSquareInt] = null
@@ -1348,13 +1371,18 @@ export default class ChessGame extends Phaser.Scene {
 
 						if(this.piecesOnSquares[thisNumber] !== null) {
 							this.piecesOnSquares[thisNumber].destroy()
+							this.piecesOnSquares[thisNumber] = null
 						}
 						else if(typePiece == 'P' && this.numberToSquareConverter(thisNumber)[0] !== clickedSquareString[0])
 							{
-								if(chess.turn() == 'b')
-									this.piecesOnSquares[thisNumber-8].destroy()
-								else
-									this.piecesOnSquares[thisNumber+8].destroy()
+							if(this.chess.turn() == 'b'){
+						this.piecesOnSquares[thisNumber-8].destroy()
+						this.piecesOnSquares[thisNumber-8] = null
+					}
+					else{
+						this.piecesOnSquares[thisNumber+8].destroy()
+						this.piecesOnSquares[thisNumber+8] = null
+					}
 							}
 						this.piecesOnSquares[thisNumber] = this.piecesOnSquares[clickedSquareInt]
 						this.piecesOnSquares[clickedSquareInt] = null
@@ -1448,6 +1476,7 @@ export default class ChessGame extends Phaser.Scene {
 	
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
     // Minutes
+	if(seconds < 0) seconds = 0
     var minutes = Math.floor(seconds/60);
     // Seconds
     var partInSeconds = seconds%60;

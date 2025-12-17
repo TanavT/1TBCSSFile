@@ -186,10 +186,10 @@ export default class CheckersMain extends Phaser.Scene {
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeFirst)}`
 			}
 			if(timeSecond == 0){
-				this.gameOver("Red")
+				this.gameOver("Black")
 			}
 			if(timeFirst == 0){
-				this.gameOver("Black")
+				this.gameOver("Red")
 			}
 		})
 
@@ -243,19 +243,21 @@ export default class CheckersMain extends Phaser.Scene {
 		unselectText.rotation = Phaser.Math.DegToRad(180);
 
 
-		const winRed = this.add.text(130, 320, "", {});
+		const winRed = this.add.text(400, 350, "", {});
 		winRed.visible = false;
 		winRed.text = "Winner: Red";
-		winRed.setStyle({ "fontSize": "100px" });
+		winRed.setStyle({ "fontSize": "60px" });
 		winRed.setStroke('#000000', 6);
 		this.winRed = winRed
+		winRed.rotation = Phaser.Math.DegToRad(180);
 
-		const winBlack = this.add.text(130, 320, "", {});
+		const winBlack = this.add.text(440, 350, "", {});
 		winBlack.visible = false;
 		winBlack.text = "Winner: Black";
-		winBlack.setStyle({ "fontSize": "100px" });
+		winBlack.setStyle({ "fontSize": "60px" });
 		winBlack.setStroke('#000000', 6);
 		this.winBlack = winBlack
+		winBlack.rotation = Phaser.Math.DegToRad(180);
 
 		const rectangle_1 = this.add.rectangle(300, 297, 100, 89);
 		rectangle_1.scaleX = 8;

@@ -925,6 +925,8 @@ io.on('connection', (socket) => {
       if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
          console.log("it da first")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+        let other2 = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other2].chess.emit('yourTurn', "notYourTurn")
         clientListMania[firstClientNum].chess.emit('yourTurn', null)
         clientListMania[firstClientNum].checkers.emit('yourTurn', null)
         clientListMania[firstClientNum].connect.emit('yourTurn', null)
@@ -933,6 +935,7 @@ io.on('connection', (socket) => {
          console.log("it da second")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
         let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+         clientListMania[firstClientNum].chess.emit('yourTurn', "notYourTurn")
         clientListMania[other].chess.emit('yourTurn', null)
         clientListMania[other].checkers.emit('yourTurn', null)
         clientListMania[other].connect.emit('yourTurn', null)
@@ -1053,6 +1056,8 @@ io.on('connection', (socket) => {
       if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
          console.log("it da first")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+         let other2 = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other2].chess.emit('yourTurn', "notYourTurn")
         clientListMania[firstClientNum].chess.emit('yourTurn', null)
         clientListMania[firstClientNum].checkers.emit('yourTurn', null)
         clientListMania[firstClientNum].connect.emit('yourTurn', null)
@@ -1061,6 +1066,7 @@ io.on('connection', (socket) => {
          console.log("it da second")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
         let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+          clientListMania[firstClientNum].chess.emit('yourTurn', "notYourTurn")
         clientListMania[other].chess.emit('yourTurn', null)
         clientListMania[other].checkers.emit('yourTurn', null)
         clientListMania[other].connect.emit('yourTurn', null)
@@ -1169,6 +1175,8 @@ io.on('connection', (socket) => {
       if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
         console.log("it da first")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+         let other2 = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other2].chess.emit('yourTurn', "notYourTurn")
         clientListMania[firstClientNum].chess.emit('yourTurn', null)
         clientListMania[firstClientNum].checkers.emit('yourTurn', null)
         clientListMania[firstClientNum].connect.emit('yourTurn', null)
@@ -1177,6 +1185,7 @@ io.on('connection', (socket) => {
          console.log("it da second")
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
         let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+          clientListMania[firstClientNum].chess.emit('yourTurn', "notYourTurn")
         clientListMania[other].chess.emit('yourTurn', null)
         clientListMania[other].checkers.emit('yourTurn', null)
         clientListMania[other].connect.emit('yourTurn', null)
@@ -1239,6 +1248,8 @@ io.on('connection', (socket) => {
       if(maniaTimers[Math.floor(thisClient / 2)].turn == "first"){
         console.log('it da first')
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
+         let other2 = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+        clientListMania[other2].chess.emit('yourTurn', "notYourTurn")
         clientListMania[firstClientNum].chess.emit('yourTurn', null)
         clientListMania[firstClientNum].checkers.emit('yourTurn', null)
         clientListMania[firstClientNum].connect.emit('yourTurn', null)
@@ -1247,6 +1258,7 @@ io.on('connection', (socket) => {
         console.log('it da second')
         let firstClientNum = maniaTimers[Math.floor(thisClient / 2)].whoFirst
         let other = (firstClientNum - 1) + (((firstClientNum + 1)%2) * 2)
+          clientListMania[firstClientNum].chess.emit('yourTurn', "notYourTurn")
         clientListMania[other].chess.emit('yourTurn', null)
         clientListMania[other].checkers.emit('yourTurn', null)
         clientListMania[other].connect.emit('yourTurn', null)
