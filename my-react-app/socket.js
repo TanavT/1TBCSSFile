@@ -7,10 +7,11 @@ import {Server} from 'socket.io'; //replaces (import socketIo from 'socket.io')
 
 const ioServer = (httpServer) => {
     const io = new Server(httpServer, {cors: {
-        origin: process.env.FRONTEND_CLIENT,
+        origin: [process.env.FRONTEND_CLIENT],
         methods: ["GET", "POST"],
         credentials: true
     }});
     return io
 }
+console.log("Allowed socket origin:", process.env.FRONTEND_CLIENT);
 export default ioServer

@@ -272,7 +272,7 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.load.image(
 		'blackKingChess',
-		'assets/blackKingChess.png'
+		'/public/assets/blackKingChess.png'
 		);
 	}
 

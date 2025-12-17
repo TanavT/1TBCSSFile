@@ -293,51 +293,51 @@ export default class ChessGame extends Phaser.Scene {
 
 		this.load.image(
 		'blackKingChess',
-		'/assets/blackKingChess.png'
+		'/public/assets/blackKingChess.png'
 		);
 		this.load.image(
 		'blackBishop',
-		'/assets/blackBishop.png'
+		'/public/assets/blackBishop.png'
 		);
 		this.load.image(
 		'blackKnight',
-		'/assets/blackKnight.png'
+		'/public/assets/blackKnight.png'
 		);
 		this.load.image(
 		'blackQueen',
-		'/assets/blackQueen.png'
+		'/public/assets/blackQueen.png'
 		);
 		this.load.image(
 		'blackRook',
-		'/assets/blackRook.png'
+		'/public/assets/blackRook.png'
 		);
 		this.load.image(
 		'blackPawn',
-		'/assets/blackPawn.png'
+		'/public/assets/blackPawn.png'
 		);
 		this.load.image(
 		'whiteKing',
-		'/assets/whiteKing.png'
+		'/public/assets/whiteKing.png'
 		);
 		this.load.image(
 		'whiteBishop',
-		'/assets/whiteBishop.png'
+		'/public/assets/whiteBishop.png'
 		);
 		this.load.image(
 		'whiteKnight',
-		'/assets/whiteKnight.png'
+		'/public/assets/whiteKnight.png'
 		);
 		this.load.image(
 		'whiteQueen',
-		'/assets/whiteQueen.png'
+		'/public/assets/whiteQueen.png'
 		);
 		this.load.image(
 		'whiteRook',
-		'/assets/whiteRook.png'
+		'/public/assets/whiteRook.png'
 		);
 		this.load.image(
 		'whitePawn',
-		'/assets/whitePawn.png'
+		'/public/assets/whitePawn.png'
 		);
 		
 

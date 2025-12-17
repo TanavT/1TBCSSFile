@@ -17,7 +17,65 @@ In npm run:
 npm install -g firebase-tools
 firebase login
 
-## 2. Create an .env file
+## 2. Create an .env file with these parameters in the root level (next to src)
+() = replace
+For Online:
+
+NODE_OPTIONS='--title="env sucessfully loaded!"'
+
+FRONTEND_CLIENT= (firebase url)
+
+VITE_BACKEND_SERVER= (render.com url)
+
+REDIS_URL= (Redis Cloud public endpoint)
+REDIS_PORT= 17307
+REDIS_PASSWORD=(Redis Cloud default user password)
+
+MONGO_URL= (Goto connect ->drivers->node.js and add the connection string with your db_password)
+
+ex: 
+NODE_OPTIONS='--title="env sucessfully loaded!"'
+
+FRONTEND_CLIENT="https://testing-game-1tbcss.web.app"
+
+VITE_BACKEND_SERVER="https://onetbcssfile.onrender.com"
+
+REDIS_URL="redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com"
+REDIS_PORT=17307
+REDIS_PASSWORD="lbsJey9NCaW4awjcVroom52ybQMJbpL7"
+
+MONGO_URL="mongodb+srv://admin:f3lJXIPnGKj8Vvm2@test-1tbcssfile.kzjerbb.mongodb.net/?appName=test-1TBCSSFile"
+
+For cloud, import the .env file into render.com (enviroment -> edit -> add -> import from .env)
+
+For Local:
+NODE_OPTIONS='--title="env sucessfully loaded!"'
+RONTEND_CLIENT= "http://localhost:8080"
+
+VITE_BACKEND_SERVER= "http://localhost:3000"
+
+
+MONGO_URL= "mongodb://localhost:27017/"
+
+
+## 3a. for Cloud
+Run npm i
+Run npm run dev
+Run firebase init in cli-> hosting -> dist (if it asks to replace index.html, say no) 
+Run firebase deploy
+
+upload files to github and link to render.com
+On render.com run latest commit
+
+website is up and running
+
+## 3a. for Local
+Runn npm i
+open two terminals
+run npm run dev in one
+run npm start in the other
+
+
 
 
 
