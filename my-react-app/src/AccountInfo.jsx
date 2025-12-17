@@ -41,6 +41,7 @@ function AccountInfo() {
     }
 
     async function handleChallengeAccept(friendUsername, game){
+        console.log(game);
         if( window.confirm(`Are you sure you want to accept the challenge from ${friendUsername}?`)){
             try {
                 if(game == "checkers"){
@@ -57,7 +58,7 @@ function AccountInfo() {
                 navigate(`/checkersCustom/${friendUsername}`);
 
                 } else if (game == "chess"){
-                    //console.log("got your ass");
+                    console.log("got your ass");
                     const response2 = await axios.post(
                     'http://localhost:3000/account/unchallengeChess',
                     {
@@ -70,6 +71,7 @@ function AccountInfo() {
 
                     navigate(`/chessCustom/${friendUsername}`);
                 } else if (game == "connect"){
+
                     const response2 = await axios.post(
                     'http://localhost:3000/account/unchallengeConnect',
                     {
@@ -201,7 +203,7 @@ function AccountInfo() {
                                     <li key={username}>
                                         <span>{username}</span>
                                         <button 
-                                            onClick={() => handleChallengeFriend(username)}
+                                            onClick={() => setChallengedFriend(username)}
                                             className="challenge-button"
                                         >
                                             Challenge
@@ -222,7 +224,7 @@ function AccountInfo() {
                                     <li key={challenger.from}>
                                         <span>{challenger.from}</span>
                                         <button 
-                                            onClick={() => handleChallengeAccept(challenger.from)}
+                                            onClick={() => handleChallengeAccept(challenger.from, challenger.game)}
                                             className="accept-button"
                                         >
                                             Accept Challenge
