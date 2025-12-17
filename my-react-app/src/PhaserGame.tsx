@@ -32,7 +32,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         if (game.current === null)
         {
 
-            game.current = StartGame("game-container", {user, gametype, opp});
+            game.current = StartGame("game-container", {user, gametype, opp, userID});
 
             if (typeof ref === 'function')
             {
@@ -57,7 +57,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         }
 
     }, [ref, user]);
-    useEffect(() => {
+    /*useEffect(() => { //this was dumb as hell. I'm adding userId the same way I do the other things
         if (!game.current || !userID || sceneStarted.current) return;
 
 
@@ -66,7 +66,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         game.current.scene.start('Connect4Main', {
             userID
         });
-    }, [userID]);
+    }, [userID]);*/
     useEffect(() =>
     {
         EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>

@@ -65,10 +65,12 @@ export default class ChessGame extends Phaser.Scene {
 		this.socket.on('timer', ({timeWhite, timeBlack}) => {
 			if(this.gameOver) return
 			if(this.color == "white"){
+				console.log("white recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeWhite)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeBlack)}`
 			}
 			else{
+				console.log("black recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeBlack)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeWhite)}`
 			}
@@ -116,9 +118,10 @@ export default class ChessGame extends Phaser.Scene {
 			let startSquareInt = this.squareToNumberConverter(startSquareStr)
 			let destSquareInt = this.squareToNumberConverter(destinationSquareStr)
 			console.log("int int int" + startSquareInt)
-			console.log(destSquareInt)
-			console.log(startSquareStr)
+			console.log("dest: " + destSquareInt)
+			console.log("start: " + startSquareInt)
 			console.log(destinationSquareStr)
+			//console.log('-----');
 			var ttt = this.tweens.add({
 			targets: [this.piecesOnSquares[startSquareInt]],
 			y: {from: this.piecesOnSquares[startSquareInt].y, to: this.squares[destSquareInt].y},

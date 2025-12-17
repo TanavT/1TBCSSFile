@@ -163,7 +163,9 @@ export default class Connect4Main extends Phaser.Scene {
 
 
 	init(data: { userID: string }) {
-    this.userID = data.userID;
+    	this.userID = this.game.registry.get("userID");
+		console.log("awoba: " + this.userID);
+
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
@@ -212,7 +214,11 @@ export default class Connect4Main extends Phaser.Scene {
   		});
 
 		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
-			if(this.userID == opponentUserID && this.gametype == "queue"){
+			//console.log("     Look here");
+			//console.log(opponentUserID);
+			//console.log(this.userID);
+			if(this.userID == opponentUserID){
+				//console.log("fuck");
 				window.location.replace('/connect')
 			}
 			if (this.socket.id == id){
