@@ -219,7 +219,7 @@ export default class Connect4Main extends Phaser.Scene {
 			//console.log(this.userID);
 			if(this.userID == opponentUserID){
 				//console.log("fuck");
-				//window.location.replace('/connect')
+				window.location.replace('/connect')
 			}
 			if (this.socket.id == id){
 				if(color == 'red'){
