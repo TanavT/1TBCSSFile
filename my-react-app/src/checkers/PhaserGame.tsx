@@ -29,7 +29,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
     {
         if (game.current === null)
         {
-            game.current = StartGame("game-container", {user, gametype, opp}); //USER IN PHASER 3: user passed to start game function
+            game.current = StartGame("game-container", {user, gametype, opp, userID}); //USER IN PHASER 3: user passed to start game function
 
             if (typeof ref === 'function')
             {
@@ -53,7 +53,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             }
         }
     }, [ref, user, opp]); //USER IN PHASER 4: add user here. next step in main.ts
-    useEffect(() => {
+    /*useEffect(() => {
         if (!game.current || !userID || sceneStarted.current) return;
 
         sceneStarted.current = true;
@@ -61,7 +61,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         game.current.scene.start('CheckersMain', {
             userID
         });
-    }, [userID]);
+    }, [userID]);*/
     useEffect(() =>
     {
         EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>

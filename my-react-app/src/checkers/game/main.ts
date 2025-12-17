@@ -17,7 +17,7 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: []
 };
 
-const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => { //USER IN PHASER 5: include options as a parameter holding user
+const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any, userID?: any}) => { //USER IN PHASER 5: include options as a parameter holding user
     console.log(options);
     const game = new Game({ 
         ...config,
@@ -36,10 +36,14 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp
                     console.log("got opp");
                     game.registry.set("opp", options.opp)
                 }
+                if(options?.userID) {
+                    console.log("got userID");
+                    game.registry.set("userID", options.userID);
+                }
             }
          }
         });
-    game.scene.add('CheckersMain', CheckersMain, false);
+    game.scene.add('CheckersMain', CheckersMain, true);
     return game;
 
 }

@@ -20,6 +20,7 @@ interface IProps
 
 export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, gametype, user, opp, userID }, ref)
 {
+    console.log("bubububu: " + userID);
     const game = useRef<Phaser.Game | null>(null!);
     const sceneStarted = useRef(false);
     useLayoutEffect(() =>
@@ -27,7 +28,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         if (game.current === null)
         {
 
-            game.current = StartGame("game-container", {user, gametype, opp});
+            game.current = StartGame("game-container", {user, gametype, opp, userID});
 
             if (typeof ref === 'function')
             {
@@ -51,7 +52,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             }
         }
     }, [ref, user, opp]);
-    useEffect(() => {
+   /* useEffect(() => {
         if (!game.current || !userID || sceneStarted.current) return;
 
         sceneStarted.current = true;
@@ -61,7 +62,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
                 userID
             }
         });
-    }, [userID]);
+    }, [userID]);*/
 
     useEffect(() =>
     {

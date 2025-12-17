@@ -36,8 +36,10 @@ export default class ChessGame extends Phaser.Scene {
 	me: any;
 
 	init() {
-		const chessData = this.registry.get('chessData');
-        this.userID = chessData.userID;
+		
+		//const chessData = this.registry.get('chessData');
+        //this.userID = chessData.userID;
+		this.userID = this.game.registry.get("userID");
 		console.log("Chess user ID" + this.userID)
 
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
@@ -63,6 +65,7 @@ export default class ChessGame extends Phaser.Scene {
 	}
 
 	preload(){
+		
 		this.editorCreate();
 		this.socket = io('http://localhost:4000');
 
@@ -287,10 +290,55 @@ export default class ChessGame extends Phaser.Scene {
 		'blackKingChess',
 		'/assets/blackKingChess.png'
 		);
+		this.load.image(
+		'blackBishop',
+		'/assets/blackBishop.png'
+		);
+		this.load.image(
+		'blackKnight',
+		'/assets/blackKnight.png'
+		);
+		this.load.image(
+		'blackQueen',
+		'/assets/blackQueen.png'
+		);
+		this.load.image(
+		'blackRook',
+		'/assets/blackRook.png'
+		);
+		this.load.image(
+		'blackPawn',
+		'/assets/blackPawn.png'
+		);
+		this.load.image(
+		'whiteKing',
+		'/assets/whiteKing.png'
+		);
+		this.load.image(
+		'whiteBishop',
+		'/assets/whiteBishop.png'
+		);
+		this.load.image(
+		'whiteKnight',
+		'/assets/whiteKnight.png'
+		);
+		this.load.image(
+		'whiteQueen',
+		'/assets/whiteQueen.png'
+		);
+		this.load.image(
+		'whiteRook',
+		'/assets/whiteRook.png'
+		);
+		this.load.image(
+		'whitePawn',
+		'/assets/whitePawn.png'
+		);
+		
 
 
 	}
-
+	chessBoardLowLife: any;
 	editorCreate(): void {
 
 		// chessboard
@@ -298,6 +346,7 @@ export default class ChessGame extends Phaser.Scene {
 		chessboard.scaleX = 2.6;
 		chessboard.scaleY = 2.6;
 		chessboard.angle = 90;
+		this.chessBoardLowLife = chessboard;
 
 		// location_dot_grey_svg_0
 		const location_dot_grey_svg_0 = this.add.image(215, 681, "Location_dot_grey.svg");
@@ -749,7 +798,7 @@ export default class ChessGame extends Phaser.Scene {
 	_50move
 
 	create() {
-
+		
 
 		const whiteRook = this.add.image(this.squares[0].x, this.squares[0].y + 5, "whiteRook");
 		whiteRook.scaleX = 1.6;

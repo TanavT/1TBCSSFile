@@ -98,8 +98,9 @@ export default class CheckersMain extends Phaser.Scene {
 				matchID: this.matchID})
 	}
 
-	init(data: { userID: string }) {
-    	this.userID = data.userID;
+	init(/*data: { userID: string }*/) {
+    	this.userID = this.game.registry.get("userID");
+		console.log("userID: " + this.userID);
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
