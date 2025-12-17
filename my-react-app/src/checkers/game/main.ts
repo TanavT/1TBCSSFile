@@ -14,14 +14,12 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#028af8',
-    scene: [
-        CheckersMain
-    ]
+    scene: []
 };
 
 const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => { //USER IN PHASER 5: include options as a parameter holding user
     console.log(options);
-    return new Game({ 
+    const game = new Game({ 
         ...config,
          parent,
          callbacks: { //USER IN PHASER 6: add preboot function to get user if it exists (it better) and add it to the game registry. Final step in CheckersMain.ts
@@ -41,6 +39,8 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp
             }
          }
         });
+    game.scene.add('CheckersMain', CheckersMain, false);
+    return game;
 
 }
 

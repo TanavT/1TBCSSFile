@@ -82,11 +82,24 @@ export default class CheckersMain extends Phaser.Scene {
 	color:string;
 	opponentColor:string;
 
+	userID!:string;
+	opponentUserID:string;
+	matchID:string;
 	gametype: string;
 	opp: any;
 	me: any;
 
-	init() {
+	callGameover(gameState: number) {
+		console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverCheckers", { 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
+	}
+
+	init(data: { userID: string }) {
+    	this.userID = data.userID;
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
@@ -109,7 +122,7 @@ export default class CheckersMain extends Phaser.Scene {
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketCheckers", 'test');
+				this.socket.emit("realSocketCheckers", this.userID);
 			} else {
 				console.log("custom match");
 				console.log("opponent name: " + this.opp);
@@ -118,8 +131,10 @@ export default class CheckersMain extends Phaser.Scene {
 			
 		})
 
-		this.socket.on('checkersColor', ({id, color}) => {
+		this.socket.on('checkersColor', ({id, color, opponentUserID, matchID}) => {
 			console.log("I am " + id + " and my color is " + color);
+			this.matchID = matchID
+			this.opponentUserID = opponentUserID
 			this.myColor = color;
 			this.yourColorText.text = `Your Color: ${this.myColor}`;
 
@@ -349,10 +364,24 @@ export default class CheckersMain extends Phaser.Scene {
     }
 
 	gameOver(team){
+		let gameState:number = -1
 		if (team = "black"){
+			if (this.color === "red") {
+				gameState = 1
+			} else {
+				gameState = 0
+			}
 			this.winRed.visible = true
 		} else {
+			if (this.color === "black") {
+				gameState = 1
+			} else {
+				gameState = 0
+			}
 			this.winBlack.visible = true
+		}
+		if (gameState !== -1 ) {
+			this.callGameover(gameState)
 		}
 	}
 

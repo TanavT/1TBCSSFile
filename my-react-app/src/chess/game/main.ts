@@ -15,20 +15,12 @@ const config: Phaser.Types.Core.GameConfig = {
     height: 768,
     parent: 'game-container',
     backgroundColor: '#818589',
-    scene: [
-        Boot,
-        Preloader,
-        MainMenu,
-        MainGame,
-        GameOver,
-        Connect4Main,
-        ChessGame
-    ]
+    scene: []
 };
 
 const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp?: any}) => {
 
-    return new Game({ 
+    const game = new Game({ 
         ...config, 
         parent,
         callbacks: {
@@ -48,6 +40,15 @@ const StartGame = (parent: string, options?: {user?: any, gametype?: string, opp
             }
         }
     });
+    game.scene.add('Boot', Boot, false);
+    game.scene.add('Preloader', Preloader, false);
+    game.scene.add('MainMenu', MainMenu, false);
+    game.scene.add('MainGame', MainGame, false);
+    game.scene.add('GameOver', GameOver, false);
+
+    game.scene.add('Connect4Main', Connect4Main, false);
+    game.scene.add('ChessGame', ChessGame, false);
+    return game;
 
 }
 

@@ -19,7 +19,9 @@ export default class ChessGame extends Phaser.Scene {
 		// Write your code here.
 		/* END-USER-CTR-CODE */
 	}
-
+	userID!:string;
+	opponentUserID:string;
+	matchID:string;
 	socket:Socket;
 
 	color:string;
@@ -34,6 +36,10 @@ export default class ChessGame extends Phaser.Scene {
 	me: any;
 
 	init() {
+		const chessData = this.registry.get('chessData');
+        this.userID = chessData.userID;
+		console.log("Chess user ID" + this.userID)
+
 		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
 		console.log("got user: " + user.username);
 		this.me = user.username
@@ -46,6 +52,15 @@ export default class ChessGame extends Phaser.Scene {
 		console.log("got opp: " + opp);
 		this.opp = opp;
 	}
+	
+	callGameover(gameState: number) {
+		console.log(this.userID + " at gameover")
+			this.socket.emit("gameOverChess", { 
+				gameState: gameState,
+				userID: this.userID, 
+				opponentUserID: this.opponentUserID,
+				matchID: this.matchID})
+	}
 
 	preload(){
 		this.editorCreate();
@@ -54,7 +69,7 @@ export default class ChessGame extends Phaser.Scene {
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
 			if(this.gametype == "queue"){
-				this.socket.emit("realSocketChess", 'test')
+				this.socket.emit("realSocketChess", this.userID)
 			} else {
 				console.log("custom match");
 				this.socket.emit("chessCustomConnect", {me: this.me, opp: this.opp})
@@ -84,7 +99,7 @@ export default class ChessGame extends Phaser.Scene {
 			}
   		});
 		
-		this.socket.on('color', ({id, color}) => {
+		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
 			if (this.socket.id == id){
 				if(color == 'white'){
 					this.color="white"
@@ -105,6 +120,9 @@ export default class ChessGame extends Phaser.Scene {
 					this.opponentColor="black"
 				}
 			}
+			this.matchID = matchID
+			this.opponentUserID = opponentUserID
+			console.log(`My id: ${this.userID}, opponent id: ${this.opponentUserID}, matchID: ${matchID}`)
 			console.log("COLOR:" + this.color)
 			this.myTurn = (this.color == "white")
 			this.yourColorText.text = `Your Color: ${this.color}`
@@ -222,18 +240,44 @@ export default class ChessGame extends Phaser.Scene {
 
 			if(this.chess.isGameOver()){
 				//rectangle_1.visible = true
+				let gameState:number = -1 //1 = this player won, 0.5 = tie, 0 = this player lost
 				if(this.chess.isCheckmate()){
 					if(this.chess.turn() == 'b'){
+						if(this.color === "white") {
+							gameState = 1
+						} else {
+							gameState = 0
+						}
 						this.winWhite.visible = true
 					}
-					else this.winBlack.visible = true
+					else {
+						if(this.color === "black") {
+							gameState = 1
+						} else {
+							gameState = 0
+						}
+						this.winBlack.visible = true
+					}
 				}
 				if(this.chess.isStalemate()){
 					this.stalemate.visible = true
+					gameState = 0.5
 				}
-				if(this.chess.isInsufficientMaterial()) this.insufficient.visible = true
-				if(this.chess.isDrawByFiftyMoves()) this._50move.visible = true
-				if(this.chess.isThreefoldRepetition()) this.repetition.visible = true
+				if(this.chess.isInsufficientMaterial()) {
+					this.insufficient.visible = true
+					gameState = 0.5
+				}
+				if(this.chess.isDrawByFiftyMoves()){
+					 this._50move.visible = true
+					 gameState = 0.5
+				}
+				if(this.chess.isThreefoldRepetition()) {
+					this.repetition.visible = true
+					gameState = 0.5
+				}
+				if (gameState !== -1 ) {
+					this.callGameover(gameState)
+				}
 			}
 
 
@@ -1283,19 +1327,44 @@ export default class ChessGame extends Phaser.Scene {
 					moves = []
 					activeSquares = []
 					if(chess.isGameOver()){
-						//rectangle_1.visible = true
-						if(chess.isCheckmate()){
-							if(chess.turn() == 'b'){
-								winWhite.visible = true
+						let gameState:number = -1 //1 = this player won, 0.5 = tie, 0 = this player lost
+						if(this.chess.isCheckmate()){
+							if(this.chess.turn() == 'b'){
+								if(this.color === "white") {
+									gameState = 1
+								} else {
+									gameState = 0
+								}
+								this.winWhite.visible = true
 							}
-							else winBlack.visible = true
+							else {
+								if(this.color === "black") {
+									gameState = 1
+								} else {
+									gameState = 0
+								}
+								this.winBlack.visible = true
+							}
 						}
-						if(chess.isStalemate()){
-							stalemate.visible = true
+						if(this.chess.isStalemate()){
+							this.stalemate.visible = true
+							gameState = 0.5
 						}
-						if(chess.isInsufficientMaterial()) insufficient.visible = true
-						if(chess.isDrawByFiftyMoves()) _50move.visible = true
-						if(chess.isThreefoldRepetition()) repetition.visible = true
+						if(this.chess.isInsufficientMaterial()) {
+							this.insufficient.visible = true
+							gameState = 0.5
+						}
+						if(this.chess.isDrawByFiftyMoves()){
+							this._50move.visible = true
+							gameState = 0.5
+						}
+						if(this.chess.isThreefoldRepetition()) {
+							this.repetition.visible = true
+							gameState = 0.5
+						}
+						if (gameState !== -1 ) {
+							this.callGameover(gameState)
+						}
 					}
 					this.myTurn = false
 					this.turnText.text = `Turn: ${this.opponentColor}`

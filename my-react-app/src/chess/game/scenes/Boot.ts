@@ -6,7 +6,9 @@ export default class Boot extends Scene
     {
         super('Boot');
     }
-
+    init(data: any){
+        this.registry.set('chessData', data.chessData);
+    }
     preload ()
     {
         //  The Boot Scene is typically used to load in any assets you require for your Preloader, such as a game logo or background.
