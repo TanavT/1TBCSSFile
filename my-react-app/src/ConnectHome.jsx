@@ -35,7 +35,9 @@ function ConnectHomePage(){
         <div className='centerBox'>
             <h2>CONNECT 4</h2>
             <button onClick={handleRandomQueue} className='button'>Random Match</button>
-            <button onClick={handlePrivateMatch} className='button'>Challenge a friend</button>
+           
+           <br />
+            <br />
             <ConnectLeaderboard />
         </div>
         

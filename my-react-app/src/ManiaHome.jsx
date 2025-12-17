@@ -34,7 +34,7 @@ function ManiaHomePage(){
         <div className='centerBox'>
             <h2>MANIA</h2>
             <button onClick={handleRandomQueue} className='button'>Random Match</button>
-            <button onClick={handlePrivateMatch} className='button'>Challenge a friend</button>
+           
             <ManiaLeaderboard />
         </div>
         
