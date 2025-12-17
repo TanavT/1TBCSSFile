@@ -28,6 +28,7 @@ function NavBar() {
         <Link to="/mania" className="nav-link">Mania</Link>
         <Link to="/manialeaderboard" className="nav-link">leaderboard</Link>
         
+        <Link to="/search" className="nav-link">Search</Link>
       </div>
 
       <div className="nav-right">

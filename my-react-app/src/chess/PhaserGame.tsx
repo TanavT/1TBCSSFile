@@ -11,11 +11,14 @@ export interface IRefPhaserGame
 
 interface IProps
 {
-    currentActiveScene?: (scene_instance: Phaser.Scene) => void
+    currentActiveScene?: (scene_instance: Phaser.Scene) => void;
+    gametype?: string;
+    user?: any;
+    opp?: any;
     userID?: string
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, userID }, ref)
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, gametype, user, opp, userID }, ref)
 {
     const game = useRef<Phaser.Game | null>(null!);
     const sceneStarted = useRef(false);
@@ -24,7 +27,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
         if (game.current === null)
         {
 
-            game.current = StartGame("game-container");
+            game.current = StartGame("game-container", {user, gametype, opp});
 
             if (typeof ref === 'function')
             {
@@ -47,7 +50,7 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
                 }
             }
         }
-    }, [ref]);
+    }, [ref, user, opp]);
     useEffect(() => {
         if (!game.current || !userID || sceneStarted.current) return;
 

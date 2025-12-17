@@ -2,6 +2,7 @@ import  {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { PhaserGame } from './PhaserGame';
 import type { IRefPhaserGame } from './PhaserGame';
+import ChatBox from './components/ChatBox.jsx';
 
 
 function ConnectGame(){
@@ -33,15 +34,19 @@ function ConnectGame(){
         //todo?
     }
 
-    if (loading) return <p>Loading...</p>;
-    return (
-        <div>
-            <h2>Connect4</h2>
-            <PhaserGame ref={phaserRef} currentActiveScene={currentScene} userID={user? user._id: "testing"}/>
-            {user ?<> <h2>Username: {user.username}</h2>  </>: <h2>Please log in to play</h2>}
-        </div>
-        
-    )
+    if(user){
+        return (
+            <div>
+                <h2>Connect4</h2>
+                <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" userID={user? user._id: "testing"}/>
+                {user ?<> <h2>Username: {user.username}</h2>  </>: <h2>Please log in to play</h2>}
+                <ChatBox />
+            </div>
+            
+        )
+    } else {
+        return <p>loading...</p>
+    }
 }
 
 export default ConnectGame;

@@ -10,7 +10,7 @@
     "build-nolog": "vite build --config vite/config.prod.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
-    "startBackend": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -28,6 +28,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "uuid": "^13.0.0"
+    "xss": "^1.0.15"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
