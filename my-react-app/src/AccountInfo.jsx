@@ -9,7 +9,7 @@ function AccountInfo() {
     const [user, setUser] = useState(null);
     const fetchUser = async () => {
         const res = await axios.get(
-            `${process.env.VITE_BACKEND_SERVER}/account/me`,{withCredentials: true}
+            `${import.meta.env.VITE_BACKEND_SERVER}/account/me`,{withCredentials: true}
         );
         setUser(res.data);
     };
@@ -32,7 +32,7 @@ function AccountInfo() {
         if( window.confirm(`Are you sure you want to challenge ${friendUsername}?`)){
             try {
                 const response = await axios.post(
-                    `${process.env.VITE_BACKEND_SERVER}/account/challenge`,
+                    `${import.meta.env.VITE_BACKEND_SERVER}/account/challenge`,
                     {
                         from: user.username, 
                         to: friendUsername
@@ -43,7 +43,7 @@ function AccountInfo() {
                 alert(`${friendUsername} challenged!`);
 
                 /*const response2 = await axios.post(
-                    `${process.env.VITE_BACKEND_SERVER}/account/unchallenge`,
+                    `${import.meta.env.VITE_BACKEND_SERVER}/account/unchallenge`,
                     {
                         from: user.username, 
                         to: friendUsername
@@ -67,7 +67,7 @@ function AccountInfo() {
 
 
                 const response2 = await axios.post(
-                    `${process.env.VITE_BACKEND_SERVER}/account/unchallenge`,
+                    `${import.meta.env.VITE_BACKEND_SERVER}/account/unchallenge`,
                     {
                         from: friendUsername, 
                         to: user.username

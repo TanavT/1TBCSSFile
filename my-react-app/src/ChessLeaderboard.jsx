@@ -8,7 +8,7 @@ function ChessLeaderboard() {
     const [loading, setLoading] = useState(true);
     const fetchLeaderboard = async () => {
         const res = await axios.get(
-            `${process.env.VITE_BACKEND_SERVER}/leaderboard/chess`,{withCredentials: true}
+            `${import.meta.env.VITE_BACKEND_SERVER}/leaderboard/chess`,{withCredentials: true}
         );
         setLeaderboard(res.data);
         setLoading(false)
