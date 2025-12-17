@@ -62,6 +62,11 @@ export default class ChessGame extends Phaser.Scene {
 				userID: this.userID, 
 				opponentUserID: this.opponentUserID,
 				matchID: this.matchID})
+			this.time.delayedCall(5000, () => {
+				this.socket.disconnect();
+			}, [], this);
+
+			
 	}
 
 	preload(){

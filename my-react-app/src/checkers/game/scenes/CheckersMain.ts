@@ -384,6 +384,11 @@ export default class CheckersMain extends Phaser.Scene {
 		if (gameState !== -1 ) {
 			this.callGameover(gameState)
 		}
+
+		this.time.delayedCall(5000, () => {
+				this.socket.disconnect();
+			}, [], this);
+		//this.socket.disconnect();
 	}
 
 	undoSelection(){
