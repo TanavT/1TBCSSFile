@@ -8,7 +8,7 @@ function CheckersLeaderboard() {
     const [loading, setLoading] = useState(true);
     const fetchLeaderboard = async () => {
         const res = await axios.get(
-            "http://localhost:3000/leaderboard/checkers",{withCredentials: true}
+            `${process.env.VITE_BACKEND_SERVER}/leaderboard/checkers`,{withCredentials: true}
         );
         setLeaderboard(res.data);
         setLoading(false)

@@ -101,7 +101,7 @@ export default class CheckersMain extends Phaser.Scene {
 
     preload() {
 		
-		this.socket = io('http://localhost:4000');
+		this.socket = io(`${process.env.VITE_BACKEND_SERVER}`);
 		this.socket.on('checkersTest', ({id, message}) => {
 			console.log("I am " + id + " and the message is " + message);
 		});

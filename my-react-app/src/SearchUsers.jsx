@@ -11,7 +11,7 @@ function SearchUsers() {
 
     // Get the current logged-in user
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
+        axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
             .then(res => {
                 setCurrentUser(res.data);
                 setUserLoading(false);
@@ -31,7 +31,7 @@ function SearchUsers() {
         
         try {
             const response = await axios.get(
-                "http://localhost:3000/api/users/search",
+                `${process.env.VITE_BACKEND_SERVER}/api/users/search`,
                 {
                     params: { username: input },
                     withCredentials: true
@@ -52,7 +52,7 @@ function SearchUsers() {
         if (window.confirm(`Are you sure you want to add ${friendUsername} as a friend?`)) {
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/account/addFriend',
+                    `${process.env.VITE_BACKEND_SERVER}/account/addFriend`,
                     {
                         userUsername: currentUser.username,
                         friendUsername: friendUsername
@@ -63,7 +63,7 @@ function SearchUsers() {
                 alert(`${friendUsername} added as friend!`);
                 
                 // Refresh current user data to get updated friend list
-                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                const userRes = await axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true });
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error adding friend:", err);
@@ -76,7 +76,7 @@ function SearchUsers() {
         if (window.confirm(`Are you sure you want to delete ${friendUsername} as a friend?`)) {
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/account/deleteFriend',
+                    `${process.env.VITE_BACKEND_SERVER}/account/deleteFriend`,
                     {
                         userUsername: currentUser.username,
                         friendUsername: friendUsername
@@ -87,7 +87,7 @@ function SearchUsers() {
                 alert(`${friendUsername} removed as a friend!`);
                 
                 // refresh current user data to get updated friend list
-                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                const userRes = await axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true });
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error deleting friend:", err);

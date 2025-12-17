@@ -12,7 +12,7 @@ function AccountPage() {
     const handleLogin = async () => {
         try {
             const res = await axios.post(
-                "http://localhost:3000/account/login",
+                `${process.env.VITE_BACKEND_SERVER}/account/login`,
                 { username, password },
                 { withCredentials: true }
             );
@@ -28,7 +28,7 @@ function AccountPage() {
     const handleSignup = async () => {
         try {
             const res = await axios.post(
-                "http://localhost:3000/account/signup",
+                `${process.env.VITE_BACKEND_SERVER}/account/signup`,
                 { username, password },
                 { withCredentials: true } // include session cookie
             );

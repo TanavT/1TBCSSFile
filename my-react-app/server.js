@@ -1,7 +1,8 @@
 import express from 'express';
 //import redis from 'redis';
 import app from 'express';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
+import ioServer from './socket.js';
 const app2 = express();
 import session from 'express-session';
 import configRoutesFunction from './src/routes/index.js';
@@ -14,14 +15,86 @@ import { v4 as uuid } from 'uuid';
 import gameData from './src/routes/gameData.js'
 //import client from './redis.js'
 
+if (process.env){
+  console.log(process.title)
+} else {
+  console.log(".env not detected! The server will not run properly") 
+}
+
+// const httpServer = createServer(app);
+
+app2.use(express.json());
+app2.use(express.urlencoded({ extended: true }));
+
+// Allow us to send requests from react to here
+app2.use(cors({
+  origin: process.env.FRONTEND_CLIENT, // frontend URL
+  credentials: true                // allow cookies/session
+}));
 
 
-const httpServer = createServer(app);
+app2.use(
+  session({
+    name: 'AwesomeWebapp2',
+    secret: "This is a secret.. shhh don't tell anyone",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
+  })
+);
 
-const client = createClient();
-client.connect().then(() => {});
+//crteating an api to grab users from
+app2.get('/api/users/search', async (req, res) => {
+    try {
+        const username = req.query.username;
+        if (!username) {
+            return res.status(400).json({ error: 'Username required' });
+        }
+        console.log("before accounts collection");
+        const accountsCollection = await accounts();
+        console.log("after grabbing accounts");
+        const result = await accountsCollection.findOne({ username: username });
+        console.log("after grabbing results");
+        
+        res.json(result ? [result] : []);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
 
-const io = new Server(httpServer, {cors: {origin: '*'}});
+
+app2.get('/api/users/search', async (req, res) => {
+    try {
+        const username = req.query.username;
+        if (!username) {
+            return res.status(400).json({ error: 'Username required' });
+        }
+        console.log("before accounts collection");
+        const accountsCollection = await accounts();
+        console.log("after grabbing accounts");
+        const result = await accountsCollection.findOne({ username: username });
+        console.log("after grabbing results");
+        
+        res.json(result ? [result] : []);
+    } catch (error) {
+        console.error("Error searching users:", error);
+        res.status(500).json({ error: 'Failed to search users' });
+    }
+});
+
+configRoutesFunction(app2);
+
+const PORT = process.env.PORT || 3000;
+const httpServer = app2.listen(PORT, () => {
+  console.log("We've now got a server!");
+  console.log(`Your routes will be running on ${process.env.VITE_BACKEND_SERVER}`);
+});
+
+// const client = createClient();
+// client.connect().then(() => {});
+
+const io = ioServer(httpServer)
 
 //chat message socket
 const chat = io.of("/chat");
@@ -1185,72 +1258,8 @@ io.on('connection', (socket) => {
 });
 
 
-app2.use(express.json());
-app2.use(express.urlencoded({ extended: true }));
-
-// Allow us to send requests from react to here
-app2.use(cors({
-  origin: "http://localhost:8080", // frontend URL
-  credentials: true                // allow cookies/session
-}));
 
 
-app2.use(
-  session({
-    name: 'AwesomeWebapp2',
-    secret: "This is a secret.. shhh don't tell anyone",
-    saveUninitialized: false,
-    resave: false,
-    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
-  })
-);
-
-//crteating an api to grab users from
-app2.get('/api/users/search', async (req, res) => {
-    try {
-        const username = req.query.username;
-        if (!username) {
-            return res.status(400).json({ error: 'Username required' });
-        }
-        console.log("before accounts collection");
-        const accountsCollection = await accounts();
-        console.log("after grabbing accounts");
-        const result = await accountsCollection.findOne({ username: username });
-        console.log("after grabbing results");
-        
-        res.json(result ? [result] : []);
-    } catch (error) {
-        console.error("Error searching users:", error);
-        res.status(500).json({ error: 'Failed to search users' });
-    }
-});
-
-configRoutesFunction(app2);
 
 
-app2.listen(3000, () => {
-  console.log("We've now got a server!");
-  console.log('Your routes will be running on http://localhost:3000');
-});
-httpServer.listen(4000, () => { //we've got 2 servers here this is chaos idk whats goin on
-  console.log(`listening on *:${4000}`);
-});
 
-app2.get('/api/users/search', async (req, res) => {
-    try {
-        const username = req.query.username;
-        if (!username) {
-            return res.status(400).json({ error: 'Username required' });
-        }
-        console.log("before accounts collection");
-        const accountsCollection = await accounts();
-        console.log("after grabbing accounts");
-        const result = await accountsCollection.findOne({ username: username });
-        console.log("after grabbing results");
-        
-        res.json(result ? [result] : []);
-    } catch (error) {
-        console.error("Error searching users:", error);
-        res.status(500).json({ error: 'Failed to search users' });
-    }
-});

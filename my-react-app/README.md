@@ -1,3 +1,35 @@
+# Setup
+### What you will need:
+NPM
+Cloud Service Stack:
+    Frontend: Recommend Firebase
+    Backend Server: Recommend Render.com
+    Backend Redis: Recommend Redis Cloud
+    Backend DB: Recommend MongoDB Atlas
+
+    All of these services have free tiers as of the creation of the project, but you will need to make an account!
+
+## Assuming you are using all these services:
+
+## 1. Setting up firebase-cli  (you will need to make an account at firebase.google.com first):
+In npm run:
+
+npm install -g firebase-tools
+firebase login
+
+## 2. Create an .env file
+
+
+
+
+
+
+
+
+
+
+
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

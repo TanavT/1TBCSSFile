@@ -15,7 +15,7 @@ function ChatBox() {
     const room = location.pathname.replace("/", "");
 
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
+        axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
             .then(res => {
                 setUser(res.data);
                 setLoading(false);
@@ -29,7 +29,7 @@ function ChatBox() {
     useEffect(() => {
         if (!user) return;
 
-        socketRef.current = io("http://localhost:4000/chat");
+        socketRef.current = io(`${process.env.VITE_BACKEND_SERVER}`);
 
         socketRef.current.on("userJoined", (msg) => {
             let message = {username: msg.username, text: msg.message};
@@ -65,7 +65,7 @@ function ChatBox() {
         if (window.confirm(`Are you sure you want to add ${friendUsername} as a friend?`)) {
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/account/addFriend',
+                    `${process.env.VITE_BACKEND_SERVER}/account/addFriend`,
                     {
                         userUsername: currentUser.username,
                         friendUsername: friendUsername
@@ -76,7 +76,7 @@ function ChatBox() {
                 alert(`${friendUsername} added as friend!`);
                 
                 // Refresh current user data to get updated friend list
-                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                const userRes = await axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true });
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error adding friend:", err);
@@ -89,7 +89,7 @@ function ChatBox() {
         if (window.confirm(`Are you sure you want to delete ${friendUsername} as a friend?`)) {
             try {
                 const response = await axios.post(
-                    'http://localhost:3000/account/deleteFriend',
+                    `${process.env.VITE_BACKEND_SERVER}/account/deleteFriend`,
                     {
                         userUsername: currentUser.username,
                         friendUsername: friendUsername
@@ -100,7 +100,7 @@ function ChatBox() {
                 alert(`${friendUsername} removed as a friend!`);
                 
                 // refresh current user data to get updated friend list
-                const userRes = await axios.get("http://localhost:3000/account/me", { withCredentials: true });
+                const userRes = await axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true });
                 setCurrentUser(userRes.data);
             } catch (err) {
                 console.error("Error deleting friend:", err);

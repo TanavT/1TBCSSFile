@@ -15,7 +15,7 @@ function ConnectGameUnlimited(){
         async function fetchUser() {
             let data
             try {
-                const request = await axios.get("http://localhost:3000/account/me", { withCredentials: true })
+                const request = await axios.get(`${process.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
                 data = request.data
             } catch (e){
                 console.log(e)
