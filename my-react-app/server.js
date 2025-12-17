@@ -645,7 +645,7 @@ io.on('connection', (socket) => {
     clientIDs.push(userID)
     if(thisClient%2 == 1){
       let red = Math.floor(Math.random() * 2)
-      connectTimers.push({redTimer: 30, yellowTimer: 30, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
+      connectTimers.push({redTimer: 300, yellowTimer: 300, turn: "red", whoRed: red == 0 ? thisClient : thisClient - 1})
       socket.emit('error', {id: socket.id, message:"you are two"});
       const matchID = uuid()
       connectMatches.push(matchID)
