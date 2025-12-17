@@ -22,6 +22,20 @@ export default class Connect4Main extends Phaser.Scene {
 		/* END-USER-CTR-CODE */
 	}
 
+	gametype
+	user
+
+	init() {
+		const user = this.game.registry.get("user");//USER IN PHASER 7 FINAL: get user
+		if(user)
+			console.log("got user: " + user.username);
+		this.user = user
+
+		const gametype = this.game.registry.get("gametype");
+		console.log("got gametype: " + gametype);
+		this.gametype = gametype;
+	}
+
 	editorCreate(): void {
 
 		// connect4_Empty_Grid
@@ -156,7 +170,7 @@ export default class Connect4Main extends Phaser.Scene {
 
 		this.socket.on('user_join', (id) => {
 			console.log('A user joined their id is ' + id);
-			this.socket.emit("realSocketConnectMania", 'test')
+			this.socket.emit("realSocketConnectMania", this.user)
   		});
 
 		this.socket.on("allOver", (whoWon) => {

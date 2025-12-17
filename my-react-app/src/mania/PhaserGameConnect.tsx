@@ -8,12 +8,15 @@ export interface IRefPhaserGame
     scene: Phaser.Scene | null;
 }
 
+
 interface IProps
 {
-    currentActiveScene?: (scene_instance: Phaser.Scene) => void
+    currentActiveScene?: (scene_instance: Phaser.Scene) => void;
+    user?: any;
+    gametype?: any;
 }
 
-export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref)
+export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene, user, gametype}, ref) //USER IN PHASER 2: add user to props here
 {
     const game = useRef<Phaser.Game | null>(null!);
 
@@ -22,7 +25,7 @@ export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function Pha
         if (game.current === null)
         {
 
-            game.current = StartGame("game-container3");
+            game.current = StartGame("game-container3", {user, gametype}); //USER IN PHASER 3: user passed to start game function
 
             if (typeof ref === 'function')
             {
@@ -45,7 +48,7 @@ export const PhaserGameConnect = forwardRef<IRefPhaserGame, IProps>(function Pha
                 }
             }
         }
-    }, [ref]);
+    }, [ref, user]);
 
     useEffect(() =>
     {

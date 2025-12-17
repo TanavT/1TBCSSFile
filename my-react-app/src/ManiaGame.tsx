@@ -47,9 +47,9 @@ function ManiaGame(){
         <div>
             <h2>Mania</h2>
             <div>
-            <PhaserGameConnect ref={phaserRef2} currentActiveScene={currentScene2} />
+            <PhaserGameConnect ref={phaserRef2} currentActiveScene={currentScene2} user={user} gametype="queue" />
 
-            {game2 ? <PhaserGame ref={phaserRef} currentActiveScene={currentScene} /> : <></>}
+            {game2 ? <PhaserGame ref={phaserRef} currentActiveScene={currentScene} user={user} gametype="queue" /> : <></>}
 
             {game3 ? <PhaserGameCheckers ref={phaserRef3} currentActiveScene={currentScene3} user={user} gametype="queue"/> : <></>}
 

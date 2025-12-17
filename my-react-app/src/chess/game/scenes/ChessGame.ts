@@ -138,8 +138,8 @@ export default class ChessGame extends Phaser.Scene {
 				this.chess.move({from: startSquareStr, to: destinationSquareStr})
 
 			if(castleStr.length !== 0){
-				if(chess.turn() == 'b'){
-							if(thisNumber == 62){//king side black
+				if(this.chess.turn() == 'b'){
+							if(destSquareInt == 62){//king side black
 								var tttt = this.tweens.add({
 								targets: [this.piecesOnSquares[63]],
 								y: {from: this.piecesOnSquares[63].y, to: this.squares[61].y},
@@ -165,7 +165,7 @@ export default class ChessGame extends Phaser.Scene {
 
 
 						else{
-							if(thisNumber == 6){//king side white
+							if(destSquareInt == 6){//king side white
 								var tttt = this.tweens.add({
 								targets: [this.piecesOnSquares[7]],
 								y: {from: this.piecesOnSquares[7].y, to: this.squares[5].y},
@@ -205,7 +205,7 @@ export default class ChessGame extends Phaser.Scene {
 					}
 			else if(typePiece == 'P' && this.numberToSquareConverter(destSquareInt)[0] !== destinationSquareStr[0])
 				{
-					if(chess.turn() == 'b')
+					if(this.chess.turn() == 'b')
 						this.piecesOnSquares[destSquareInt-8].destroy()
 					else
 						this.piecesOnSquares[destSquareInt+8].destroy()
