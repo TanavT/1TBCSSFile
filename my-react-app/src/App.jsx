@@ -12,7 +12,7 @@ import CheckersGame from './CheckersGame.tsx';
 import CheckersCustomGame from './CheckersCustomGame.tsx';
 import ChessCustomGame from './ChessCustom.tsx';
 import ConnectCustom from './ConnectCustom.tsx';
-import ConnectGame from './ConnectGame.jsx';
+import ConnectGame from './ConnectGame.tsx';
 import ManiaGame from './ManiaGame.jsx';
 import ChessHomePage from './ChessHome.jsx'; //page that lets us queue for chess
 import CheckersHomePage from './CheckersHome.jsx';
@@ -36,14 +36,14 @@ function App() {
         <Route path='/chessCustom/:enemyId' element ={<ChessCustomGame/>}/>
         <Route path='/connectCustom/:enemyId' element={<ConnectCustom/>}/>
         <Route path='/connect' element={<ConnectHomePage/>} />
-        <Route path='/connectMatch' element ={<ConnectGame/>}/>
+        <Route path='/connectMatch' element ={<ConnectGame/>}/> 
          <Route path='/mania' element={<ManiaHomePage/>} />
         <Route path='/maniaMatch' element ={<ManiaGame/>}/>
 
         <Route path='/search' element={<SearchUsers/>}/>
 
         <Route path='/login' element={<AccountPage/>} />
-        <Route path='/account' element={<AccountInfo/>}/>
+        <Route path='/account' element={<AccountInfo/>}/> 
       </Routes>
    </div>
   )

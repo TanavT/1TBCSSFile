@@ -23,14 +23,6 @@ function ConnectHomePage(){
         // };
     }
 
-    const handlePrivateMatch = async () => {
-        if(user){
-            navigate("/connectMatch");
-        } else {
-            navigate("/login");
-        }
-    }
-
     return (
         <div className='centerBox'>
             <h2>CONNECT 4</h2>
