@@ -28,20 +28,21 @@ app2.use(express.urlencoded({ extended: true }));
 
 // Allow us to send requests from react to here
 app2.use(cors({
-  origin: process.env.FRONTEND_CLIENT, // frontend URL
-  credentials: true                // allow cookies/session
+  origin: process.env.FRONTEND_CLIENT,
+  credentials: true
 }));
 
-
-app2.use(
-  session({
-    name: 'AwesomeWebapp2',
-    secret: "This is a secret.. shhh don't tell anyone",
-    saveUninitialized: false,
-    resave: false,
-    cookie: {maxAge: 1000 * 60 * 60} //one second * 60 seconds * 60 minutes. 1 hour cookies
-  })
-);
+app2.use(session({
+  name: 'AwesomeWebapp2',
+  secret: 'This is a secret.. shhh don\'t tell anyone',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,
+    sameSite: 'none',
+    maxAge: 1000 * 60 * 60
+  }
+}));
 
 //crteating an api to grab users from
 app2.get('/api/users/search', async (req, res) => {
@@ -88,7 +89,7 @@ configRoutesFunction(app2);
 const PORT = process.env.PORT || 3000;
 const httpServer = app2.listen(PORT, () => {
   console.log("We've now got a server!");
-  console.log(`Your routes will be running on ${process.env.VITE_BACKEND_SERVER}`);
+  console.log(`Your routes will be running on PORT ${PORT}`);
 });
 
 // const client = createClient();
