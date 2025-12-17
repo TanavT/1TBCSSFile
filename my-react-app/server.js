@@ -405,16 +405,21 @@ io.on('connection', (socket) => {
 
     if(i == 0){
       i++
-      //console.log("weird ass interval");
-       connectCustomTimers[roomName].interval = setInterval((() => {
-        if(connectCustomTimers[roomName].turn == "red"){
-          connectCustomTimers[roomName].redTimer -= 1
-        }
-        else{
-          connectCustomTimers[roomName].blackTimer -= 1
-        }
-        io.to(roomName).emit('timer', {timeRed: connectCustomTimers[roomName].redTimer, timeYellow: connectCustomTimers[roomName].redTimer});
-      }), 1000)
+      console.log("bazinga!");
+      console.log(myName);
+      if(connectCustomTimers[roomName].whoRed == myName){ 
+         console.log("weird ass interval");
+        connectCustomTimers[roomName].interval = setInterval((() => {
+          if(connectCustomTimers[roomName].turn == "red"){
+            //console.log("red");
+            connectCustomTimers[roomName].redTimer -= 1
+          } else{
+            //console.log("yelloq");
+            connectCustomTimers[roomName].yellowTimer -= 1
+          }
+          io.to(roomName).emit('timer', {timeRed: connectCustomTimers[roomName].redTimer, timeYellow: connectCustomTimers[roomName].yellowTimer});
+        }), 1000)
+      }
       //console.log("why isn't it working")
       //}
     }
@@ -455,17 +460,17 @@ io.on('connection', (socket) => {
     }
 
     
-    console.log("custom black move");
-    console.log(i);
+    //console.log("custom black move");
+    //console.log(i);
     if(i == 0){
       i++
-      console.log(chessCustomTimers[roomName])
+      //console.log(chessCustomTimers[roomName])
       if(chessCustomTimers[roomName].whoWhite == myName){ 
         //console.log(i);
-        console.log("weird ass interval");
+        //console.log("weird ass interval");
         chessCustomTimers[roomName].interval = setInterval((() => {
-          if(chessCustomTimers[roomName].turn == "red"){
-            chessCustomTimers[roomName].redTimer -= 1
+          if(chessCustomTimers[roomName].turn == "white"){
+            chessCustomTimers[roomName].whiteTimer -= 1
           }
           else{
             chessCustomTimers[roomName].blackTimer -= 1
@@ -479,22 +484,18 @@ io.on('connection', (socket) => {
 
 
     
-    if(!fun){
-      if(chessCustomTimers[roomName].turn == "white"){
-        //console.log("flipped to black");
-        chessCustomTimers[roomName].turn = "black"
-      }
-      else{
-        //console.log("flipped to white");
-        chessCustomTimers[roomName].turn = "white"
-      }
-      fun = !fun;
-    } else {
-      //console.log("not flipping");
-      fun = !fun;
+
+    if(chessCustomTimers[roomName].turn == "white"){
+      //console.log("flipped to black");
+      chessCustomTimers[roomName].turn = "black"
     }
+    else{
+      //console.log("flipped to white");
+      chessCustomTimers[roomName].turn = "white"
+    }
+
     
-    //checkersCustomTimers[roomName].turn)
+    //console.log(chessCustomTimers[roomName]);
 
     chessCustomClients[oppName].emit("otherPlaced", (data));
     //io.to(roomName).emit("otherPlaced", (data));

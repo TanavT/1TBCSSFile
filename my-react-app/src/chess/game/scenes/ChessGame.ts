@@ -65,10 +65,12 @@ export default class ChessGame extends Phaser.Scene {
 		this.socket.on('timer', ({timeWhite, timeBlack}) => {
 			if(this.gameOver) return
 			if(this.color == "white"){
+				console.log("white recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeWhite)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeBlack)}`
 			}
 			else{
+				console.log("black recieved");
 				this.yourTimeText.text = `Your Time: ${this.formatTime(timeBlack)}`
 				this.enemyTimeText.text = `Enemy Time: ${this.formatTime(timeWhite)}`
 			}
