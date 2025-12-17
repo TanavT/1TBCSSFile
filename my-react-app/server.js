@@ -33,6 +33,7 @@ app2.use(cors({
 }));
 app2.options(/.*/, cors());
 
+app2.set('trust proxy', 1);
 app2.use(session({
   name: 'AwesomeWebapp2',
   secret: 'This is a secret.. shhh don\'t tell anyone',
@@ -44,6 +45,8 @@ app2.use(session({
     maxAge: 1000 * 60 * 60
   }
 }));
+
+
 
 //crteating an api to grab users from
 app2.get('/api/users/search', async (req, res) => {

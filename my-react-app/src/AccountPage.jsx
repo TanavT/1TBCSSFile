@@ -4,9 +4,9 @@ import axios from "axios";
 import React from 'react'
 
 function AccountPage() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [message, setMessage] = useState(null);
     const navigate = useNavigate();
 
     const handleLogin = async () => {
