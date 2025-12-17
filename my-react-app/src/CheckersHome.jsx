@@ -9,7 +9,7 @@ function CheckersHomePage(){
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
+        axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
         .then(res => setUser(res.data))
         .catch(() => setUser(null));
     }, [])

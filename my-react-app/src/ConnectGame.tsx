@@ -15,17 +15,23 @@ function ConnectGame(){
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => {
-            setUser(res.data);
-            setLoading(false);
-        })
-        .catch(() => {
-            setUser(null);
-            setLoading(false);
-            navigate('/login'); // redirect to home page if not logged in
-        });
-    }, [navigate])
+        async function fetchUser() {
+            let data
+            try {
+                const request = await axios.get(`${import.meta.env.VITE_BACKEND_SERVER}/account/me`, { withCredentials: true })
+                data = request.data
+            } catch (e){
+                console.log(e)
+            }
+            try {
+                setUser(data)
+            } catch {
+                setUser(null)
+            }
+            setLoading(false)
+        }
+        fetchUser()
+    }, [])
 
     const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?

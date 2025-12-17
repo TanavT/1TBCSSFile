@@ -8,7 +8,7 @@ function ChallengeModal({friendUsername, user, onClose}) {
     const handleChallenge = async(game) => {
         if (game == "checkers") {
             const response = await axios.post(
-                'http://localhost:3000/account/challenge',
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/challenge`,
                 {
                     from: user.username, 
                     to: friendUsername
@@ -20,7 +20,7 @@ function ChallengeModal({friendUsername, user, onClose}) {
             navigate(`/checkersCustom/${friendUsername}`);
         } else if (game=="chess") {
             const response = await axios.post(
-                'http://localhost:3000/account/challengeChess',
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/challengeChess`,
                 {
                     from: user.username, 
                     to: friendUsername
@@ -32,7 +32,7 @@ function ChallengeModal({friendUsername, user, onClose}) {
             navigate(`/chessCustom/${friendUsername}`);
         } else if (game=="connect") {
             const response = await axios.post(
-                'http://localhost:3000/account/challengeConnect',
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/challengeConnect`,
                 {
                     from: user.username, 
                     to: friendUsername

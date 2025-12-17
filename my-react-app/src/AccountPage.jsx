@@ -4,15 +4,15 @@ import axios from "axios";
 import React from 'react'
 
 function AccountPage() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const [username, setUsername] = useState(null);
+    const [password, setPassword] = useState(null);
+    const [message, setMessage] = useState(null);
     const navigate = useNavigate();
 
     const handleLogin = async () => {
         try {
             const res = await axios.post(
-                "http://localhost:3000/account/login",
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/login`,
                 { username, password },
                 { withCredentials: true }
             );
@@ -29,7 +29,7 @@ function AccountPage() {
     const handleSignup = async () => {
         try {
             const res = await axios.post(
-                "http://localhost:3000/account/signup",
+                `${import.meta.env.VITE_BACKEND_SERVER}/account/signup`,
                 { username, password },
                 { withCredentials: true }
             );

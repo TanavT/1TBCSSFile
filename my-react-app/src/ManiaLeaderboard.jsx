@@ -8,7 +8,7 @@ function ManiaLeaderboard() {
     const [loading, setLoading] = useState(true);
     const fetchLeaderboard = async () => {
         const res = await axios.get(
-            "http://localhost:3000/leaderboard/mania",{withCredentials: true}
+            `${import.meta.env.VITE_BACKEND_SERVER}/leaderboard/mania`,{withCredentials: true}
         );
         setLeaderboard(res.data);
         setLoading(false)
