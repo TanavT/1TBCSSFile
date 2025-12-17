@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import ConnectLeaderboard from './ConnectLeaderboard';
 
 
 function ConnectHomePage(){
@@ -31,10 +32,11 @@ function ConnectHomePage(){
     }
 
     return (
-        <div>
+        <div className='centerBox'>
             <h2>CONNECT 4</h2>
-            <button onClick={handleRandomQueue}>Random Match</button>
-            <button onClick={handlePrivateMatch}>Challenge a friend</button>
+            <button onClick={handleRandomQueue} className='button'>Random Match</button>
+            <button onClick={handlePrivateMatch} className='button'>Challenge a friend</button>
+            <ConnectLeaderboard />
         </div>
         
     )

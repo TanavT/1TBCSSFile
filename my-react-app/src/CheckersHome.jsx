@@ -1,6 +1,7 @@
 import React, {useContext, useState, useEffect} from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import CheckersLeaderboard from './CheckersLeaderboard';
 
 
 function CheckersHomePage(){
@@ -30,10 +31,11 @@ function CheckersHomePage(){
     }
 
     return (
-        <div>
+        <div className='centerBox'>
             <h2>CHECKERS</h2>
-            <button onClick={handleRandomQueue}>Random Match</button>
-            <button onClick={handlePrivateMatch}>Challenge a friend</button>
+            <button onClick={handleRandomQueue} className='button'>Random Match</button>
+            <button onClick={handlePrivateMatch} className='button'>Challenge a friend</button>
+            <CheckersLeaderboard />
         </div>
         
     )

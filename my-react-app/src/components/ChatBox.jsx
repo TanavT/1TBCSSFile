@@ -164,7 +164,7 @@ function ChatBox() {
                     placeholder="Type something..."
                     className="inputBox"
                 />
-                <button type="submit" className="sendButton">Send</button>
+                <button type="submit" className="sendButton">{'>'}</button>
             </form>
         </div>
     );

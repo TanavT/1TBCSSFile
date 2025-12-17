@@ -1,26 +1,39 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import { IRefPhaserGame, PhaserGame } from './checkers/PhaserGame';
 import ChatBox from './components/ChatBox.jsx';
 
 function CheckersCustom(){
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const params = useParams();
+    const navigate = useNavigate();
 
     const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
-    }, [])
+        .then(res => {
+            setUser(res.data);
+            setLoading(false);
+        })
+        .catch(() => {
+            setUser(null);
+            setLoading(false);
+            navigate('/login'); // redirect to home page if not logged in
+        });
+    }, [navigate])
 
     const currentScene = (_scene: any) => { //I don't know what this does but colby did it and it works so im keeping it.
         //todo?
     }
     console.log(user);
+
+    if(loading){
+        return <p>loading...</p>
+    }
 
     if(user){
         return ( //USER IN PHASER 1: include user as a prop to PhaserGame. next step in PhaserGame.tsx

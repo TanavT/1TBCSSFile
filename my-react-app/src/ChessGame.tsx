@@ -1,21 +1,36 @@
 import React, {useContext, useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { IRefPhaserGame, PhaserGame } from './chess/PhaserGame';
+import { useNavigate } from 'react-router-dom';
 import ChatBox from './components/ChatBox.jsx';
 
 function ChessGame(){
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
     
-     const phaserRef = useRef<IRefPhaserGame | null>(null);
+    const phaserRef = useRef<IRefPhaserGame | null>(null);
 
     useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
-    }, [])
+        .then(res => {
+            setUser(res.data);
+            setLoading(false);
+        })
+        .catch(() => {
+            setUser(null);
+            setLoading(false);
+            navigate('/login'); // redirect to home page if not logged in
+        });
+    }, [navigate])
 
      const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?
+    }
+
+    if(loading){
+        return <p>loading...</p>
     }
 
     return (

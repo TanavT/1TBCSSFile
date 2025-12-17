@@ -3,9 +3,12 @@ import axios from 'axios';
 import { IRefPhaserGame, PhaserGame } from './mania/PhaserGame';
 import { PhaserGameCheckers } from './mania/PhaserGameCheckers';
 import { PhaserGameConnect } from './mania/PhaserGameConnect';
+import { useNavigate } from 'react-router-dom';
+import ChatBox from './components/ChatBox.jsx';
 
 function ManiaGame(){
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
     
      const phaserRef = useRef<IRefPhaserGame | null>(null);
      const phaserRef2 = useRef<IRefPhaserGame | null>(null);
@@ -13,7 +16,9 @@ function ManiaGame(){
 
 
     const [game2, setGame2] = useState(false);
-     const [game3, setGame3] = useState(false);
+    const [game3, setGame3] = useState(false);
+
+    const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,9 +34,16 @@ function ManiaGame(){
 
     useEffect(() => {
         axios.get("http://localhost:3000/account/me", { withCredentials: true })
-        .then(res => setUser(res.data))
-        .catch(() => setUser(null));
-    }, [])
+        .then(res => {
+            setUser(res.data);
+            setLoading(false);
+        })
+        .catch(() => {
+            setUser(null);
+            setLoading(false);
+            navigate('/login'); // redirect to home page if not logged in
+        });
+    }, [navigate])
 
      const currentScene = (_scene: any) => { //I don't know what this does but it's from the Phaser starter code and it works so I'm gonna keep it as is
         //todo?
@@ -43,8 +55,12 @@ function ManiaGame(){
         //todo?
     }
 
+    if(loading) {
+      <p>Loading...</p>
+    }
+
     return (
-        <div>
+        <div className='maniaBox'>
             <h2>Mania</h2>
             <div>
             <PhaserGameConnect ref={phaserRef2} currentActiveScene={currentScene2} />
@@ -56,6 +72,7 @@ function ManiaGame(){
 
             </div>
             {user ? <h2>Username: {user.username}</h2> : <h2>Please log in to play</h2>}
+            <ChatBox />
         </div>
         
     )

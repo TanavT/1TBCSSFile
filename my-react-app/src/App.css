@@ -1,21 +1,36 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F7F2ED;
+  min-height: 100vh;
 }
 
-.logo {
+#root {
+  min-height: calc(100vh - 100px);
+  width: 100%;
+  margin-top: 100px;
+  
+  background-color: #F7F2ED;
+  color: #08205B;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.vite-logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+.vite-logo:hover {
+  filter: drop-shadow(0 0 2em #7096D1aa);
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+.vite-logo.react:hover {
+  filter: drop-shadow(0 0 2em #D0E4FFaa);
 }
 
 @keyframes logo-spin {
@@ -28,15 +43,239 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
+  a:nth-of-type(2) .vite-logo {
     animation: logo-spin infinite 20s linear;
   }
 }
 
-.card {
+/* .card {
   padding: 2em;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(8, 32, 91, 0.08);
+} */
+
+
+/* game home screens */
+.centerBox {
+  background-color: #08205B;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 0;
+  color: white;
+  
+  text-align: center;
 }
 
-.read-the-docs {
-  color: #888;
+.centerBox h2 {
+  margin-top: 0;
+}
+
+.centerBox .button {
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 0.9rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* account page */
+.account-form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.account-form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+}
+
+.account-form-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: none;
+  background-color: #F7F2ED;
+  color: #08205B;
+  box-sizing: border-box;
+}
+
+.account-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.account-message {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+/* search screen */
+.centerBox .friends .button, .button {
+  background-color: #F7F2ED;
+  color: #08205B;
+
+  padding: 0.3rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.searchInput {
+  background-color: #F7F2ED;
+  color: #08205B;
+  padding: 0rem 0rem
+}
+
+.main-content {
+  margin-right: 340px;
+  padding: 100px 20px 20px 20px;
+}
+
+/* account info */
+.account-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.account-header {
+  margin-bottom: 30px;
+}
+
+.account-header h2 {
+  color: #08205B;
+  margin-bottom: 10px;
+}
+
+.account-header p {
+  margin: 5px 0;
+}
+
+.refresh-button {
+  background-color: #08205B;
+  color: #F7F2ED;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: #0a2970;
+}
+
+.stats-section {
+  margin-bottom: 30px;
+}
+
+.stats-section h3 {
+  color: #08205B;
+  margin-bottom: 15px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.game-stat-card {
+  padding: 15px;
+  border: 2px solid #08205B;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(8, 32, 91, 0.1);
+}
+
+.game-stat-card h4 {
+  color: #08205B;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.game-stat-card p {
+  margin: 5px 0;
+  color: #333;
+  font-size: 0.95em;
+}
+
+.friends-section,
+.challenges-section {
+  margin-bottom: 30px;
+}
+
+.friends-section h3,
+.challenges-section h3 {
+  color: #08205B;
+  margin-bottom: 10px;
+}
+
+.friends-section ul,
+.challenges-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.friends-section li,
+.challenges-section li {
+  padding: 10px;
+  margin: 5px 0;
+  background-color: white;
+  border: 1px solid #08205B;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.challenge-button,
+.accept-button {
+  background-color: #08205B;
+  color: #F7F2ED;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.challenge-button:hover,
+.accept-button:hover {
+  background-color: #0a2970;
+}
+
+.not-signed-in {
+  text-align: center;
+  color: #08205B;
+  font-size: 1.2em;
+  margin-top: 50px;
 }
