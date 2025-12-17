@@ -212,7 +212,7 @@ export default class Connect4Main extends Phaser.Scene {
   		});
 
 		this.socket.on('color', ({id, color, opponentUserID, matchID}) => {
-			if(this.userID == opponentUserID){
+			if(this.userID == opponentUserID && this.gametype == "queue"){
 				window.location.replace('/connect')
 			}
 			if (this.socket.id == id){

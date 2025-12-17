@@ -456,7 +456,7 @@ export default class Connect4Main extends Phaser.Scene {
 	tieGame.setStroke('#000000', 6);
 	this.tieGame = tieGame
 
-	const rectangle_1 = this.add.rectangle(512, 384, 128, 128);
+	const rectangle_1 = this.add.rectangle(512, 384, 124, 124);
 		rectangle_1.scaleX = 8;
 		rectangle_1.scaleY = 6;
 		rectangle_1.visible = false;

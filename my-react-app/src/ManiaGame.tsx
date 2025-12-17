@@ -24,7 +24,7 @@ function ManiaGame(){
     useEffect(() => {
     const timer = setTimeout(() => {
       setGame3(true);
-    }, 1000);
+    }, 1500);
   }, [game2]);
 
     useEffect(() => {
