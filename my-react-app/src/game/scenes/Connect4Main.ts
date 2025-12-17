@@ -79,14 +79,14 @@ export default class Connect4Main extends Phaser.Scene {
 
 		// yourTimeText
 		const yourTimeText = this.add.text(15, 53, "", {});
-		yourTimeText.text = "Your time: 10:00\n";
+		yourTimeText.text = "Your time: 5:00\n";
 		yourTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		yourTimeText.setWordWrapWidth(1);
 		this.yourTimeText = yourTimeText
 
 		// enemyTimeText
 		const enemyTimeText = this.add.text(902, 53, "", {});
-		enemyTimeText.text = "Enemy time: 10:00\n";
+		enemyTimeText.text = "Enemy time: 5:00\n";
 		enemyTimeText.setStyle({ "fontFamily": "Times", "fontSize": "40px" });
 		enemyTimeText.setWordWrapWidth(1);
 		this.enemyTimeText = enemyTimeText
@@ -147,7 +147,8 @@ export default class Connect4Main extends Phaser.Scene {
 
 
 	formatTime(seconds){//this timer code based on https://phaser.discourse.group/t/countdown-timer/2471/4
-    // Minutes
+    if(seconds < 0) seconds = 0
+	// Minutes
     var minutes = Math.floor(seconds/60);
     // Seconds
     var partInSeconds = seconds%60;

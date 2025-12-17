@@ -17,7 +17,7 @@ function AccountPage() {
                 { withCredentials: true }
             );
             console.log(res);
-            navigate("/chess");
+            window.location.replace('/')
             setMessage(`Logged in as ${res.data.username}`);
         } catch (e) {
             console.log(e);
