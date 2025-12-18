@@ -15,7 +15,7 @@ async function seed() {
         const accountsCollection = await accounts();
         const accountSeed = [
             {
-                username: "theSaltyOne",
+                username: "thesaltyone",
                 password: saltPassword,
                 winrates: {
                     chessWins: 2,
@@ -38,11 +38,11 @@ async function seed() {
                     mania: 200
                 },
                 signupDate: "12/14/2025",
-                friendList: ["Gorlock", "PHillTheGreat"],
+                friendList: ["gorlock", "phillthegreat"],
                 challenges: []
             },
             {
-                username: "Gorlock",
+                username: "gorlock",
                 password: gorlockPassword,
                 winrates: {
                     chessWins: 8,
@@ -65,11 +65,11 @@ async function seed() {
                     mania: 456
                 },
                 signupDate: "12/09/2025",
-                friendList: ["theSaltyOne", "PHillTheGreat"],
+                friendList: ["thesaltyone", "phillthegreat"],
                 challenges: []
             },
             {
-                username: "Sheldon Cooper",
+                username: "sheldoncooper",
                 password: sheldonPassword,
                 winrates: {
                     chessWins: 99,
@@ -96,7 +96,7 @@ async function seed() {
                 challenges: []
             },
             {
-                username: "PHillTheGreat",
+                username: "phillthegreat",
                 password: hillPassword,
                 winrates: {
                     chessWins: 10,
@@ -119,7 +119,7 @@ async function seed() {
                     mania: 800
                 },
                 signupDate: "5/19/2017",
-                friendList: ["theSaltyOne", "Gorlock"],
+                friendList: ["thesaltyone", "gorlock"],
                 challenges: []
             },
         ];
