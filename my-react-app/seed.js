@@ -1,6 +1,7 @@
 import { accounts }from './src/routes/mongo/MongoCollections.js';
 import {closeConnection} from './src/routes/mongo/mongoConnections.js';
 import bcrypt from 'bcrypt';
+import gameData from './src/routes/gameData.js'
 // const hashedPassword = await bcrypt.hash(password, saltRounds);
 const saltRounds = 10;
 
@@ -123,7 +124,27 @@ async function seed() {
                 challenges: []
             },
         ];
+
+        
+        //Yeah ik it's O(N^2)
+        const games = ["chess", "checkers", "connect", "mania"];
         const result = await accountsCollection.insertMany(accountSeed);
+        const ids = Object.values(result.insertedIds);
+        let gameResult = 0
+        for (let i = 0; i < ids.length; i++) {
+        const playerOneID = ids[i].toString();
+
+            for (let j = 0; j < ids.length; j++) {
+                const playerTwoID = ids[j].toString();
+                if (playerOneID === playerTwoID) continue;
+
+                for (const game of games) {
+                    await gameData.gameOver(playerOneID, playerTwoID, gameResult, game);
+                }
+
+                gameResult = 1 - gameResult;
+            }
+        }
         console.log("seed planted");
         await closeConnection();
     } catch (e) {
