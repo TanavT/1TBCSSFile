@@ -1,16 +1,17 @@
 import { accounts }from './src/routes/mongo/MongoCollections.js';
 import {closeConnection} from './src/routes/mongo/mongoConnections.js';
 import bcrypt from 'bcrypt';
-const hashedPassword = await bcrypt.hash(password, saltRounds);
+// const hashedPassword = await bcrypt.hash(password, saltRounds);
 const saltRounds = 10;
 
-const saltPassword = await bcrypt.hash("IAmMad12345!", saltRounds);
-const gorlockPassword = await bcrypt.hash("aoUvd1$ka*k", saltRounds);
-const sheldonPassword = await bcrypt.hash("Baz1nga!", saltRounds);
-const hillPassword = await bcrypt.hash("$$PatrickH1LL$$", saltRounds);
+
 
 async function seed() {
     try {
+        const saltPassword = await bcrypt.hash("IAmMad12345!", saltRounds);
+        const gorlockPassword = await bcrypt.hash("aoUvd1$ka*k", saltRounds);
+        const sheldonPassword = await bcrypt.hash("Baz1nga!", saltRounds);
+        const hillPassword = await bcrypt.hash("$$PatrickH1LL$$", saltRounds);
         const accountsCollection = await accounts();
         const accountSeed = [
             {
@@ -126,6 +127,7 @@ async function seed() {
         console.log("seed planted");
         await closeConnection();
     } catch (e) {
+        console.log(e)
         console.log("seed failure. booo");
         await closeConnection();
     }
