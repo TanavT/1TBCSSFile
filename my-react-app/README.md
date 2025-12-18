@@ -13,21 +13,24 @@ All of these services have free tiers as of the creation of the project, but you
 # Cloud Setup
 
 If at any point, an option isn't mentioned, leave it blank if possible or anything works
+If you ever mess up and need to change the .env file, run "npm run build" again and load it into render.com and restart render.com.
 
 ## Cloud Services
-### 1. Setting up firebase-cli and firebase (you will need to make an account at firebase.google.com first):
+### 1. Setting up firebase-cli and firebase (this will need your google account):
+
+Go to google.firebase.com and sign in, then click the "Go to console" button in the top right. Once you're there click "create a new firebase project" on the left. Input a valid name and click the box to accept the terms of service. Disable AI and analytics.
 
 In a terminal with npm run:
 
     npm install -g firebase-tools
     firebase login
 
-If you do not already have a firebase account, you will need to make one now
+If you do not already have a google account, you will need to make one now and make sure you're in the my-react-app directory
 
     npm i
     npm run build
 
-After the build is done, run this in my-react-app directory
+After the build is done, run this in the same directory
     
     firebase init
 
@@ -35,8 +38,8 @@ For the firebase init options:
     
     (Ready to Proceed) Y
     (Firebase features) Hosting
-    (Project) You can do either of the first two, but adding to an existing project will require you to have it already made in Firebase
-    (If new project, set id) You can put any id you want
+    (Project) Create a new project
+    (set project id) You can put any id you want
     (what to call project) same name as above
     (public directory) dist
     (Configure as single page app) Y
@@ -52,7 +55,7 @@ After this is all done, run
 ### 2. Setting up render.com
 Make an account
 
-Make a web service
+Make a web service (new web service button)
 
 Public Git Repository and paste this link "https://github.com/TanavT/1TBCSSFile"
 
@@ -60,16 +63,20 @@ Options:
 
     Language: Node
     Branch: cloudSetup
+    Root directory: my-react-app
     Build Command: npm install
     Start command: npm start
     Instance Type: Free
 
 Leave enviromental variables empty for now
 
-Go to service settings and set root directory to: my-react-app
+click deploy web service
+
+It's going to fail for now don't worry about that
+
 
 ### 3. Setting up Redis Cloud
-Make Redis Cloud account
+Make Redis Cloud account from https://redis.io/cloud/
 
 Make a new Database
 
@@ -79,7 +86,7 @@ options:
     Region: Any work but consider same region as past services
 
 ### 4. Setting up MongoDB Atlas
-Make MongoDB Atlas account
+Make MongoDB Atlas account from https://www.mongodb.com/cloud/atlas/register
 
 Deploy cluster
 
@@ -89,14 +96,14 @@ options:
 
 Add any admin user you want
 
-Then for connection method, choose Node.js and version 6.7 or later. If you set up this right after making the cluster you can recieve a string that includes your db password
+Then for connection method, click on drivers then choose Node.js and version 6.7 or later. If you set up this right after making the cluster you can recieve a string that includes your db password in section 3. Copy and save this for later.
 
-Go to security quickstart and add the ip address 0.0.0.0 to the ip access list (this stands for any address can connect which is fine for a dev enviroment/proof of concept)
+Go to security quickstart on the left, scroll down, and add the ip address 0.0.0.0 to the ip access list (this stands for any address can connect which is fine for a dev enviroment/proof of concept)
 
 ## Create an .env file with these parameters in the my-react-app directory 
 Our .env file will be provided in the submission, however our  endpoints for the cloud will be useless to push to as they are configured to our accounts, therefore in order to push to the cloud you will need to set up the cloud stack mentioned above
 
-To create the .env file, () means replace this field and make sure to put quotation marks on strings!:
+To create the .env file, anything in parentheses means replace this field and make sure to put quotation marks on strings!:
 
     NODE_OPTIONS='--title="env sucessfully loaded!"'
 
@@ -104,13 +111,13 @@ To create the .env file, () means replace this field and make sure to put quotat
 
     NODE_ENV="production"
 
-    FRONTEND_CLIENT= (firebase website -> go to console -> select your project -> build -> hosting -> domain. Should look something like "testing-game-1tbcss.web.app" in form)
+    FRONTEND_CLIENT= (firebase website -> go to console -> select your project -> build -> hosting -> get started -> deploy to firebase hosting and then look at the "after deploying, view your app at". Should look something like "testing-game-1tbcss.web.app" in form. Add https:// in front so it looks like "https://testing-game-1tbcss.web.app")
 
     VITE_BACKEND_SERVER= (render.com url, can be found in service -> events)
 
-    REDIS_URL= (Redis Cloud public endpoint, truncating at :, ex. " redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com")
+    REDIS_URL= (Redis Cloud public endpoint (look at databse and then scroll down to general), truncating at :, ex. " redis-17307.c263.us-east-1-2.ec2.cloud.redislabs.com")
     REDIS_PORT= (truncated part after endpoint, ex. 17307) (do NOT put quotation marks)
-    REDIS_PASSWORD=(Redis Cloud -> Security -> default user password)
+    REDIS_PASSWORD=(look at databse and scroll down to Security and then click the arrow and copy default user password)
 
     MONGO_URL= (Goto connect ->drivers->node.js and add the connection string with your db_password)
 
@@ -129,15 +136,16 @@ ex:
     MONGO_URL="mongodb+srv://admin:f3lJXIPnGKj8Vvm2@test-1tbcssfile.kzjerbb.mongodb.net/?appName=test-1TBCSSFile"
 
 
-## Placing .env
+## Where to place .env
 1) Within the my-react-app directory of the project
-2) On render.com, goto your service -> environment -> secret files -> upload files -> upload the .env
+2) On render.com, goto your service -> environment -> secret files -> upload files -> upload the .env and then click save rebuild and redeploy
 
 ## Running Cloud
 
-1)Go to render.com and deploy the latest commit (If the build fails, make sure you set the build and run commands as well as the root directory correctly!)
-2)Inside your terminal where you ran the firebase commands, run
+1) Go to render.com and manually deploy the latest commit (If the build fails, make sure you set the build and run commands as well as the root directory correctly!)
+2) Inside your terminal where you ran the firebase commands, run
 
+    npm run build
     firebase deploy
 
 The terminal will now display the link to the firebase website!
@@ -146,7 +154,9 @@ Keep in mind that the render.com server will spin down with inactivity and somet
 
 # Local Setup
 
-You will require NPM, Redis with a default setup and MongoDB to be installen
+IMPORTANT - THIS IS FOR A GENERAL OVERVIEW ONLY. Running it locally could have some errors since this submission is dedicated to cloud use (for example some pages locally don't display leaderboard correctly)
+
+You will require NPM, Redis with a default setup and MongoDB to be installed
 
 Make a .env file with the following text:
 
@@ -182,11 +192,7 @@ Your website will now be running on localhost:8080
 
 # Seeding Database
 
-Set the MONGO_URL to database url (local or cloud address) within .env
-
-(You cannot run this on render.com with the free tier)
-
-run
+after doing all above instructions (including setting up the .env file for your implementation), run
 
     npm run seed
 
